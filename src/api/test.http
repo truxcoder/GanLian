@@ -1,0 +1,67 @@
+POST http://localhost:3000/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "username":"admin"
+}
+
+
+# 警察接口
+###
+
+POST  http://30.29.2.6:8686/autoapi/data/json HTTP/1.1
+content-type: application/json
+
+{
+    "identityName": "00_DATA_KM05T7A4U",
+    "select": "",
+    "orderby": "createTime",
+    "skip": 0,
+    "sort": "DESC",
+    "filter": "",
+    "interfaceType": "select",
+    "password": "x_4L9v__F93U",
+    "top": 20,
+    "withTotal": true,
+    "where": "cJh = '5159373'"
+}
+
+# 部门接口
+###
+
+POST  http://30.29.2.6:8686/unionapi/dept/list/json HTTP/1.1
+content-type: application/x-www-form-urlencoded
+
+Authorization=438019355f6940fba3b98316d97fd5f0
+&deptId=b73a7f7d27f041bcb7c220d1e9d796f2
+
+# 用户接口
+###
+
+POST  http://30.29.2.6:8686/unionapi/user/list/json HTTP/1.1
+content-type: application/x-www-form-urlencoded
+
+Authorization=438019355f6940fba3b98316d97fd5f0
+&foo=bar
+
+###
+POST http://localhost:9090/test HTTP/1.1
+content-type: application/json
+
+{
+    "id": "5555555",
+    "name": "lixiaoobo",
+    "code": "5159373",
+    "phone": "18080550302"
+}
+
+{
+    "identityName": "00_DATA_KM05T7A4U",
+    "select": "",
+    "skip": 0,
+    "top": 50,
+    "sort": "DESC",
+    "interfaceType": "select",
+    "password": "x_4L9v__F93U",
+    "withTotal": true,
+}
