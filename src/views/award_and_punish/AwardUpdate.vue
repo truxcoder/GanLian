@@ -76,7 +76,7 @@ export default {
               })
               this.dialogLoading = false
               this.personnelOpitons = []
-              this.$emit('updateSuccess', this.form)
+              this.$emit('updateSuccess', 'Award')
             })
             .catch(err => {
               console.log(err)
@@ -90,7 +90,7 @@ export default {
     },
     onCancel() {
       this.personnelOpitons = []
-      this.$emit('updateVisibleChange')
+      this.$emit('updateVisibleChange', 'Award')
       this.$refs.updateForm.resetFields()
     },
     onPersonnelChange(value) {

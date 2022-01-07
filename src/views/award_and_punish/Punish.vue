@@ -1,9 +1,9 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2021-12-22 10:46:47
+ * @LastEditTime: 2021-12-22 15:31:24
  * @LastEditors: truxcoder
- * @Description:奖励信息，后端分页
+ * @Description:组织处理，后端分页
 -->
 <template>
   <div class="app-container">
@@ -19,8 +19,8 @@
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="等级/奖励项" prop="grade">
-        <el-select v-model="searchForm.grade" size="small" placeholder="请选择等级/奖励项">
+      <el-form-item label="处理项" prop="grade">
+        <el-select v-model="searchForm.grade" size="small" placeholder="请选择处理项">
           <el-option v-for="i in gradeList" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
@@ -54,22 +54,22 @@
           {{ scope.row.policeCode }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励类型" align="center">
+      <el-table-column label="处理类型" align="center">
         <template slot-scope="scope">
           {{ options.category[scope.row.category - 1] && options.category[scope.row.category - 1].label }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励项/等级" align="center">
+      <el-table-column label="处理项" align="center">
         <template slot-scope="scope">
           {{ options.grade[scope.row.grade - 1] && options.grade[scope.row.grade - 1].label }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励时间" align="center">
+      <el-table-column label="处理时间" align="center">
         <template slot-scope="scope">
           {{ scope.row.getTime | dateFilter }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励文号" align="center">
+      <el-table-column label="处理文号" align="center">
         <template slot-scope="scope">
           {{ scope.row.docNumber }}
         </template>
@@ -100,25 +100,25 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <award-add :form-visible="addFormVisible" :options="options" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
-    <award-update :form-visible="updateFormVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
-    <award-detail :visible="detailVisible" :options="options" :row="rowData" @detailClose="detailClose" />
+    <punish-add :form-visible="addFormVisible" :options="options" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
+    <punish-update :form-visible="updateFormVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
+    <punish-detail :visible="detailVisible" :options="options" :row="rowData" @detailClose="detailClose" />
   </div>
 </template>
 
 <script>
-import { awardList, awardDelete } from '@/api/award'
+import { punishList, punishDelete } from '@/api/punish'
 import { common_mixin } from '@/common/mixin/mixin'
 import { permission_mixin } from '@/common/mixin/permission'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
-import AwardAdd from './AwardAdd'
-import AwardUpdate from './AwardUpdate'
-import AwardDetail from './AwardDetail'
+import PunishAdd from './PunishAdd'
+import PunishUpdate from './PunishUpdate'
+import PunishDetail from './PunishDetail'
 
 export default {
-  name: 'Award',
-  components: { AwardAdd, AwardUpdate, PersonnelOption, AwardDetail },
+  name: 'Punish',
+  components: { PunishAdd, PunishUpdate, PersonnelOption, PunishDetail },
   mixins: [common_mixin, permission_mixin],
   data() {
     return {
@@ -144,20 +144,18 @@ export default {
   computed: {
     options() {
       const categoryOptions = [
-        { label: '年度奖励', value: 1 },
-        { label: '专项表彰', value: 2 }
+        { label: '组织处理', value: 1 },
+        { label: '组织教育', value: 2 }
       ]
       const gradeOptions = [
-        { label: '授予称号', value: 1 },
-        { label: '一等功', value: 2 },
-        { label: '二等功', value: 3 },
-        { label: '三等功', value: 4 },
-        { label: '嘉奖', value: 5 },
-        { label: '国家级', value: 6 },
-        { label: '省部级', value: 7 },
-        { label: '市厅级', value: 8 },
-        { label: '局级', value: 9 },
-        { label: '所级', value: 10 }
+        { label: '停职检查', value: 1 },
+        { label: '调整职务', value: 2 },
+        { label: '责令辞职', value: 3 },
+        { label: '降职', value: 4 },
+        { label: '免职', value: 5 },
+        { label: '责令检查', value: 6 },
+        { label: '批评教育', value: 7 },
+        { label: '诫勉', value: 8 }
       ]
       return {
         category: categoryOptions,
@@ -191,7 +189,7 @@ export default {
       params.currentPage = this.currentPage
       params.pageSize = this.pageSize
       params.queryMeans = this.queryMeans
-      awardList(data, params).then(response => {
+      punishList(data, params).then(response => {
         if (response.count) {
           this.originData = response.data
           this.currentData = [...this.originData]
@@ -231,7 +229,7 @@ export default {
       })
         .then(() => {
           console.log('id:', [id])
-          awardDelete({ id: [id] })
+          punishDelete({ id: [id] })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -258,7 +256,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          awardDelete({ id: this.multipleSelection.map(item => item.id) })
+          punishDelete({ id: this.multipleSelection.map(item => item.id) })
             .then(response => {
               this.$message({
                 message: response.message,

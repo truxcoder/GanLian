@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-loading="dialogLoading" title="添加奖励信息" :width="dialogWidth" :visible.sync="formVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="formVisible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" title="添加处理信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
         <personnel-option v-if="!isSingle" :rowdata="rowdata" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
@@ -10,13 +10,13 @@
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="等级/奖励项" prop="grade">
-        <el-select v-model="form.grade" :style="formItemWidth" placeholder="请选择等级/奖励项">
-          <el-option v-for="i in gradeList" :key="i.vaule" :label="i.label" :value="i.value" />
+      <el-form-item label="处理项" prop="dictId">
+        <el-select v-model="form.dictId" :style="formItemWidth" placeholder="请选择处理项">
+          <el-option v-for="i in disDictList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="奖励时间" prop="getTime">
+      <el-form-item label="处理时间" prop="getTime">
         <el-date-picker v-model="form.getTime" :style="formItemWidth" type="date" placeholder="选择日期" />
       </el-form-item>
 
@@ -24,8 +24,12 @@
         <el-input v-model="form.docNumber" :style="formItemWidth" placeholder="输入文号" />
       </el-form-item>
 
-      <el-form-item label="奖励内容" prop="content">
-        <el-input v-model="form.content" :style="formItemWidth" placeholder="输入奖励内容" />
+      <el-form-item label="影响期至" prop="deadline">
+        <el-date-picker v-model="form.deadline" :style="formItemWidth" type="date" placeholder="选择日期" />
+      </el-form-item>
+
+      <el-form-item label="处理内容" prop="content">
+        <el-input v-model="form.content" :style="formTextAreaWidth" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="输入处理内容" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -36,21 +40,21 @@
 </template>
 
 <script>
-import { awardAdd } from '@/api/award'
-import { mixin } from '@/common/mixin/award'
+import { disciplineAdd } from '@/api/discipline'
+import { mixin } from '@/common/mixin/discipline'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 export default {
-  name: 'AwardAdd',
+  name: 'DisciplineAdd',
   components: { PersonnelOption },
   mixins: [mixin],
   props: {
-    formVisible: {
+    visible: {
       type: Boolean,
       default: false
     }
   },
   watch: {
-    formVisible: function(val, oldval) {
+    visible: function(val, oldval) {
       if (val === true) {
         this.form.personnelId = this.singlePersonnelData.id
       } else {
@@ -66,14 +70,14 @@ export default {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          awardAdd(this.form)
+          disciplineAdd(this.form)
             .then(response => {
               this.$message({
                 message: response.message,
                 type: 'success'
               })
               this.dialogLoading = false
-              this.$emit('addSuccess', 'Award')
+              this.$emit('addSuccess', 'Discipline')
               this.$refs.addForm.resetFields()
               this.personnelOpitons = []
               // Object.keys(this.form).forEach(key => this.form[key]='')
@@ -94,7 +98,7 @@ export default {
     },
     onCancel() {
       this.personnelOpitons = []
-      this.$emit('addVisibleChange', 'Award')
+      this.$emit('addVisibleChange', 'Discipline')
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()
     },

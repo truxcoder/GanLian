@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-25 17:31:28
+ * @LastEditTime: 2022-01-04 17:09:06
+ * @LastEditors: truxcoder
+ * @Description: 人员信息模型
+ */
 import { suggestions } from './suggestions'
 const YesOrNo = ['是', '否']
 const genderList = ['男', '女']
@@ -25,6 +32,6 @@ export default {
   partTimeEdu: { type: 'AUTOCOMPLETE', label: '非全日制教育学历', order: 18, suggestion: suggestions.queryPartTimeEdu, disabled: false },
   proCert: { type: 'SELECT', label: '取得专业证书情况', order: 19, options: proCertList, multiple: true, disabled: false },
   // proCert: { type: 'AUTOCOMPLETE', label: '取得专业证书情况', order: 19, suggestion: suggestions.queryProCert, disabled: false },
-  training: { type: 'TEXT', label: '参加培训情况', order: 20, disabled: false },
-  resume: { type: 'TEXT', label: '个人简历', order: 21, disabled: false }
+  training: { type: 'TEXT', label: '参加培训情况', order: 20, disabled: false }
+  // resume: { type: 'TEXT', label: '个人简历', order: 21, disabled: false }
 }

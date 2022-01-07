@@ -18,10 +18,11 @@
       <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button type="success" size="small" icon="el-icon-search" @click="searchVisible = true">高级查询</el-button>
+      </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button type="success" :disabled="true" icon="el-icon-circle-plus-outline" size="mini" @click="addFormVisible = true">添加</el-button>
-      <el-button v-if="total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <el-table
@@ -75,7 +76,6 @@
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
           <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
         </template>
       </el-table-column>
@@ -94,22 +94,23 @@
     />
     <!-- <personnel-add :form-visible="addFormVisible" :organ-list="organList" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" /> -->
     <personnel-update :form-visible="updateFormVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
+    <personnel-search :visible="searchVisible" @advanceSearch="advanceSearch" @searchVisibleChange="searchVisibleChange" />
   </div>
 </template>
 
 <script>
 import dayjs from 'dayjs'
 // import remoteDepartmentData from '@/api/departmentData.json'
-import { personnelList, personnelDelete } from '@/api/personnel'
+import { personnelList } from '@/api/personnel'
 import { common_mixin } from '@/common/mixin/mixin'
 // import { department_mixin } from '@/common/mixin/department'
 import { getAge } from '@/utils/index'
-// import PersonnelAdd from './PerAdd'
+import PersonnelSearch from './PersonnelSearch'
 import PersonnelUpdate from './PerUpdate'
 
 export default {
   name: 'Personnel',
-  components: { PersonnelUpdate },
+  components: { PersonnelUpdate, PersonnelSearch },
   filters: {
     ageFilter(age) {
       return getAge(dayjs(age).format('YYYY-MM-DD'))
@@ -124,6 +125,7 @@ export default {
       listLoading: true,
       updateFormVisible: false,
       addFormVisible: false,
+      searchVisible: false,
       dialogPrintVisible: false,
       rowData: {},
       currentEditIndex: 0,
@@ -176,6 +178,11 @@ export default {
       params.currentPage = this.currentPage
       params.pageSize = this.pageSize
       params.queryMeans = this.queryMeans
+      params.searchMeans = 'normal'
+      // 判断如果data的key超过一定数量，则认定是高级搜索，把搜索方式改为advance
+      if (Object.keys(data).length > 5) {
+        params.searchMeans = 'advance'
+      }
       personnelList(data, params).then(response => {
         // if (this.queryMeans === "frontend" || response.count) {
         //   this.originData = response.data
@@ -228,64 +235,6 @@ export default {
       this.currentEditIndex = index
       this.updateFormVisible = true
     },
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          console.log('id:', [id])
-          personnelDelete({ id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.originData.splice(index, 1)
-              this.currentData.splice(index, 1)
-              if (this.queryMeans === 'backend') {
-                this.count--
-              }
-            })
-            .catch(err => {
-              // this.$message.error(err.message)
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          personnelDelete({ id: this.multipleSelection.map(item => item.id) })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.fetchData()
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
     onSearch() {
       const searchData = {}
       let searchParamNumber = 0
@@ -307,6 +256,12 @@ export default {
       this.currentPage = 1
       this.fetchData(searchData)
     },
+    advanceSearch(data) {
+      this.searchData = data
+      this.currentPage = 1
+      this.searchVisible = false
+      this.fetchData(data)
+    },
     printVisibleChange() {
       this.dialogPrintVisible = false
     },
@@ -315,6 +270,9 @@ export default {
     },
     updateVisibleChange() {
       this.updateFormVisible = false
+    },
+    searchVisibleChange() {
+      this.searchVisible = false
     },
     addSuccess() {
       this.addFormVisible = false

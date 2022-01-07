@@ -1,13 +1,19 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2021-12-23 17:48:39
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}">
+  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 v-else class="sidebar-title">{{ title }} </h1>
+        <img v-if="logo" :src="logo" style="display:inline;" class="sidebar-logo" />
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <img v-if="logo" :src="logo" style="display:inline;" class="sidebar-logo" />
+        <h1 class="sidebar-title">{{ title }}</h1>
       </router-link>
     </transition>
   </div>
@@ -59,7 +65,6 @@ export default {
   & .sidebar-logo-link {
     height: 100%;
     width: 100%;
-
     & .sidebar-logo {
       width: 32px;
       height: 32px;
@@ -74,7 +79,7 @@ export default {
       font-weight: 600;
       line-height: 50px;
       font-size: 16px;
-      font-family: 微软雅黑,Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-family: 微软雅黑, Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }
   }

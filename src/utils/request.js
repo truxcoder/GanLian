@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-01-06 17:39:57
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
@@ -10,7 +17,7 @@ const service = axios.create({
   baseURL: defaultSettings.serverURL, // GO后台地址
   // baseURL: 'http://localhost:3000', //NodeJS后台地址
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 5000
 })
 
 // request interceptor
@@ -39,7 +46,7 @@ service.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
-  */
+   */
 
   /**
    * Determine the request status by custom code

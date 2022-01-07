@@ -1,16 +1,16 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2021-12-22 10:46:47
+ * @LastEditTime: 2022-01-06 15:39:28
  * @LastEditors: truxcoder
- * @Description:奖励信息，后端分页
+ * @Description:处分，前端分页
 -->
 <template>
   <div class="app-container">
-    <!-- <el-row v-if="!total">
+    <el-row v-if="!count">
       <el-col :span="24"><h2>暂无数据</h2></el-col>
-    </el-row> -->
-    <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
+    </el-row>
+    <el-form v-if="count" ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
         <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
       </el-form-item>
@@ -19,9 +19,9 @@
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="等级/奖励项" prop="grade">
-        <el-select v-model="searchForm.grade" size="small" placeholder="请选择等级/奖励项">
-          <el-option v-for="i in gradeList" :key="i.value" :label="i.label" :value="i.value" />
+      <el-form-item label="处分项" prop="grade">
+        <el-select v-model="searchForm.dictId" size="small" placeholder="请选择处理项">
+          <el-option v-for="i in disDictList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -41,9 +41,15 @@
       <el-button v-if="can.read && count" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
         所有数据
       </el-button>
+      <el-button v-if="can.manage" type="primary" icon="el-icon-document" size="mini" @click="dictVisible = true">维护处分项字典</el-button>
     </div>
-    <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
+    <el-table v-if="count" v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
+      <el-table-column align="center" label="单位">
+        <template slot-scope="scope">
+          {{ scope.row.organShortName }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="姓名">
         <template slot-scope="scope">
           {{ scope.row.personnelName }}
@@ -54,24 +60,24 @@
           {{ scope.row.policeCode }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励类型" align="center">
+      <el-table-column label="处分类型" align="center">
         <template slot-scope="scope">
-          {{ options.category[scope.row.category - 1] && options.category[scope.row.category - 1].label }}
+          {{ scope.row.category && options.category[scope.row.category - 1] && options.category[scope.row.category - 1].label }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励项/等级" align="center">
+      <el-table-column label="处分项" align="center">
         <template slot-scope="scope">
-          {{ options.grade[scope.row.grade - 1] && options.grade[scope.row.grade - 1].label }}
+          {{ scope.row.dictName }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励时间" align="center">
+      <el-table-column label="处分时间" align="center">
         <template slot-scope="scope">
           {{ scope.row.getTime | dateFilter }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励文号" align="center">
+      <el-table-column label="剩余影响期" align="center">
         <template slot-scope="scope">
-          {{ scope.row.docNumber }}
+          {{ scope.row.deadline | deadlineFilter }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="240">
@@ -100,35 +106,41 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <award-add :form-visible="addFormVisible" :options="options" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
-    <award-update :form-visible="updateFormVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
-    <award-detail :visible="detailVisible" :options="options" :row="rowData" @detailClose="detailClose" />
+    <discipline-add :visible="addFormVisible" :options="options" :dis-dict="disDict" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
+    <discipline-update :visible="updateFormVisible" :options="options" :dis-dict="disDict" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
+    <discipline-detail :visible="detailVisible" :options="options" :row="rowData" @detailClose="detailClose" />
+    <dis-dict :visible="dictVisible" :list="disDict" :options="options" @dictChange="dictChange" @dictVisibleChange="dictVisibleChange" />
   </div>
 </template>
 
 <script>
-import { awardList, awardDelete } from '@/api/award'
+import { disciplineList, disDictList, disciplineDelete } from '@/api/discipline'
 import { common_mixin } from '@/common/mixin/mixin'
 import { permission_mixin } from '@/common/mixin/permission'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
-import AwardAdd from './AwardAdd'
-import AwardUpdate from './AwardUpdate'
-import AwardDetail from './AwardDetail'
+import DisciplineAdd from './DisciplineAdd'
+import DisciplineUpdate from './DisciplineUpdate'
+import DisciplineDetail from './DisciplineDetail'
+import DisDict from '@/views/incorruption/DisDict.vue'
 
 export default {
-  name: 'Award',
-  components: { AwardAdd, AwardUpdate, PersonnelOption, AwardDetail },
+  name: 'Discipline',
+  components: { DisciplineAdd, DisciplineUpdate, PersonnelOption, DisciplineDetail, DisDict },
   mixins: [common_mixin, permission_mixin],
   data() {
     return {
       searchData: {},
       originData: [],
+      disDict: [],
+      newDisDict: [],
+
       currentData: [],
       listLoading: true,
       updateFormVisible: false,
       detailVisible: false,
       addFormVisible: false,
+      dictVisible: false,
       dialogPrintVisible: false,
       rowData: {},
       currentEditIndex: 0,
@@ -136,72 +148,57 @@ export default {
       rowSuccessClass: '',
       currentPage: 1,
       pageSize: 10,
-      count: 0,
-      searchForm: { personnelId: '', category: '', grade: '' },
+      searchForm: { personnelId: '', category: '', dictId: '' },
       isClean: false
     }
   },
   computed: {
+    count() {
+      return this.currentData.length
+    },
     options() {
       const categoryOptions = [
-        { label: '年度奖励', value: 1 },
-        { label: '专项表彰', value: 2 }
-      ]
-      const gradeOptions = [
-        { label: '授予称号', value: 1 },
-        { label: '一等功', value: 2 },
-        { label: '二等功', value: 3 },
-        { label: '三等功', value: 4 },
-        { label: '嘉奖', value: 5 },
-        { label: '国家级', value: 6 },
-        { label: '省部级', value: 7 },
-        { label: '市厅级', value: 8 },
-        { label: '局级', value: 9 },
-        { label: '所级', value: 10 }
+        { label: '党纪处分', value: 1 },
+        { label: '政务处分', value: 2 }
       ]
       return {
-        category: categoryOptions,
-        grade: gradeOptions
+        category: categoryOptions
       }
     },
-    gradeList() {
-      return this.options.grade.filter(item => {
-        let isTrue = true
-        switch (this.searchForm.category) {
-          case 1:
-            isTrue = item.value < 6
-            break
-          case 2:
-            isTrue = item.value > 5
-            break
-          default:
-            isTrue = true
-            break
-        }
-        return isTrue
-      })
+    disDictList() {
+      return this.disDict.filter(item => item.category === this.searchForm.category)
     }
   },
   created() {
-    this.fetchData()
+    this.fetchAllData()
+    disDictList().then(response => {
+      this.newDisDict = response.data
+      console.log('response:---', response.data)
+    })
   },
   methods: {
+    fetchAllData(params = {}) {
+      this.listLoading = true
+      const promises = [disciplineList(params), disDictList()]
+      Promise.all(promises).then(responses => {
+        this.originData = responses[0].data ?? []
+        this.currentData = this.originData.length ? [...this.originData] : []
+
+        this.disDict = responses[1].data
+        this.listLoading = false
+      })
+    },
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params.currentPage = this.currentPage
-      params.pageSize = this.pageSize
-      params.queryMeans = this.queryMeans
-      awardList(data, params).then(response => {
-        if (response.count) {
-          this.originData = response.data
-          this.currentData = [...this.originData]
-          this.count = response.count
-        } else {
-          this.originData = []
-          this.currentData = []
-          this.count = 0
-        }
+      disciplineList(data, params).then(response => {
+        this.originData = response.data ?? []
+        this.currentData = this.originData.length ? [...this.originData] : []
         this.listLoading = false
+      })
+    },
+    fetchDictData() {
+      disDictList().then(response => {
+        this.disDict = response.data
       })
     },
     handleSelectionChange(val) {
@@ -231,7 +228,7 @@ export default {
       })
         .then(() => {
           console.log('id:', [id])
-          awardDelete({ id: [id] })
+          disciplineDelete({ id: [id] })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -258,7 +255,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          awardDelete({ id: this.multipleSelection.map(item => item.id) })
+          disciplineDelete({ id: this.multipleSelection.map(item => item.id) })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -284,6 +281,9 @@ export default {
     updateVisibleChange() {
       this.updateFormVisible = false
     },
+    dictVisibleChange() {
+      this.dictVisible = false
+    },
     addSuccess() {
       this.addFormVisible = false
       this.fetchData(this.searchData)
@@ -291,6 +291,9 @@ export default {
     updateSuccess(row) {
       this.updateFormVisible = false
       this.fetchData(this.searchData)
+    },
+    dictChange() {
+      this.fetchDictData()
     },
     detailClose() {
       this.detailVisible = false

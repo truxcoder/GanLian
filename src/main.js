@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2021-12-24 11:34:23
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import Vue from 'vue'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
@@ -7,9 +14,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 // import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 
 import '@/styles/index.scss' // global css
+import '@/styles/custom/theme/index.css' // 自定义element主题色
 import '@/styles/common.css' // global css
 
-// import 'tailwindcss/tailwind.css' // tailwind
+import 'tailwindcss/tailwind.css' // tailwind
 
 import App from './App'
 import store from './store'

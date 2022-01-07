@@ -104,29 +104,43 @@
       </div>
     </div>
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
-      <div class="h-12 flex items-center px-4 bg-blue-50">
+      <div class="h-12 flex items-center px-4 bg-blue-50 justify-between">
         <span>个人简历</span>
+        <el-button type="text" @click="resumeVisible = true">编辑</el-button>
       </div>
       <hr class="border-gray-300" />
       <div class="p-4">
-        <pre>{{ originData.resume }}</pre>
+        <!-- <pre>{{ originData.resume }}</pre> -->
+        <li v-for="(v, k) in resumeList" :key="k" class="list-none">{{ v.start | dateFilter }}-{{ v.end | dateFilter }} {{ v.organ }}{{ v.dept }} {{ v.post }}</li>
       </div>
     </div>
     <personnel-update :form-visible="updateFormVisible" :rowdata="singlePersonnelData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
+    <resume-edit :visible="resumeVisible" :personnel-id="originData.id" :resume="originData.resume" @editSuccess="editSuccess" @resumeVisibleChange="resumeVisibleChange" />
   </div>
 </template>
 
 <script>
+import dayjs from 'dayjs'
 import { mixin } from '@/common/mixin/personnel_detail'
 import PersonnelUpdate from '@/views/personnel/PerUpdate.vue'
+import ResumeEdit from '@/views/personnel/ResumeEdit.vue'
 
 export default {
   name: 'Basic',
-  components: { PersonnelUpdate },
+  components: { PersonnelUpdate, ResumeEdit },
+  filters: {
+    dateFilter(date) {
+      if (date === '') {
+        return '今'
+      }
+      return dayjs(date).format('YYYY年MM月')
+    }
+  },
   mixins: [mixin],
   data() {
     return {
       cpnName: 'Basic',
+      resumeVisible: false,
       models: [
         { label: '姓名', field: 'name' },
         { label: '编号', field: 'policeCode' },
@@ -157,6 +171,25 @@ export default {
     },
     originData() {
       return this.singlePersonnelData
+    },
+    resumeList() {
+      const resume = this.originData.resume ?? ''
+      let result = []
+
+      if (resume === '') {
+        return []
+      }
+      result = JSON.parse(resume)
+      return result
+    }
+  },
+  methods: {
+    resumeVisibleChange() {
+      this.resumeVisible = false
+    },
+    editSuccess() {
+      this.resumeVisible = false
+      this.$emit('reFetchCpnData', this.cpnName)
     }
   }
 }

@@ -9,10 +9,13 @@
           <post :loading="loading" :passed-data="posts" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
         </el-tab-pane>
         <el-tab-pane label="奖惩情况">
-          <award-and-punish :loading="loading" :passed-data="awards" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <award-and-punish :loading="loading" :award-passed-data="awards" :punish-passed-data="punishes" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
         </el-tab-pane>
         <el-tab-pane label="考核情况">
           <appraisal :loading="loading" :passed-data="appraisals" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+        </el-tab-pane>
+        <el-tab-pane label="处分情况">
+          <discipline :loading="loading" :passed-data="disciplines" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
         </el-tab-pane>
       </el-tabs>
     </el-main>
@@ -25,20 +28,25 @@ import { personnelDetail } from '@/api/personnel'
 import { postDetail } from '@/api/post'
 import { appraisalDetail } from '@/api/appraisal'
 import { awardDetail } from '@/api/award'
+import { punishDetail } from '@/api/punish'
+import { disciplineDetail } from '@/api/discipline'
 import AwardAndPunish from './PerDetail/AwardAndPunish.vue'
 import Appraisal from './PerDetail/Appraisal.vue'
 import Post from './PerDetail/Post.vue'
+import Discipline from './PerDetail/Discipline.vue'
 import Basic from './PerDetail/Basic.vue'
 
 export default {
   name: 'Pdetail',
-  components: { AwardAndPunish, Appraisal, Post, Basic },
+  components: { AwardAndPunish, Appraisal, Post, Basic, Discipline },
   data() {
     return {
       originData: {},
       posts: [],
       appraisals: [],
       awards: [],
+      punishes: [],
+      disciplines: [],
       loading: true
     }
   },
@@ -48,12 +56,14 @@ export default {
   methods: {
     fetchAllData(params = {}) {
       this.loading = true
-      const promises = [personnelDetail(params), postDetail(params), appraisalDetail(params), awardDetail(params)]
+      const promises = [personnelDetail(params), postDetail(params), appraisalDetail(params), awardDetail(params), punishDetail(params), disciplineDetail(params)]
       Promise.all(promises).then(responses => {
         this.originData = responses[0].data
         this.posts = responses[1].data
         this.appraisals = responses[2].data.sort((a, b) => a.years - b.years)
         this.awards = responses[3].data
+        this.punishes = responses[4].data
+        this.disciplines = responses[5].data
         this.loading = false
       })
     },
@@ -77,6 +87,16 @@ export default {
         this.awards = response.data
       })
     },
+    fetchPunishData() {
+      punishDetail({ id: this.$route.query.id }).then(response => {
+        this.punishes = response.data
+      })
+    },
+    fetchDisciplineData() {
+      disciplineDetail({ id: this.$route.query.id }).then(response => {
+        this.disciplines = response.data
+      })
+    },
     reFetchCpnData(cpn) {
       switch (cpn) {
         case 'Basic':
@@ -85,11 +105,17 @@ export default {
         case 'Post':
           this.fetchPostData()
           break
-        case 'AwardAndPunish':
+        case 'Award':
           this.fetchAwardData()
+          break
+        case 'Punish':
+          this.fetchPunishData()
           break
         case 'Appraisal':
           this.fetchAppraisalData()
+          break
+        case 'Discipline':
+          this.fetchDisciplineData()
           break
         default:
           console.log('cpn:', cpn)

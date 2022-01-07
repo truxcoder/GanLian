@@ -1,5 +1,16 @@
 <template>
-  <el-select v-model="personnelId" :disabled="disabled" :style="formItemWidth" filterable remote placeholder="请选择人员" :remote-method="filterMethod" :loading="loading" @change="onChange">
+  <el-select
+    v-model="personnelId"
+    :disabled="disabled"
+    :size="size"
+    :style="formItemWidth"
+    filterable
+    remote
+    placeholder="请选择人员"
+    :remote-method="filterMethod"
+    :loading="loading"
+    @change="onChange"
+  >
     <el-option v-for="i in isUpdate ? personnelList : personnelOpitons" :key="i.vaule" :label="i.label" :value="i.value" />
   </el-select>
 </template>
@@ -31,6 +42,18 @@ export default {
       default() {
         return false
       }
+    },
+    size: {
+      type: String,
+      default() {
+        return 'medium'
+      }
+    },
+    isClean: {
+      type: Boolean,
+      default() {
+        return false
+      }
     }
   },
   data() {
@@ -55,6 +78,14 @@ export default {
         ]
       } else {
         return this.personnelOpitons
+      }
+    }
+  },
+  watch: {
+    isClean: function(val, oldval) {
+      if (val) {
+        this.personnelId = ''
+        this.personnelOpitons = []
       }
     }
   },

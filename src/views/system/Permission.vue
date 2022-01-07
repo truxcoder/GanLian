@@ -1,7 +1,7 @@
 <template>
   <div class="app-container user-container">
     <el-card class="left-card">
-      <el-tree ref="tree" class="filter-tree" :data="moduleList" :props="defaultProps" default-expand-all :expand-on-click-node="false" icon-class="no">
+      <el-tree ref="tree" class="filter-tree" :data="moduleList" :props="defaultProps" default-expand-all :expand-on-click-node="false" icon-class="no" @node-click="handleNodeClick">
         <div slot-scope="{ node, data }" class="custom-tree-node">
           <i :class="data.icon" />
           <span>{{ node.label }}</span>
@@ -13,7 +13,6 @@
         <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleAdd">为角色授权</el-button>
         <el-button v-if="can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除角色权限</el-button>
         <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
-        <el-button v-if="can.manage" type="primary" icon="el-icon-document" size="mini" @click="dictVisible = true">维护角色字典</el-button>
       </div>
       <el-table v-loading="listLoading" :data="currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
@@ -36,8 +35,8 @@
 
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -79,12 +78,14 @@ export default {
   data() {
     return {
       permissionData: [],
+      currentData: [],
       moduleData: [],
       listLoading: true,
       manageVisible: false,
       dialogPrintVisible: false,
       rowData: {},
       currentEditIndex: 0,
+      currentClickedNode: {},
       multipleSelection: [],
       rowSuccessClass: '',
       currentPage: 1,
@@ -120,7 +121,7 @@ export default {
      */
     parsedData() {
       const temp = new Map()
-      this.permissionData.forEach(item => {
+      this.currentData.forEach(item => {
         const item_ = { ...item }
         const key = item_.moduleName + item_.roleName
         if (!temp.has(key)) {
@@ -164,6 +165,7 @@ export default {
       const promises = [permissionList({}), getModuleList()]
       Promise.all(promises).then(responses => {
         this.permissionData = responses[0].data || []
+        this.currentData = responses[0].data || []
         this.moduleData = responses[1].data
         this.listLoading = false
       })
@@ -172,6 +174,12 @@ export default {
       this.listLoading = true
       permissionList(params).then(response => {
         this.permissionData = response.data || []
+
+        if (Object.keys(this.currentClickedNode).length !== 0) {
+          this.currentData = this.permissionData.filter(i => i.moduleName === this.currentClickedNode.name)
+        } else {
+          this.currentData = response.data || []
+        }
         this.listLoading = false
       })
     },
@@ -179,6 +187,7 @@ export default {
       this.multipleSelection = val
     },
     handleAllData() {
+      this.currentClickedNode = {}
       this.fetchData()
     },
     handleAdd() {
@@ -270,6 +279,10 @@ export default {
       this.rowData = {}
       this.check()
       this.fetchData()
+    },
+    handleNodeClick(data) {
+      this.currentClickedNode = data
+      this.currentData = this.permissionData.filter(i => i.moduleName === data.name)
     },
     handleSizeChange(size) {
       this.pageSize = size

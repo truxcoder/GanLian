@@ -5,13 +5,6 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-
-// const FixedAsset = () => import('@/views/asset/FixedAsset')
-// const Material = () => import('@/views/asset/material')
-// const User = () => import('@/views/system/User')
-// const Role = () => import('@/views/system/Role')
-// const Department = () => import('@/views/organ/Department')
-// const Permission = () => import('@/views/website/Permission')
 const Module = () => import('@/views/website/Module')
 const Personnel = () => import('@/views/personnel/Personnel')
 const Organ = () => import('@/views/organ/Organ')
@@ -20,17 +13,13 @@ const Position = () => import('@/views/personnel/Position')
 const Post = () => import('@/views/personnel/Post')
 const Appraisal = () => import('@/views/personnel/Appraisal')
 const Award = () => import('@/views/award_and_punish/Award')
+const Punish = () => import('@/views/award_and_punish/Punish')
+const Discipline = () => import('@/views/incorruption/Discipline')
 const Department = () => import('@/views/organ/Department')
 const Role = () => import('@/views/system/Role')
 const Permission = () => import('@/views/system/Permission')
 
 export const componentList = {
-  // FixedAsset,
-  // Material,
-  // User,
-  // Role,
-  // Department,
-  // Permission,
   Personnel,
   Module,
   Organ,
@@ -39,9 +28,11 @@ export const componentList = {
   Post,
   Appraisal,
   Award,
+  Punish,
   Department,
   Role,
-  Permission
+  Permission,
+  Discipline
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1

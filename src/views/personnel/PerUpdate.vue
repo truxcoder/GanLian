@@ -73,7 +73,7 @@ export default {
       // 重构：用spread语法
       // this.form = JSON.parse(JSON.stringify(val))
       this.form = { ...val }
-      this.form.proCert = this.form.proCert.split(',')
+      this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
     }
   },
   methods: {
