@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2021-12-21 10:29:50
+ * @LastEditTime: 2022-01-10 17:21:11
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -10,7 +10,7 @@ import request from '@/utils/request'
 export function getModuleList(params) {
   return request({
     url: '/module/list',
-    method: 'get',
+    method: 'post',
     params
   })
 }

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2021-12-16 09:45:52
+ * @LastEditTime: 2022-01-26 19:05:02
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { roleAdd } from '@/api/role'
+import { request } from '@/api/index'
 import { mixin } from '@/common/mixin/role'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 export default {
@@ -36,6 +36,11 @@ export default {
     visible: {
       type: Boolean,
       default: false
+    }
+  },
+  data() {
+    return {
+      resource: 'role'
     }
   },
   watch: {
@@ -56,7 +61,7 @@ export default {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          roleAdd(this.form)
+          request(this.resource, 'add', this.form)
             .then(response => {
               this.$message({
                 message: response.message,
@@ -84,7 +89,7 @@ export default {
     },
     onCancel() {
       this.personnelOpitons = []
-      this.$emit('addVisibleChange')
+      this.$emit('visibleChange', 'add')
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()
     },

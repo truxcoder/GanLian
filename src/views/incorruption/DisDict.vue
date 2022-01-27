@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { disDictAdd, disDictUpdate, disDictDelete } from '@/api/discipline'
+import { curd } from '@/api/index'
 export default {
   name: 'DisDict',
   props: {
@@ -83,6 +83,7 @@ export default {
   },
   data() {
     return {
+      resource: 'dis_dict',
       form: { name: '', category: '' },
       currentData: [],
       originData: [],
@@ -118,14 +119,11 @@ export default {
     }
   },
   methods: {
-    visibleChange() {
-      this.$emit('dictVisibleChange')
-    },
     onSubmit() {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          disDictAdd(this.form)
+          curd('add', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -164,7 +162,7 @@ export default {
       }
       const data = { id: row.id, name: this.updateForm.name, category: this.updateForm.category }
       this.dialogLoading = true
-      disDictUpdate(data)
+      curd('update', data, { resource: this.resource })
         .then(response => {
           this.$message({
             message: response.message,
@@ -198,8 +196,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          console.log('id:', [id])
-          disDictDelete({ id: [id] })
+          curd('delete', { id: [id] }, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -226,7 +223,7 @@ export default {
       this.currentEditIndex = -1
     },
     onCancel() {
-      this.$emit('dictVisibleChange')
+      this.$emit('visibleChange', 'dict')
       this.resetUpdateForm()
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2021-12-22 10:46:47
+ * @LastEditTime: 2022-01-25 17:44:23
  * @LastEditors: truxcoder
  * @Description:奖励信息，后端分页
 -->
@@ -32,13 +32,13 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addFormVisible = true">
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">
         添加
       </el-button>
-      <el-button v-if="can.delete && count" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
+      <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
         删除
       </el-button>
-      <el-button v-if="can.read && count" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
+      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
         所有数据
       </el-button>
     </div>
@@ -89,109 +89,74 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      v-if="count"
+      v-if="total"
       class="pagination"
       background
       :current-page="currentPage"
       :page-sizes="[10, 20, 40]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="count"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <award-add :form-visible="addFormVisible" :options="options" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
-    <award-update :form-visible="updateFormVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
-    <award-detail :visible="detailVisible" :options="options" :row="rowData" @detailClose="detailClose" />
+    <award-add :visible="addVisible" :options="options" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <award-update :visible="updateVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <award-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
 
 <script>
-import { awardList, awardDelete } from '@/api/award'
+import { request } from '@/api/index'
 import { common_mixin } from '@/common/mixin/mixin'
+import { delete_mixin } from '@/common/mixin/delete'
+import { list_mixin } from '@/common/mixin/list'
+import { search_mixin } from '@/common/mixin/search'
 import { permission_mixin } from '@/common/mixin/permission'
-import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
+import { awardCategory, awardGrade } from '@/utils/dict'
 
-import AwardAdd from './AwardAdd'
-import AwardUpdate from './AwardUpdate'
-import AwardDetail from './AwardDetail'
+import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
+import AwardAdd from './AwardAdd.vue'
+import AwardUpdate from './AwardUpdate.vue'
+import AwardDetail from './AwardDetail.vue'
 
 export default {
   name: 'Award',
   components: { AwardAdd, AwardUpdate, PersonnelOption, AwardDetail },
-  mixins: [common_mixin, permission_mixin],
+  mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
-      searchData: {},
+      resource: 'award',
+      queryMeans: 'backend',
       originData: [],
       currentData: [],
-      listLoading: true,
-      updateFormVisible: false,
       detailVisible: false,
-      addFormVisible: false,
-      dialogPrintVisible: false,
-      rowData: {},
-      currentEditIndex: 0,
-      multipleSelection: [],
-      rowSuccessClass: '',
-      currentPage: 1,
-      pageSize: 10,
-      count: 0,
-      searchForm: { personnelId: '', category: '', grade: '' },
-      isClean: false
+      searchForm: { personnelId: '', category: '', grade: '' }
     }
   },
   computed: {
     options() {
-      const categoryOptions = [
-        { label: '年度奖励', value: 1 },
-        { label: '专项表彰', value: 2 }
-      ]
-      const gradeOptions = [
-        { label: '授予称号', value: 1 },
-        { label: '一等功', value: 2 },
-        { label: '二等功', value: 3 },
-        { label: '三等功', value: 4 },
-        { label: '嘉奖', value: 5 },
-        { label: '国家级', value: 6 },
-        { label: '省部级', value: 7 },
-        { label: '市厅级', value: 8 },
-        { label: '局级', value: 9 },
-        { label: '所级', value: 10 }
-      ]
+      const categoryOptions = awardCategory
+      const gradeOptions = awardGrade
       return {
         category: categoryOptions,
         grade: gradeOptions
       }
     },
     gradeList() {
-      return this.options.grade.filter(item => {
-        let isTrue = true
-        switch (this.searchForm.category) {
-          case 1:
-            isTrue = item.value < 6
-            break
-          case 2:
-            isTrue = item.value > 5
-            break
-          default:
-            isTrue = true
-            break
-        }
-        return isTrue
-      })
+      return this.options.grade.filter(item => item.category === this.searchForm.category)
     }
   },
   created() {
-    this.fetchData()
+    this.check().then(() => {
+      this.fetchData()
+    })
   },
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params.currentPage = this.currentPage
-      params.pageSize = this.pageSize
-      params.queryMeans = this.queryMeans
-      awardList(data, params).then(response => {
+      params = this.buildParams(this.queryMeans)
+      request(this.resource, 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
           this.currentData = [...this.originData]
@@ -204,133 +169,14 @@ export default {
         this.listLoading = false
       })
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
-
     handleAllData() {
       this.searchData = {}
       this.currentPage = 1
       this.fetchData()
     },
-    handleUpdate(index, row) {
-      // console.log(index, row)
-      this.rowData = row
-      this.currentEditIndex = index
-      this.updateFormVisible = true
-    },
     handleDetail(row) {
       this.rowData = row
       this.detailVisible = true
-    },
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          console.log('id:', [id])
-          awardDelete({ id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.currentData.splice(index, 1)
-            })
-            .catch(err => {
-              // this.$message.error(err.message)
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          awardDelete({ id: this.multipleSelection.map(item => item.id) })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.fetchData()
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-
-    addVisibleChange() {
-      this.addFormVisible = false
-    },
-    updateVisibleChange() {
-      this.updateFormVisible = false
-    },
-    addSuccess() {
-      this.addFormVisible = false
-      this.fetchData(this.searchData)
-    },
-    updateSuccess(row) {
-      this.updateFormVisible = false
-      this.fetchData(this.searchData)
-    },
-    detailClose() {
-      this.detailVisible = false
-    },
-    handleSizeChange(size) {
-      this.pageSize = size
-    },
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage
-      this.fetchData(this.searchData)
-    },
-    onPersonnelChange(value) {
-      this.searchForm.personnelId = value
-      this.isClean = false
-    },
-    onSearch() {
-      const searchData = {}
-      let searchParamNumber = 0
-      for (const key in this.searchForm) {
-        if (this.searchForm[key] !== '') {
-          searchData[key] = this.searchForm[key]
-          searchParamNumber++
-        }
-      }
-      if (!searchParamNumber) {
-        this.$message({
-          type: 'info',
-          message: '查询条件不能为空！'
-        })
-        return
-      }
-      this.searchData = searchData
-      this.currentPage = 1
-      this.fetchData(searchData)
-      this.onClean()
-    },
-    // 清空搜索框
-    onClean() {
-      this.$refs.searchForm.resetFields()
-      this.isClean = true
     }
   }
 }

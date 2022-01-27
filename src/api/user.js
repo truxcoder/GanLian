@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-01-10 17:24:04
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import request from '@/utils/request'
 
 export function login(data) {
@@ -11,7 +18,7 @@ export function login(data) {
 export function getInfo(token) {
   return request({
     url: '/user/info',
-    method: 'get',
+    method: 'post',
     params: { token }
   })
 }
@@ -26,7 +33,7 @@ export function logout() {
 export function getUserList(params) {
   return request({
     url: '/user/list',
-    method: 'get',
+    method: 'post',
     params
   })
 }

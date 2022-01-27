@@ -1,9 +1,16 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-01-10 17:19:57
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import request from '@/utils/request'
 
 export function getDepartmentList(params) {
   return request({
     url: '/department/list',
-    method: 'get',
+    method: 'post',
     params
   })
 }
@@ -11,7 +18,7 @@ export function getDepartmentList(params) {
 export function getOrganList(params) {
   return request({
     url: '/department/organ',
-    method: 'get',
+    method: 'post',
     params
   })
 }

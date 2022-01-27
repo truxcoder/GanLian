@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2021-12-23 17:48:39
+ * @LastEditTime: 2022-01-17 08:34:52
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       // title: '',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      logo: 'http://30.29.2.6:8686/static/img/homelogo.png'
     }
   },
   computed: {

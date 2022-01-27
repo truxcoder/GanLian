@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-loading="dialogLoading" title="编辑人员信息" :width="dialogWidth" :visible.sync="formVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="formVisible" ref="updateForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" title="编辑人员信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="updateForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item v-for="item in formItemData" :key="item" :label="models[item].label" :prop="item">
         <!-- <el-select v-if="item=='organId'" v-model="form[item]" :style="formItemWidth" :placeholder="'请选择'+models[item].label">
           <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
@@ -16,6 +16,18 @@
           :placeholder="'请选择' + models[item].label"
         >
           <el-option v-for="i in models[item].options" :key="i" :label="i" :value="i" />
+        </el-select>
+
+        <el-select
+          v-else-if="models[item].type == 'SELECT2'"
+          v-model="form[item]"
+          :style="models[item].multiple === true ? formTextAreaWidth : formItemWidth"
+          :multiple="models[item].multiple === true"
+          :filterable="models[item].multiple === true"
+          :allow-create="models[item].multiple === true"
+          :placeholder="'请选择' + models[item].label"
+        >
+          <el-option v-for="(i, k) in models[item].options" :key="k" :label="i.label" :value="i.value" />
         </el-select>
 
         <el-autocomplete
@@ -48,14 +60,14 @@
 </template>
 
 <script>
-import { personnelUpdate } from '@/api/personnel'
+import { curd } from '@/api'
 import { mixin } from '@/common/mixin/personnel'
 
 export default {
   name: 'PersonnelUpdate',
   mixins: [mixin],
   props: {
-    formVisible: {
+    visible: {
       type: Boolean,
       default: false
     },
@@ -64,6 +76,11 @@ export default {
       default() {
         return {}
       }
+    }
+  },
+  data() {
+    return {
+      resource: 'personnel'
     }
   },
   watch: {
@@ -83,7 +100,7 @@ export default {
           this.dialogLoading = true
           console.log('updateForm----:', this.form)
           this.form.proCert = this.form.proCert.toString()
-          personnelUpdate(this.form)
+          curd('update', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -97,7 +114,7 @@ export default {
               //   }
               // })
               // this.form.department = { name: selected_dept }
-              this.$emit('updateSuccess', this.form)
+              this.$emit('updateSuccess')
             })
             .catch(err => {
               console.log(err)
@@ -110,7 +127,7 @@ export default {
       })
     },
     onCancel() {
-      this.$emit('updateVisibleChange')
+      this.$emit('visibleChange', 'update')
       this.$refs.updateForm.resetFields()
     }
   }

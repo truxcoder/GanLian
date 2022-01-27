@@ -6,7 +6,7 @@
           <img :src="photoURL" alt class="photo" />
         </div>
         <div class=" mt-1 mr-4">
-          <el-button size="mini" type="primary" plain style="width:100%" @click="updateFormVisible = true">修改人员信息</el-button>
+          <el-button size="mini" type="primary" plain style="width:100%" @click="updateVisible = true">修改人员信息</el-button>
           <!-- <button class="text-base font-medium rounded-lg w-full py-1 bg-blue-500 text-white" @click="handleUpdate">修改人员信息</button> -->
         </div>
       </div>
@@ -28,61 +28,12 @@
               </span>
               <span>中共党员</span>
             </div>
+            <span v-else-if="item.type === 'bool'">{{ originData[item.field] ? '是' : '否' }}</span>
             <span v-else-if="item.field === 'age'">{{ originData.birthday | ageFilter }}</span>
             <span v-else-if="item.type === 'date'">{{ originData[item.field] | dateFilter }}</span>
             <span v-else>{{ originData[item.field] }}</span>
           </el-descriptions-item>
         </el-descriptions>
-        <!-- <table v-loading="loading" class="border-separate rounded-sm mainTable w-full">
-          <tr>
-            <td>姓名</td>
-            <td>{{ originData.name }}</td>
-            <td>编号</td>
-            <td>{{ originData.policeCode }}</td>
-            <td>性别</td>
-            <td>{{ originData.gender }}</td>
-          </tr>
-          <tr>
-            <td>民族</td>
-            <td>{{ originData.nation }}</td>
-            <td>所属单位</td>
-            <td>{{ originData.organName }}</td>
-            <td>所在部门</td>
-            <td>{{ originData.departmentName }}</td>
-          </tr>
-          <tr>
-            <td>身份证号码</td>
-            <td>{{ originData.idCode }}</td>
-            <td>政治面貌</td>
-            <td>{{ originData.political }}</td>
-            <td>通讯方式</td>
-            <td>{{ originData.phone }}</td>
-          </tr>
-          <tr>
-            <td>岗位是否涉密</td>
-            <td>{{ originData.isSecret }}</td>
-            <td>年龄</td>
-            <td>{{ originData.birthday | ageFilter }}</td>
-            <td>出生日期</td>
-            <td>{{ originData.birthday | dateFilter }}</td>
-          </tr>
-          <tr>
-            <td>入党日期</td>
-            <td>{{ originData.joinPartyDay | dateFilter }}</td>
-            <td>参加工作时间</td>
-            <td>{{ originData.startJobDay | dateFilter }}</td>
-            <td>录警时间</td>
-            <td>{{ originData.bePoliceDay | dateFilter }}</td>
-          </tr>
-          <tr>
-            <td>全日制教育</td>
-            <td>{{ originData.fullTimeEdu }}</td>
-            <td>非全日制教育</td>
-            <td>{{ originData.partTimeEdu }}</td>
-            <td>全日制专业</td>
-            <td>{{ originData.fullTimeMajor }}</td>
-          </tr>
-        </table> -->
       </div>
     </div>
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
@@ -90,8 +41,8 @@
         <span class="font-semibold">取得专业证书情况</span>
       </div>
       <hr class="border-gray-300" />
-      <div class="h-12 p-4">
-        <pre>{{ originData.proCert }}</pre>
+      <div class="min-h-0 p-4">
+        <span>{{ originData.proCert }}</span>
       </div>
     </div>
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
@@ -99,8 +50,8 @@
         <span>参加培训情况</span>
       </div>
       <hr class="border-gray-300" />
-      <div class="h-12 p-4">
-        <pre>{{ originData.training }}</pre>
+      <div class="p-4 min-h-0">
+        <span>{{ originData.training }}</span>
       </div>
     </div>
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
@@ -114,8 +65,8 @@
         <li v-for="(v, k) in resumeList" :key="k" class="list-none">{{ v.start | dateFilter }}-{{ v.end | dateFilter }} {{ v.organ }}{{ v.dept }} {{ v.post }}</li>
       </div>
     </div>
-    <personnel-update :form-visible="updateFormVisible" :rowdata="singlePersonnelData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
-    <resume-edit :visible="resumeVisible" :personnel-id="originData.id" :resume="originData.resume" @editSuccess="editSuccess" @resumeVisibleChange="resumeVisibleChange" />
+    <personnel-update :visible="updateVisible" :rowdata="singlePersonnelData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <resume-edit :visible="resumeVisible" :personnel-id="originData.id" :resume="originData.resume" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -125,6 +76,8 @@ import { mixin } from '@/common/mixin/personnel_detail'
 import PersonnelUpdate from '@/views/personnel/PerUpdate.vue'
 import ResumeEdit from '@/views/personnel/ResumeEdit.vue'
 
+import { getPhoto } from '@/utils/personnel'
+
 export default {
   name: 'Basic',
   components: { PersonnelUpdate, ResumeEdit },
@@ -132,6 +85,9 @@ export default {
     dateFilter(date) {
       if (date === '') {
         return '今'
+      }
+      if (dayjs(date).year() === 1) {
+        return ''
       }
       return dayjs(date).format('YYYY年MM月')
     }
@@ -151,7 +107,7 @@ export default {
         { label: '身份证号码', field: 'idCode' },
         { label: '政治面貌', field: 'political' },
         { label: '通讯方式', field: 'phone' },
-        { label: '岗位是否涉密', field: 'isSecret' },
+        { label: '岗位是否涉密', field: 'isSecret', type: 'bool' },
         { label: '年龄', field: 'age' },
         { label: '出生日期', field: 'birthday', type: 'date' },
         { label: '入党日期', field: 'joinPartyDay', type: 'date' },
@@ -159,7 +115,9 @@ export default {
         { label: '录警日期', field: 'bePoliceDay', type: 'date' },
         { label: '全日制教育', field: 'fullTimeEdu' },
         { label: '非全日制教育', field: 'partTimeEdu' },
-        { label: '全日制专业', field: 'fullTimeMajor' }
+        { label: '全日制专业', field: 'fullTimeMajor' },
+        { label: '是否持有护照', field: 'hasPassport', type: 'bool' },
+        { label: '通过县处级考试时间', field: 'passExamDay', type: 'date' }
       ]
     }
   },
@@ -167,7 +125,7 @@ export default {
     photoURL() {
       // return this.$store.getters.staticURL+"/static/lxb2.jpg"
       // return '/image/lxb2.jpg'
-      return 'http://n.sinaimg.cn/spider202011/400/w1000h1000/20200101/2d53-imkzenq6040371.jpg'
+      return this.singlePersonnelData.id ? getPhoto(this.singlePersonnelData.id, 'small') : ''
     },
     originData() {
       return this.singlePersonnelData

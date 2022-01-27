@@ -1,6 +1,12 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-11-16 09:13:38
+ * @LastEditTime: 2022-01-18 14:46:50
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import rules from '@/common/rules/post'
-import { getPositionList } from '@/api/position'
-import { getLevelList } from '@/api/level'
+import { request } from '@/api/index'
 export const mixin = {
   props: {
     passedData: {
@@ -50,7 +56,7 @@ export const mixin = {
     },
     options() {
       const positionOptions = this.remotePositionList.map(item => {
-        return { label: item.name + ' 〔' + item.Level.name + '〕', value: item.id }
+        return { label: item.name + ' 〔' + item.levelName + '〕', value: item.id }
       })
       const levelOptions = this.remoteLevelList.map(item => {
         return { label: item.name, value: item.id }
@@ -75,7 +81,7 @@ export const mixin = {
   },
   methods: {
     fetchAllData() {
-      const promises = [getPositionList(), getLevelList()]
+      const promises = [request('position', 'list'), request('level', 'list')]
       Promise.all(promises).then(responses => {
         this.remotePositionList = responses[0].data
         this.remoteLevelList = responses[1].data

@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2021-12-21 12:45:00
+ * @LastEditTime: 2022-01-20 20:01:34
  * @LastEditors: truxcoder
  * @Description: 根据角色处理路由，得到允许访问的路由，形成用户菜单。
  */
@@ -61,6 +61,7 @@ const mutations = {
 
 const actions = {
   async getOriginRoutes({ commit, state }, roles) {
+    console.log('getOriginRoutes roles:', roles)
     const response = await getModuleList({})
     // moduleNameList:模块名称数组
     const moduleNameList = response.data.map(i => i.name)
@@ -104,13 +105,14 @@ const actions = {
     // 把构建结果与非权限路由连结起来
     const result = superModules.concat(asyncRoutes)
     return new Promise(resolve => {
-      let accessedRoutes
+      // let accessedRoutes
       // 如果用户具备root角色，则返回所有路由，否则进行筛选，得到允许访问的路由
-      if (roles.includes('root')) {
-        accessedRoutes = result || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(result, roles)
-      }
+      // if (roles.includes('root')) {
+      //   accessedRoutes = result || []
+      // } else {
+      //   accessedRoutes = filterAsyncRoutes(result, roles)
+      // }
+      const accessedRoutes = filterAsyncRoutes(result, roles)
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

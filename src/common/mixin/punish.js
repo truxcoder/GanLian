@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-22 15:20:15
- * @LastEditTime: 2021-12-22 15:20:33
+ * @LastEditTime: 2022-01-24 14:38:02
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -53,21 +53,12 @@ export const mixin = {
   },
   computed: {
     gradeList() {
-      return this.options.grade.filter(item => {
-        let isTrue = true
-        switch (this.form.category) {
-          case 1:
-            isTrue = item.value < 6
-            break
-          case 2:
-            isTrue = item.value > 5
-            break
-          default:
-            isTrue = true
-            break
-        }
-        return isTrue
-      })
+      return this.options.grade.filter(item => item.category === this.form.category)
+    }
+  },
+  methods: {
+    onCategoryChange() {
+      this.form.grade = ''
     }
   }
 }

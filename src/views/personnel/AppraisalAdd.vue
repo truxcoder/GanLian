@@ -1,6 +1,13 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-18 17:41:42
+ * @LastEditTime: 2022-01-26 15:13:57
+ * @LastEditors: truxcoder
+ * @Description: 添加考核数据
+-->
 <template>
-  <el-dialog v-loading="dialogLoading" title="添加考核信息" :width="dialogWidth" :visible.sync="formVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="formVisible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" title="添加考核信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
         <personnel-option v-if="!isSingle" :rowdata="rowdata" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
@@ -18,9 +25,15 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="考核季度" prop="season">
+        <el-select v-model="form.season" :style="formItemWidth" placeholder="请选择考核季度">
+          <el-option v-for="i in options.season" :key="i.vaule" :label="i.label" :value="i.value" />
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="考核结果" prop="conclusion">
         <el-select v-model="form.conclusion" :style="formItemWidth" placeholder="请选择考核结果">
-          <el-option v-for="i in options.conclusion" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.conclusion" :key="i" :label="i" :value="i" />
         </el-select>
       </el-form-item>
     </el-form>
@@ -32,7 +45,7 @@
 </template>
 
 <script>
-import { appraisalAdd } from '@/api/appraisal'
+import { curd } from '@/api/index'
 import { mixin } from '@/common/mixin/appraisal'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 export default {
@@ -40,13 +53,18 @@ export default {
   components: { PersonnelOption },
   mixins: [mixin],
   props: {
-    formVisible: {
+    visible: {
       type: Boolean,
       default: false
     }
   },
+  data() {
+    return {
+      resource: 'appraisal'
+    }
+  },
   watch: {
-    formVisible: function(val, oldval) {
+    visible: function(val, oldval) {
       if (val === true) {
         this.form.personnelId = this.singlePersonnelData.id
       } else {
@@ -55,14 +73,11 @@ export default {
     }
   },
   methods: {
-    visibleChange() {
-      this.$emit('addVisibleChange')
-    },
     onSubmit() {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          appraisalAdd(this.form)
+          curd('add', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -84,11 +99,8 @@ export default {
         }
       })
     },
-    handleSelect(item) {
-      console.log(item)
-    },
     onCancel() {
-      this.$emit('addVisibleChange')
+      this.$emit('visibleChange', 'add')
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()
     },

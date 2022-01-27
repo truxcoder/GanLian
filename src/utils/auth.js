@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-01-17 13:18:23
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import Cookies from 'js-cookie'
 
 const TokenKey = 'role_token'
@@ -12,4 +19,34 @@ export function setToken(token) {
 
 export function removeToken() {
   return Cookies.remove(TokenKey)
+}
+
+export function getTicket() {
+  return Cookies.get('ticket')
+}
+
+export function setTicket(ticket) {
+  return Cookies.set('ticket', ticket)
+}
+
+export function removeTicket() {
+  return Cookies.remove('ticket')
+}
+
+/**
+ * [通过参数名获取url中的参数值]
+ * 示例URL:http://htmlJsTest/getrequest.html?uid=admin&rid=1&fid=2&name=小明
+ * @param  {[string]} queryName [参数名]
+ * @return {[string]}           [参数值]
+ */
+export function GetQueryValue(queryName) {
+  var query = decodeURI(window.location.search.substring(1))
+  var vars = query.split('&')
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=')
+    if (pair[0] === queryName) {
+      return pair[1]
+    }
+  }
+  return null
 }

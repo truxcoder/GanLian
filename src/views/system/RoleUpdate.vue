@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { roleUpdate } from '@/api/role'
+import { request } from '@/api/index'
 import { mixin } from '@/common/mixin/role'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 export default {
@@ -33,7 +33,7 @@ export default {
   },
   data() {
     return {
-      testData: this.rowdata
+      resource: 'role'
     }
   },
   computed: {
@@ -67,7 +67,7 @@ export default {
             old: [this.rowdata.id, this.rowdata.role],
             new: [this.form.personnelId, this.form.role]
           }
-          roleUpdate(data)
+          request(this.resource, 'update', data)
             .then(response => {
               this.$message({
                 message: response.message,

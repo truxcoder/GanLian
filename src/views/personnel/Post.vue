@@ -3,10 +3,26 @@
     <!-- <el-row v-if="!total">
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
+    <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form-item label="姓名" prop="personnelId">
+        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+      </el-form-item>
+      <el-form-item label="单位" prop="organId">
+        <el-select v-model="searchForm.organId" size="small" placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="text" @click="onClean">清空</el-button>
+      </el-form-item>
+    </el-form>
     <div class="tool-bar">
-      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addFormVisible = true">添加</el-button>
-      <el-button v-if="count" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
-      <el-button v-if="count" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
+      <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
@@ -47,7 +63,7 @@
       </el-table-column>
       <el-table-column label="任职结束日期" align="center" width="130">
         <template slot-scope="scope">
-          {{ scope.row.endDay | dateFilter }}
+          {{ scope.row.endDay | dateEndFilter }}
         </template>
       </el-table-column>
 
@@ -59,154 +75,78 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      v-if="count"
+      v-if="total"
       class="pagination"
       background
       :current-page="currentPage"
       :page-sizes="[10, 20, 40]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="count"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <post-add :form-visible="addFormVisible" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
-    <post-update :form-visible="updateFormVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @updateVisibleChange="updateVisibleChange" />
+    <post-add :visible="addVisible" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <post-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
 <script>
-import { getPostList, postDelete } from '@/api/post'
+import { request } from '@/api/index'
 import { common_mixin } from '@/common/mixin/mixin'
+import { delete_mixin } from '@/common/mixin/delete'
+import { list_mixin } from '@/common/mixin/list'
+import { search_mixin } from '@/common/mixin/search'
+import { permission_mixin } from '@/common/mixin/permission'
+import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
 import PostAdd from './PostAdd'
 import PostUpdate from './PostUpdate'
 
 export default {
   name: 'Post',
-  components: { PostAdd, PostUpdate },
-  mixins: [common_mixin],
+  components: { PostAdd, PostUpdate, PersonnelOption },
+  mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
+      resource: 'post',
+      queryMeans: 'backend',
+      originData: [],
       currentData: [],
-      listLoading: true,
-      updateFormVisible: false,
-      addFormVisible: false,
-      dialogPrintVisible: false,
-      rowData: {},
-      currentEditIndex: 0,
-      multipleSelection: [],
-      rowSuccessClass: '',
-      currentPage: 1,
-      pageSize: 10
+      searchForm: { personnelId: '', organId: '' }
     }
   },
   computed: {
-    count() {
-      return this.currentData.length
+    organList() {
+      return this.$store.getters.organs
     }
   },
   created() {
-    this.fetchData()
+    this.check().then(() => {
+      this.fetchData()
+    })
   },
   methods: {
-    fetchData() {
+    fetchData(data = {}, params = {}) {
       this.listLoading = true
-      getPostList({}).then(response => {
-        this.currentData = response.data
+      params = this.buildParams(this.queryMeans)
+      request(this.resource, 'list', data, params).then(response => {
+        if (response.count) {
+          this.originData = response.data
+          this.currentData = [...this.originData]
+          this.count = response.count
+        } else {
+          this.originData = []
+          this.currentData = []
+          this.count = 0
+        }
         this.listLoading = false
       })
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
-
     handleAllData() {
+      this.searchData = {}
+      this.currentPage = 1
       this.fetchData()
-    },
-    handleUpdate(index, row) {
-      // console.log(index, row)
-      this.rowData = row
-      this.currentEditIndex = index
-      this.updateFormVisible = true
-    },
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          console.log('id:', [id])
-          postDelete({ id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.currentData.splice(index, 1)
-            })
-            .catch(err => {
-              // this.$message.error(err.message)
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          postDelete({ id: this.multipleSelection.map(item => item.id) })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.fetchData()
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-
-    addVisibleChange() {
-      this.addFormVisible = false
-    },
-    updateVisibleChange() {
-      this.updateFormVisible = false
-    },
-    addSuccess() {
-      this.addFormVisible = false
-      this.fetchData()
-    },
-    updateSuccess(row) {
-      this.updateFormVisible = false
-      this.fetchData()
-    },
-    handleSizeChange(size) {
-      this.pageSize = size
-    },
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage
-      if (this.queryMeans === 'backend') {
-        this.fetchData()
-      }
     }
   }
 }

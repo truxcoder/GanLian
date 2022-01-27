@@ -43,7 +43,7 @@
         </el-select>
         <!-- <el-autocomplete v-model="form.partTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryPartTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
       </el-form-item>
-      <el-form-item label="所属单位" prop="organId">
+      <el-form-item v-if="can.global" label="所属单位" prop="organId">
         <el-select v-model="form.organId" :style="formItemWidth" placeholder="请选择单位">
           <el-option v-for="i in organOption" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
@@ -52,16 +52,21 @@
       <el-form-item label="岗位是否涉密" prop="isSecret">
         <el-radio v-model="form.isSecret" label="是">是</el-radio>
         <el-radio v-model="form.isSecret" label="否">否</el-radio>
-        <!-- <el-select v-model="form.isSecret" :style="formItemWidth">
-          <el-option v-for="i in YesOrNo" :key="i" :label="i" :value="i" />
-        </el-select> -->
       </el-form-item>
       <el-form-item label="考核是否存在称职以下等次" :label-width="formLabelLongWidth" prop="hasAppraisalIncompetent">
         <el-radio v-model="form.hasAppraisalIncompetent" label="是">是</el-radio>
         <el-radio v-model="form.hasAppraisalIncompetent" label="否">否</el-radio>
       </el-form-item>
+      <el-form-item label="是否持有护照" prop="hasPassport">
+        <el-radio v-model="form.hasPassport" label="是">是</el-radio>
+        <el-radio v-model="form.hasPassport" label="否">否</el-radio>
+      </el-form-item>
+      <el-form-item label="县处级任职考试通过且有效" :label-width="formLabelLongWidth" prop="passExamDay">
+        <el-radio v-model="form.passExamDay" label="是">是</el-radio>
+        <el-radio v-model="form.passExamDay" label="否">否</el-radio>
+      </el-form-item>
       <el-form-item label="取得专业证书情况" prop="proCert">
-        <el-select v-model="form.proCert" :style="itemLineWidth" multiple>
+        <el-select v-model="form.proCert" :style="itemLineWidth" multiple filterable allow-create>
           <el-option v-for="i in proCertOption" :key="i" :label="i" :value="i" />
         </el-select>
       </el-form-item>
@@ -78,26 +83,28 @@
     </el-form>
     <div class="dialog-footer pl-4">
       <el-button @click="onCancel">取 消</el-button>
+      <el-button type="success" plain @click="resetFields">重 置</el-button>
       <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
   </el-drawer>
 </template>
 
 <script>
-import { personnelSearch } from '@/api/personnel'
-
-// import rules from '@/common/rules/asset'
-// import models from '@/common/model/asset'
-// import { mixin } from '@/common/mixin/personnel'
 var lang = require('lodash/lang')
 import { suggestions } from '@/common/model/suggestions'
-import { nationDict, politicalDict, proCertDict, fullTimeEduDict, partTimeEduDict, subjectDict } from '@/utils/dict'
+import { nationDict, politicalDict, proCertDict, fullTimeEduDict, partTimeEduDict, subjectDict, awardGrade, punishGrade } from '@/utils/dict'
 export default {
   name: 'PersonnelSearch',
   props: {
     visible: {
       type: Boolean,
       default: false
+    },
+    can: {
+      type: Object,
+      default() {
+        return {}
+      }
     }
   },
   data() {
@@ -115,13 +122,15 @@ export default {
         organId: '',
         proCert: [],
         isSecret: '',
+        hasPassport: '',
+        passExamDay: '',
         hasAppraisalIncompetent: '',
         award: [],
         punish: []
       },
       dialogWidth: '1200px',
       formLabelWidth: '140px',
-      formLabelLongWidth: '200px',
+      formLabelLongWidth: '280px',
       formItemWidth: { width: '240px' },
       itemShortWidth: { width: '112px' },
       itemLongWidth: { width: '400px' },
@@ -131,34 +140,14 @@ export default {
       loading: false,
       genderOption: ['男', '女'],
       YesOrNo: ['是', '否'],
-      nationOption: nationDict,
+      // nationOption: nationDict,
       politicalOption: politicalDict,
       proCertOption: proCertDict,
       fullTimeEduOption: fullTimeEduDict,
       partTimeEduOption: partTimeEduDict,
       fullTimeMajorOption: subjectDict,
-      awardOption: [
-        { label: '授予称号', value: 1 },
-        { label: '一等功', value: 2 },
-        { label: '二等功', value: 3 },
-        { label: '三等功', value: 4 },
-        { label: '嘉奖', value: 5 },
-        { label: '国家级', value: 6 },
-        { label: '省部级', value: 7 },
-        { label: '市厅级', value: 8 },
-        { label: '局级', value: 9 },
-        { label: '所级', value: 10 }
-      ],
-      punishOption: [
-        { label: '停职检查', value: 1 },
-        { label: '调整职务', value: 2 },
-        { label: '责令辞职', value: 3 },
-        { label: '降职', value: 4 },
-        { label: '免职', value: 5 },
-        { label: '责令检查', value: 6 },
-        { label: '批评教育', value: 7 },
-        { label: '诫勉', value: 8 }
-      ],
+      awardOption: awardGrade,
+      punishOption: punishGrade,
       pickerOptions: {
         shortcuts: [
           {
@@ -190,12 +179,13 @@ export default {
   computed: {
     organOption() {
       return this.$store.getters.organs
+    },
+    nationOption() {
+      nationDict.splice(1, 0, '少数民族')
+      return nationDict
     }
   },
   methods: {
-    visibleChange() {
-      this.$emit('addVisibleChange')
-    },
     onSubmit() {
       if (this.allNullCheck(this.form)) {
         const temp = lang.cloneDeep(this.form)
@@ -207,7 +197,7 @@ export default {
         }
         console.log('temp:', temp)
         this.$emit('advanceSearch', temp)
-        this.resetFields()
+        // this.resetFields()
       }
       // this.form.forEach(item => {
       //   if (Array.isArray(item) && item.length >0) {
@@ -247,7 +237,7 @@ export default {
       console.log(item)
     },
     onCancel() {
-      this.$emit('searchVisibleChange')
+      this.$emit('visibleChange', 'search')
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.resetFields()
     },
@@ -255,6 +245,16 @@ export default {
       this.form.ageStart = ''
       this.form.ageEnd = ''
       this.$refs.searchForm.resetFields()
+      for (const k of Object.keys(this.form)) {
+        switch (Object.prototype.toString.call(this.form[k])) {
+          case '[object Array]':
+            this.form[k] = []
+            break
+          default:
+            this.form[k] = ''
+            break
+        }
+      }
     },
     /**
      * @description: 检查是否所有字段都为空
@@ -263,7 +263,6 @@ export default {
      */
     allNullCheck(form) {
       let isValid = false
-      Boolean
       for (const k of Object.keys(form)) {
         if (Object.prototype.toString.call(form[k]) === '[object String]') {
           form[k] = form[k].trim()

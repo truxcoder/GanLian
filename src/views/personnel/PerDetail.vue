@@ -24,12 +24,7 @@
 
 <script>
 import 'tailwindcss/tailwind.css'
-import { personnelDetail } from '@/api/personnel'
-import { postDetail } from '@/api/post'
-import { appraisalDetail } from '@/api/appraisal'
-import { awardDetail } from '@/api/award'
-import { punishDetail } from '@/api/punish'
-import { disciplineDetail } from '@/api/discipline'
+import { request } from '@/api/index'
 import AwardAndPunish from './PerDetail/AwardAndPunish.vue'
 import Appraisal from './PerDetail/Appraisal.vue'
 import Post from './PerDetail/Post.vue'
@@ -47,75 +42,66 @@ export default {
       awards: [],
       punishes: [],
       disciplines: [],
+      queryData: {},
       loading: true
     }
   },
   created() {
-    this.fetchAllData({ id: this.$route.query.id })
+    this.queryData = { id: this.$route.query.id }
+    this.fetchAllData(this.queryData)
   },
   methods: {
-    fetchAllData(params = {}) {
+    fetchAllData(data = {}) {
       this.loading = true
-      const promises = [personnelDetail(params), postDetail(params), appraisalDetail(params), awardDetail(params), punishDetail(params), disciplineDetail(params)]
+      const promises = [
+        request('personnel', 'detail', data),
+        request('post', 'detail', data),
+        request('appraisal', 'detail', data),
+        request('award', 'detail', data),
+        request('punish', 'detail', data),
+        request('discipline', 'detail', data)
+      ]
       Promise.all(promises).then(responses => {
         this.originData = responses[0].data
         this.posts = responses[1].data
-        this.appraisals = responses[2].data.sort((a, b) => a.years - b.years)
+        // this.appraisals = responses[2].data.sort((a, b) => a.years - b.years)
+        this.appraisals = responses[2].data
         this.awards = responses[3].data
         this.punishes = responses[4].data
         this.disciplines = responses[5].data
         this.loading = false
       })
     },
-    fetchPersonnelData() {
-      personnelDetail({ id: this.$route.query.id }).then(response => {
-        this.originData = response.data
-      })
-    },
-    fetchPostData() {
-      postDetail({ id: this.$route.query.id }).then(response => {
-        this.posts = response.data
-      })
-    },
-    fetchAppraisalData() {
-      appraisalDetail({ id: this.$route.query.id }).then(response => {
-        this.appraisals = response.data
-      })
-    },
-    fetchAwardData() {
-      awardDetail({ id: this.$route.query.id }).then(response => {
-        this.awards = response.data
-      })
-    },
-    fetchPunishData() {
-      punishDetail({ id: this.$route.query.id }).then(response => {
-        this.punishes = response.data
-      })
-    },
-    fetchDisciplineData() {
-      disciplineDetail({ id: this.$route.query.id }).then(response => {
-        this.disciplines = response.data
+    /**
+     * @description: 获取组件数据值
+     * @param {*} obj 组件对象的resource值
+     * @param {*} key 本地data里对应组件的数据对象
+     * @return {*}
+     */
+    fetchData(obj, key) {
+      request(obj, 'detail', this.queryData).then(response => {
+        this[key] = response.data
       })
     },
     reFetchCpnData(cpn) {
       switch (cpn) {
         case 'Basic':
-          this.fetchPersonnelData()
+          this.fetchData('personnel', 'originData')
           break
         case 'Post':
-          this.fetchPostData()
+          this.fetchData('post', 'posts')
           break
         case 'Award':
-          this.fetchAwardData()
+          this.fetchData('award', 'awards')
           break
         case 'Punish':
-          this.fetchPunishData()
+          this.fetchData('punish', 'punishes')
           break
         case 'Appraisal':
-          this.fetchAppraisalData()
+          this.fetchData('appraisal', 'appraisals')
           break
         case 'Discipline':
-          this.fetchDisciplineData()
+          this.fetchData('discipline', 'disciplines')
           break
         default:
           console.log('cpn:', cpn)

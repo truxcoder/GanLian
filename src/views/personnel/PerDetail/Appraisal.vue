@@ -1,14 +1,24 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-30 11:23:18
+ * @LastEditTime: 2022-01-26 15:26:07
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
   <div>
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="addFormVisible = true">添加信息</el-button>
+      <el-button type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
       <el-button v-if="mainData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div v-if="mainData.length" class="mt-4">
       <el-table v-loading="loading" :data="mainData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
-        <el-table-column align="center" label="考核时间">
+        <el-table-column align="center" label="考核年份">
           <template slot-scope="scope">{{ scope.row.years }}年</template>
+        </el-table-column>
+        <el-table-column align="center" label="考核季度">
+          <template slot-scope="scope">{{ scope.row.season | seasonFilter }}</template>
         </el-table-column>
         <el-table-column align="center" label="考核结果">
           <template slot-scope="scope">{{ scope.row.conclusion }}</template>
@@ -25,16 +35,8 @@
       </el-table>
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
-    <appraisal-add :is-single="true" :single-personnel-data="singlePersonnelData" :options="options" :form-visible="addFormVisible" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
-    <appraisal-update
-      :form-visible="updateFormVisible"
-      :is-single="true"
-      :single-personnel-data="singlePersonnelData"
-      :options="options"
-      :rowdata="rowData"
-      @updateSuccess="updateSuccess"
-      @updateVisibleChange="updateVisibleChange"
-    />
+    <appraisal-add :is-single="true" :single-personnel-data="singlePersonnelData" :visible="addVisible" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <appraisal-update :visible="updateVisible" :is-single="true" :single-personnel-data="singlePersonnelData" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -43,15 +45,29 @@ import AppraisalAdd from '@/views/personnel/AppraisalAdd.vue'
 import AppraisalUpdate from '@/views/personnel/AppraisalUpdate.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
-import { appraisalDelete } from '@/api/appraisal'
+
+import { conclusionDict, seasonDict } from '@/utils/dict'
 
 export default {
   name: 'Appraisal',
   components: { AppraisalAdd, AppraisalUpdate },
+  filters: {
+    seasonFilter(season) {
+      let result = '未知'
+      seasonDict.forEach(item => {
+        if (season === item.value) {
+          result = item.label
+          return
+        }
+      })
+      return result
+    }
+  },
   mixins: [mixin],
   data() {
     return {
-      cpnName: 'Appraisal'
+      cpnName: 'Appraisal',
+      resource: 'appraisal'
     }
   },
   computed: {
@@ -60,13 +76,16 @@ export default {
       for (let index = 2010; index < 2030; index++) {
         years.push({ label: index + '年', value: index + '' })
       }
-      const conclusion = [
-        { label: '优秀', value: '优秀' },
-        { label: '称职', value: '称职' },
-        { label: '基本称职', value: '基本称职' },
-        { label: '不称职', value: '不称职' },
-        { label: '不评定等次', value: '不评定等次' }
-      ]
+      const conclusion = conclusionDict.map(item => {
+        return { label: item, value: item }
+      })
+      // const conclusion = [
+      //   { label: '优秀', value: '优秀' },
+      //   { label: '称职', value: '称职' },
+      //   { label: '基本称职', value: '基本称职' },
+      //   { label: '不称职', value: '不称职' },
+      //   { label: '不确定等次', value: '不确定等次' }
+      // ]
       return {
         organ: this.$store.getters.organs,
         years,
@@ -77,60 +96,6 @@ export default {
   created() {
     if (this.$store.state.department.departments.length === 0) {
       this.$store.dispatch('department/setDepartments')
-    }
-  },
-  methods: {
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          appraisalDelete({ id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.mainData = index
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          appraisalDelete({ id: this.multipleSelection.map(item => item.id) })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.$emit('reFetchCpnData', this.cpnName)
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
     }
   }
 }

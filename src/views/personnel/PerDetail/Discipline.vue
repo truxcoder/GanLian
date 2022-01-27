@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="addFormVisible = true">添加信息</el-button>
+      <el-button type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
       <el-button v-if="mainData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div v-if="mainData.length" class="mt-4">
@@ -51,23 +51,23 @@
     <discipline-add
       :is-single="true"
       :single-personnel-data="singlePersonnelData"
-      :visible="addFormVisible"
+      :visible="addVisible"
       :options="options"
       :dis-dict="disDict"
       @addSuccess="addSuccess"
-      @addVisibleChange="addVisibleChange"
+      @visibleChange="visibleChange"
     />
     <discipline-update
       :is-single="true"
       :single-personnel-data="singlePersonnelData"
-      :visible="updateFormVisible"
+      :visible="updateVisible"
       :options="options"
       :dis-dict="disDict"
       :rowdata="rowData"
       @updateSuccess="updateSuccess"
-      @updateVisibleChange="updateVisibleChange"
+      @visibleChange="visibleChange"
     />
-    <discipline-detail :visible="detailVisible" :is-single="true" :single-personnel-data="singlePersonnelData" :dis-dict="disDict" :options="options" :row="rowData" @detailClose="detailClose" />
+    <discipline-detail :visible="detailVisible" :is-single="true" :single-personnel-data="singlePersonnelData" :dis-dict="disDict" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -79,7 +79,7 @@ import DisciplineDetail from '@/views/incorruption/DisciplineDetail.vue'
 import { mixin } from '@/common/mixin/personnel_detail'
 import { detail_permission_mixin } from '@/common/mixin/permission'
 import { common_mixin } from '@/common/mixin/mixin'
-import { disciplineDelete, disDictList } from '@/api/discipline'
+import { request } from '@/api'
 
 export default {
   name: 'Discipline',
@@ -88,6 +88,7 @@ export default {
   data() {
     return {
       cpnName: 'Discipline',
+      resource: 'discipline',
       obj: 'Discipline',
       disDict: [],
       detailVisible: false
@@ -113,61 +114,9 @@ export default {
   },
   methods: {
     fetchDictData() {
-      disDictList().then(response => {
+      request('dis_dict', 'list').then(response => {
         this.disDict = response.data
       })
-    },
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          disciplineDelete({ id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.mainData = index
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          disciplineDelete({ id: this.multipleSelection.map(item => item.id) })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.$emit('reFetchCpnData', this.cpnName)
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
     },
     handleDetail(row) {
       this.rowData = row

@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-22 15:20:15
- * @LastEditTime: 2022-01-06 12:15:41
+ * @LastEditTime: 2022-01-18 11:27:21
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -54,6 +54,11 @@ export const mixin = {
   computed: {
     disDictList() {
       return this.disDict.filter(item => item.category === this.form.category)
+    }
+  },
+  methods: {
+    onCategoryChange() {
+      this.form.dictId = ''
     }
   }
 }

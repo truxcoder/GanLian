@@ -6,7 +6,7 @@
         <personnel-option v-if="!isSingle" :rowdata="rowdata" :is-update="true" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
       </el-form-item>
       <el-form-item label="分类" prop="category">
-        <el-select v-model="form.category" :style="formItemWidth" placeholder="请选择分类">
+        <el-select v-model="form.category" :style="formItemWidth" placeholder="请选择分类" @change="onCategoryChange">
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { disciplineUpdate } from '@/api/discipline'
+import { curd } from '@/api'
 import { mixin } from '@/common/mixin/discipline'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 export default {
@@ -55,6 +55,7 @@ export default {
   },
   data() {
     return {
+      resource: 'discipline',
       testData: this.rowdata
     }
   },
@@ -72,7 +73,7 @@ export default {
       this.$refs.updateForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          disciplineUpdate(this.form)
+          curd('update', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -80,7 +81,7 @@ export default {
               })
               this.dialogLoading = false
               this.personnelOpitons = []
-              this.$emit('updateSuccess', 'Discipline')
+              this.$emit('updateSuccess')
             })
             .catch(err => {
               console.log(err)
@@ -94,7 +95,7 @@ export default {
     },
     onCancel() {
       this.personnelOpitons = []
-      this.$emit('updateVisibleChange', 'Discipline')
+      this.$emit('visibleChange', 'update')
       this.$refs.updateForm.resetFields()
     },
     onPersonnelChange(value) {

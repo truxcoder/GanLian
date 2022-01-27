@@ -1,3 +1,22 @@
+import { request } from '@/api/index'
+let fullTimeEdu = []
+let partTimeEdu = []
+request('personnel', 'dict').then(res => {
+  fullTimeEdu = res.data
+    ? res.data
+        .filter(item => item.category === 1)
+        .map(item => {
+          return { value: item.name }
+        })
+    : []
+  partTimeEdu = res.data
+    ? res.data
+        .filter(item => item.category === 2)
+        .map(item => {
+          return { value: item.name }
+        })
+    : []
+})
 const values = {
   nation: [
     { value: '汉族' },
@@ -160,12 +179,12 @@ export const suggestions = {
     cb(results)
   },
   queryFullTimeEdu(queryString, cb) {
-    const data = values.fullTimeEdu
-    var results = queryString ? data.filter(createFilter(queryString)) : data
+    const data = fullTimeEdu
+    const results = queryString ? data.filter(createFilter(queryString)) : data
     cb(results)
   },
   queryPartTimeEdu(queryString, cb) {
-    const data = values.partTimeEdu
+    const data = partTimeEdu
     var results = queryString ? data.filter(createFilter(queryString)) : data
     cb(results)
   },

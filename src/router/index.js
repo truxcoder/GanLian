@@ -1,5 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { GetQueryValue, setTicket, getTicket } from '@/utils/auth'
+const defaultSettings = require('@/settings.js')
+const ticket = GetQueryValue('ticket')
+if (ticket) {
+  setTicket(ticket)
+  window.location.href = 'http://' + defaultSettings.URL
+}
 
 Vue.use(Router)
 
@@ -7,7 +14,7 @@ Vue.use(Router)
 import Layout from '@/layout'
 const Module = () => import('@/views/website/Module')
 const Personnel = () => import('@/views/personnel/Personnel')
-const Organ = () => import('@/views/organ/Organ')
+// const Organ = () => import('@/views/organ/Organ')
 const Level = () => import('@/views/personnel/Level')
 const Position = () => import('@/views/personnel/Position')
 const Post = () => import('@/views/personnel/Post')
@@ -15,14 +22,17 @@ const Appraisal = () => import('@/views/personnel/Appraisal')
 const Award = () => import('@/views/award_and_punish/Award')
 const Punish = () => import('@/views/award_and_punish/Punish')
 const Discipline = () => import('@/views/incorruption/Discipline')
+const Report = () => import('@/views/incorruption/Report')
 const Department = () => import('@/views/organ/Department')
 const Role = () => import('@/views/system/Role')
 const Permission = () => import('@/views/system/Permission')
+const Data = () => import('@/views/system/Data')
+const EduDict = () => import('@/views/personnel/EduDict')
 
 export const componentList = {
   Personnel,
   Module,
-  Organ,
+  // Organ,
   Level,
   Position,
   Post,
@@ -32,7 +42,10 @@ export const componentList = {
   Department,
   Role,
   Permission,
-  Discipline
+  Discipline,
+  Report,
+  Data,
+  EduDict
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -73,6 +86,12 @@ export const constantRoutes = [
   {
     path: '/404',
     component: () => import('@/views/404'),
+    hidden: true
+  },
+
+  {
+    path: '/403',
+    component: () => import('@/views/403'),
     hidden: true
   },
 

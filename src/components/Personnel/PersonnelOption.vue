@@ -93,11 +93,9 @@ export default {
     if (this.$store.state.personnel.personnelOptions.length === 0) {
       this.disabled = true
       this.$store.dispatch('personnel/changePerOptions').then(res => {
-        console.log('dispatch,length:', this.$store.state.personnel.personnelOptions.length)
         this.disabled = false
       })
     }
-    console.log('personnelOptions.length:', this.$store.state.personnel.personnelOptions.length)
   },
   methods: {
     // remoteMethod: _.debounce(function(query) {

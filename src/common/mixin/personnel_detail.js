@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { getAge } from '@/utils/index'
+import { curd } from '@/api/index'
 export const mixin = {
   props: {
     passedData: {
@@ -24,8 +25,8 @@ export const mixin = {
   data() {
     return {
       dialogLoading: false,
-      updateFormVisible: false,
-      addFormVisible: false,
+      updateVisible: false,
+      addVisible: false,
       // mainData: [],
       multipleSelection: [],
       rowData: {},
@@ -64,18 +65,22 @@ export const mixin = {
     }
   },
   methods: {
+    visibleChange(cpn) {
+      const visible = cpn + 'Visible'
+      this[visible] = false
+    },
     addVisibleChange() {
-      this.addFormVisible = false
+      this.addVisible = false
     },
     updateVisibleChange() {
-      this.updateFormVisible = false
+      this.updateVisible = false
     },
     addSuccess() {
-      this.addFormVisible = false
+      this.addVisible = false
       this.$emit('reFetchCpnData', this.cpnName)
     },
     updateSuccess(row) {
-      this.updateFormVisible = false
+      this.updateVisible = false
       this.$emit('reFetchCpnData', this.cpnName)
     },
     handleSelectionChange(val) {
@@ -85,7 +90,59 @@ export const mixin = {
       // console.log(index, row)
       this.rowData = row
       this.currentEditIndex = index
-      this.updateFormVisible = true
+      this.updateVisible = true
+    },
+    handleDelete(index, id) {
+      this.$confirm('将删除该条信息, 是否确定?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          curd('delete', { id: [id] }, { resource: this.resource })
+            .then(response => {
+              this.$message({
+                message: response.message,
+                type: 'success'
+              })
+              this.mainData = index
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    deleteMutiData() {
+      this.$confirm('将删除选中信息, 是否确定?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          curd('delete', { id: this.multipleSelection.map(item => item.id) }, { resource: this.resource })
+            .then(response => {
+              this.$message({
+                message: response.message,
+                type: 'success'
+              })
+              this.$emit('reFetchCpnData', this.cpnName)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     }
   }
 }

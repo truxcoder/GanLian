@@ -111,7 +111,8 @@ export default {
         UPDATE: '修改数据',
         READ: '查看数据',
         MANAGE: '管理数据',
-        MENU: '进入菜单'
+        MENU: '进入菜单',
+        GLOBAL: '全局数据'
       }
     },
     /**

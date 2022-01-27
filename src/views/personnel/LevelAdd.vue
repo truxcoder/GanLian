@@ -1,6 +1,13 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-15 15:15:45
+ * @LastEditTime: 2022-01-10 18:26:32
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
-  <el-dialog v-loading="dialogLoading" title="添加级别信息" :width="dialogWidth" :visible.sync="formVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="formVisible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" title="添加级别信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item label="名称" prop="name">
         <el-input v-model="form.name" :style="formItemWidth" />
       </el-form-item>
@@ -16,11 +23,11 @@
 </template>
 
 <script>
-import { levelAdd } from '@/api/level'
+import { curd } from '@/api/index'
 export default {
   name: 'LevelAdd',
   props: {
-    formVisible: {
+    visible: {
       type: Boolean,
       default: false
     },
@@ -33,6 +40,7 @@ export default {
   },
   data() {
     return {
+      resource: 'level',
       form: { name: '', order: 0 },
       dialogWidth: '900px',
       formLabelWidth: '140px',
@@ -51,15 +59,13 @@ export default {
     }
   },
   methods: {
-    visibleChange() {
-      this.$emit('addVisibleChange')
-    },
     onSubmit() {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
           console.log('this.form:', this.form)
-          levelAdd(this.form)
+          // levelAdd(this.form)
+          curd('add', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
@@ -72,6 +78,7 @@ export default {
             })
             .catch(err => {
               // this.$message.error(err.message)
+              console.log(err)
               this.dialogLoading = false
             })
         } else {
@@ -84,7 +91,7 @@ export default {
       console.log(item)
     },
     onCancel() {
-      this.$emit('addVisibleChange')
+      this.$emit('visibleChange', 'add')
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()
     }

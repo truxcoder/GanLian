@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-01-04 16:11:24
+ * @LastEditTime: 2022-01-27 14:34:20
  * @LastEditors: truxcoder
  * @Description: 个人简历编辑
 -->
@@ -11,12 +11,12 @@
       <el-table :data="currentData" element-loading-text="Loading" border :fit="true" highlight-current-row>
         <el-table-column align="center" label="开始日期" width="165">
           <template slot-scope="scope">
-            <el-date-picker v-model="scope.row.start" :style="formItemWidth" type="date" value-format="yyyy-MM-dd" placeholder="选择日期" />
+            <el-date-picker v-model="scope.row.start" :style="formItemWidth" type="month" value-format="yyyy-MM-dd" placeholder="选择日期" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="结束日期" width="165">
           <template slot-scope="scope">
-            <el-date-picker v-model="scope.row.end" :style="formItemWidth" type="date" value-format="yyyy-MM-dd" placeholder="选择日期" />
+            <el-date-picker v-model="scope.row.end" :style="formItemWidth" type="month" value-format="yyyy-MM-dd" placeholder="选择日期" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="单位">
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { personnelUpdate } from '@/api/personnel'
+import { request } from '@/api'
 import dayjs from 'dayjs'
 export default {
   props: {
@@ -111,9 +111,21 @@ export default {
         if (item.end === 'null') {
           item.end = ''
         }
-        if (item.start === '' || item.organ === '' || item.post === '') {
+        if (item.organ === '') {
           isValid = 0
           return
+        }
+        if (item.start === '' || (item.post === '' && item.organ !== '待业')) {
+          isValid = 0
+          return
+        }
+        if (item.start !== '' && item.end !== '') {
+          const start = new Date(item.start)
+          const end = new Date(item.end)
+          if (start > end) {
+            isValid = -2
+            return
+          }
         }
         Object.values(item).forEach(i => {
           if (i.includes('#') || i.includes('$')) {
@@ -129,11 +141,34 @@ export default {
         this.$message.error('所填写项目中不能包含"#"、"$"等非法字符')
         return false
       }
+      if (isValid === -2) {
+        this.$message.error('开始时间不能大于结束时间!')
+        return false
+      }
       this.currentData.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
+      let currentIndex = 0
+      const length = this.currentData.length
+      if (length > 1) {
+        this.currentData.forEach(item => {
+          if (currentIndex !== 0) {
+            if (item.start !== this.currentData[currentIndex - 1].end) {
+              isValid = -2
+              return
+            }
+          }
+          currentIndex++
+        })
+      }
+      if (isValid === -2) {
+        this.$message.error('简历多条记录起止时间必须连续!')
+        return false
+      }
+
       // const result = this.currentData.map(item => item.start + '#' + item.end + '#' + item.organ + '#' + item.dept + '#' + item.post)
       // const temp = result.join('$')
       const temp = JSON.stringify(this.currentData)
-      personnelUpdate({ id: this.personnelId, resume: temp })
+      // personnelUpdate({ id: this.personnelId, resume: temp })
+      request('personnel', 'resume', { personnelId: this.personnelId, content: temp })
         .then(response => {
           this.$message({
             message: response.message,
@@ -155,7 +190,7 @@ export default {
       this.currentData.push(temp)
     },
     onCancel() {
-      this.$emit('resumeVisibleChange')
+      this.$emit('visibleChange', 'resume')
       // Object.keys(this.form).forEach(key => this.form[key]='')
     },
     onPersonnelChange(value) {

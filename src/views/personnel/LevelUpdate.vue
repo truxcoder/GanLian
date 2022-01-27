@@ -1,10 +1,17 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-15 15:29:53
+ * @LastEditTime: 2022-01-20 15:40:25
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
-  <el-dialog v-loading="dialogLoading" title="编辑级别信息" :width="dialogWidth" :visible.sync="formVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="formVisible" ref="updateForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
-      <el-form-item label="名称" :prop="name">
+  <el-dialog v-loading="dialogLoading" title="编辑级别信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="updateForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+      <el-form-item label="名称" prop="name">
         <el-input v-model="form.name" :style="formItemWidth" />
       </el-form-item>
-      <el-form-item label="排序" :prop="order">
+      <el-form-item label="排序" prop="order">
         <el-input v-model.number="form.order" :style="formItemWidth" />
       </el-form-item>
     </el-form>
@@ -16,11 +23,11 @@
 </template>
 
 <script>
-import { levelUpdate } from '@/api/level'
+import { curd } from '@/api'
 export default {
   name: 'LevelUpdate',
   props: {
-    formVisible: {
+    visible: {
       type: Boolean,
       default: false
     },
@@ -33,6 +40,7 @@ export default {
   },
   data() {
     return {
+      resource: 'level',
       form: { name: '', order: 0 },
       dialogWidth: '900px',
       formLabelWidth: '140px',
@@ -64,14 +72,14 @@ export default {
       this.$refs.updateForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          levelUpdate(this.form)
+          curd('update', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
                 type: 'success'
               })
               this.dialogLoading = false
-              this.$emit('updateSuccess', this.form)
+              this.$emit('updateSuccess')
             })
             .catch(err => {
               // this.$message.error(err.message)
@@ -85,7 +93,7 @@ export default {
       })
     },
     onCancel() {
-      this.$emit('updateVisibleChange')
+      this.$emit('visibleChange', 'update')
       this.$refs.updateForm.resetFields()
     }
   }

@@ -168,7 +168,7 @@ export default {
       this.currentEditIndex = -1
     },
     onCancel() {
-      this.$emit('dictVisibleChange')
+      this.$emit('visibleChange', 'dict')
       this.resetUpdateForm()
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()

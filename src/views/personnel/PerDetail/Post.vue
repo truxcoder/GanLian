@@ -1,7 +1,14 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-30 15:39:29
+ * @LastEditTime: 2022-01-11 16:40:50
+ * @LastEditors: truxcoder
+ * @Description: 人员详情页任职列表
+-->
 <template>
   <div>
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="addFormVisible = true">添加信息</el-button>
+      <el-button type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
       <el-button v-if="mainData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div v-if="mainData.length" class="mt-4">
@@ -34,15 +41,8 @@
       </el-table>
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
-    <post-add :is-single="true" :single-personnel-data="singlePersonnelData" :form-visible="addFormVisible" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" />
-    <post-update
-      :form-visible="updateFormVisible"
-      :is-single="true"
-      :single-personnel-data="singlePersonnelData"
-      :rowdata="rowData"
-      @updateSuccess="updateSuccess"
-      @updateVisibleChange="updateVisibleChange"
-    />
+    <post-add :visible="addVisible" :is-single="true" :single-personnel-data="singlePersonnelData" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <post-update :visible="updateVisible" :is-single="true" :single-personnel-data="singlePersonnelData" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -51,7 +51,6 @@ import PostAdd from '@/views/personnel/PostAdd.vue'
 import PostUpdate from '@/views/personnel/PostUpdate.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
-import { postDelete } from '@/api/post'
 
 export default {
   name: 'Post',
@@ -59,61 +58,8 @@ export default {
   mixins: [mixin],
   data() {
     return {
-      cpnName: 'Post'
-    }
-  },
-  methods: {
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          postDelete({ id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.mainData = index
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          postDelete({ id: this.multipleSelection.map(item => item.id) })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.$emit('reFetchCpnData', this.cpnName)
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+      cpnName: 'Post',
+      resource: 'post'
     }
   }
 }

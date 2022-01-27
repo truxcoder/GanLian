@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-01-06 17:39:57
+ * @LastEditTime: 2022-01-19 14:35:12
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -11,13 +11,14 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 
 const defaultSettings = require('@/settings.js')
+// const baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9090' : defaultSettings.serverURL
+const baseURL = defaultSettings.serverURL
 // create an axios instance
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-  baseURL: defaultSettings.serverURL, // GO后台地址
-  // baseURL: 'http://localhost:3000', //NodeJS后台地址
+  baseURL, // GO后台地址
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000
+  timeout: 50000
 })
 
 // request interceptor

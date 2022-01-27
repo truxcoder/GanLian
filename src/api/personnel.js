@@ -1,9 +1,16 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-01-24 10:39:58
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import request from '@/utils/request'
 
 export function getList(params) {
   return request({
     url: '/table/list',
-    method: 'get',
+    method: 'post',
     params
   })
 }
@@ -18,7 +25,7 @@ export function personnelList(data, params) {
 export function personnelDetail(params) {
   return request({
     url: '/personnel/detail',
-    method: 'get',
+    method: 'post',
     params
   })
 }
@@ -60,9 +67,10 @@ export function personnelSearchName(data) {
   })
 }
 
-export function getPersonnelName() {
+export function getPersonnelName(data) {
   return request({
     url: '/personnel/nameList',
-    method: 'get'
+    method: 'post',
+    data
   })
 }

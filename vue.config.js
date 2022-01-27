@@ -39,13 +39,13 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    },
-    proxy: {
-      '/image': {
-        target: 'http://localhost:8000',
-        pathRewrite: { '^/image': '' }
-      }
     }
+    // proxy: {
+    //   '/image': {
+    //     target: 'http://localhost:8000',
+    //     pathRewrite: { '^/image': '' }
+    //   }
+    // }
     // before: require('./mock/mock-server.js')
   },
 

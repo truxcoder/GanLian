@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-11-25 12:19:05
+ * @LastEditTime: 2022-01-24 14:28:25
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 import rules from '@/common/rules/award'
 export const mixin = {
   props: {
@@ -46,21 +53,12 @@ export const mixin = {
   },
   computed: {
     gradeList() {
-      return this.options.grade.filter(item => {
-        let isTrue = true
-        switch (this.form.category) {
-          case 1:
-            isTrue = item.value < 6
-            break
-          case 2:
-            isTrue = item.value > 5
-            break
-          default:
-            isTrue = true
-            break
-        }
-        return isTrue
-      })
+      return this.options.grade.filter(item => item.category === this.form.category)
+    }
+  },
+  methods: {
+    onCategoryChange() {
+      this.form.grade = ''
     }
   }
 }

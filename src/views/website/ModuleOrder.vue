@@ -1,8 +1,15 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-10-13 14:11:40
+ * @LastEditTime: 2022-01-26 20:59:08
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
-  <el-dialog title="模块批量排序" :visible.sync="cpnVisible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+  <el-dialog title="模块批量排序" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-form ref="orderForm" :inline="true" size="medium" label-position="right">
-      <el-form-item v-for="item in moduleList" :key="item.id+''" :label="item.title" :prop="item.id+''" label-width="100px">
-        <el-input v-model.number="item.order" :style="{ width:'50px' }" />
+      <el-form-item v-for="item in moduleList" :key="item.id + ''" :label="item.title" :prop="item.id + ''" label-width="100px">
+        <el-input v-model.number="item.order" :style="{ width: '50px' }" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -17,7 +24,7 @@ import { orderModule } from '@/api/module'
 export default {
   name: 'ModuleOrder',
   props: {
-    cpnVisible: {
+    visible: {
       type: Boolean,
       default: false
     },
@@ -37,23 +44,27 @@ export default {
         }
       }
       this.dialogLoading = true
-      const tempData = this.moduleList.map(item => { return { id: item.id, order: item.order } })
-      console.log(tempData)
-      orderModule(tempData).then(response => {
-        this.$message({
-          message: response.message,
-          type: 'success'
-        })
-        this.dialogLoading = false
-        this.$emit('updateOrderSuccess')
-      }).catch(err => {
-        this.$message.error(err.message)
-        this.dialogLoading = false
+      const tempData = this.moduleList.map(item => {
+        return { id: item.id, order: item.order }
       })
+      console.log(tempData)
+      orderModule(tempData)
+        .then(response => {
+          this.$message({
+            message: response.message,
+            type: 'success'
+          })
+          this.dialogLoading = false
+          this.$emit('updateOrderSuccess')
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+          this.dialogLoading = false
+        })
       this.$message({ message: 'hwhw', type: 'success' })
     },
     onCancel() {
-      this.$emit('orderCancel')
+      this.$emit('visibleChange', 'order')
       this.$refs.orderForm.resetFields()
       this.$refs.orderForm.clearValidate()
     }
@@ -61,6 +72,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -6,7 +6,7 @@
         <personnel-option v-if="!isSingle" :rowdata="rowdata" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
       </el-form-item>
       <el-form-item label="分类" prop="category">
-        <el-select v-model="form.category" :style="formItemWidth" placeholder="请选择分类">
+        <el-select v-model="form.category" :style="formItemWidth" placeholder="请选择分类" @change="onCategoryChange">
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { disciplineAdd } from '@/api/discipline'
+import { curd } from '@/api/index'
 import { mixin } from '@/common/mixin/discipline'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 export default {
@@ -53,6 +53,11 @@ export default {
       default: false
     }
   },
+  data() {
+    return {
+      resource: 'discipline'
+    }
+  },
   watch: {
     visible: function(val, oldval) {
       if (val === true) {
@@ -63,21 +68,18 @@ export default {
     }
   },
   methods: {
-    visibleChange() {
-      this.$emit('addVisibleChange')
-    },
     onSubmit() {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          disciplineAdd(this.form)
+          curd('add', this.form, { resource: this.resource })
             .then(response => {
               this.$message({
                 message: response.message,
                 type: 'success'
               })
               this.dialogLoading = false
-              this.$emit('addSuccess', 'Discipline')
+              this.$emit('addSuccess')
               this.$refs.addForm.resetFields()
               this.personnelOpitons = []
               // Object.keys(this.form).forEach(key => this.form[key]='')
@@ -93,12 +95,9 @@ export default {
         }
       })
     },
-    handleSelect(item) {
-      console.log(item)
-    },
     onCancel() {
       this.personnelOpitons = []
-      this.$emit('addVisibleChange', 'Discipline')
+      this.$emit('visibleChange', 'add')
       // Object.keys(this.form).forEach(key => this.form[key]='')
       this.$refs.addForm.resetFields()
     },

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-22 10:10:06
- * @LastEditTime: 2021-12-22 10:51:53
+ * @LastEditTime: 2022-01-11 15:08:25
  * @LastEditors: truxcoder
  * @Description:奖励详情页
 -->
@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     onClose() {
-      this.$emit('detailClose')
+      this.$emit('visibleChange', 'detail')
     }
   }
 }
