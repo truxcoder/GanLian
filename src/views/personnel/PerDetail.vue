@@ -5,6 +5,9 @@
         <el-tab-pane label="人员基本情况">
           <basic :loading="loading" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
         </el-tab-pane>
+        <el-tab-pane label="培训情况">
+          <training :loading="loading" :passed-data="trainings" :personnel-id="originData.id" @reFetchCpnData="reFetchCpnData" />
+        </el-tab-pane>
         <el-tab-pane label="任职情况">
           <post :loading="loading" :passed-data="posts" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
         </el-tab-pane>
@@ -23,32 +26,40 @@
 </template>
 
 <script>
-import 'tailwindcss/tailwind.css'
+// import 'tailwindcss/tailwind.css'
 import { request } from '@/api/index'
 import AwardAndPunish from './PerDetail/AwardAndPunish.vue'
 import Appraisal from './PerDetail/Appraisal.vue'
 import Post from './PerDetail/Post.vue'
 import Discipline from './PerDetail/Discipline.vue'
 import Basic from './PerDetail/Basic.vue'
+import Training from './PerDetail/Training.vue'
+
+import { detail_permission_mixin } from '@/common/mixin/permission'
 
 export default {
   name: 'Pdetail',
-  components: { AwardAndPunish, Appraisal, Post, Basic, Discipline },
+  components: { AwardAndPunish, Appraisal, Post, Basic, Discipline, Training },
+  mixins: [detail_permission_mixin],
   data() {
     return {
       originData: {},
       posts: [],
+      trains: [],
       appraisals: [],
       awards: [],
       punishes: [],
       disciplines: [],
+      trainings: [],
       queryData: {},
       loading: true
     }
   },
   created() {
-    this.queryData = { id: this.$route.query.id }
-    this.fetchAllData(this.queryData)
+    this.check().then(() => {
+      this.queryData = { id: this.$route.query.id }
+      this.fetchAllData(this.queryData)
+    })
   },
   methods: {
     fetchAllData(data = {}) {
@@ -59,16 +70,19 @@ export default {
         request('appraisal', 'detail', data),
         request('award', 'detail', data),
         request('punish', 'detail', data),
-        request('discipline', 'detail', data)
+        request('discipline', 'detail', data),
+        request('training', 'detail', data)
       ]
       Promise.all(promises).then(responses => {
         this.originData = responses[0].data
+        this.trains = responses[0].trains
         this.posts = responses[1].data
         // this.appraisals = responses[2].data.sort((a, b) => a.years - b.years)
         this.appraisals = responses[2].data
         this.awards = responses[3].data
         this.punishes = responses[4].data
         this.disciplines = responses[5].data
+        this.trainings = responses[6].data
         this.loading = false
       })
     },
@@ -102,6 +116,9 @@ export default {
           break
         case 'Discipline':
           this.fetchData('discipline', 'disciplines')
+          break
+        case 'Training':
+          this.fetchData('training', 'trainings')
           break
         default:
           console.log('cpn:', cpn)

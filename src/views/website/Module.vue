@@ -122,6 +122,7 @@ export default {
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin],
   data() {
     return {
+      resource: 'module',
       currentData: [],
       originData: [],
       orderVisible: false,

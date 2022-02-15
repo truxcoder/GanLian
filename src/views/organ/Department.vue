@@ -1,6 +1,13 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-12-06 10:31:44
+ * @LastEditTime: 2022-02-07 18:33:53
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
   <div v-loading="listLoading" class="app-container user-container">
-    <el-col :span="12">
+    <!-- <el-col :span="12">
       <el-card class="left-card">
         <el-row :gutter="20">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="addFormVisible = true">编辑</el-button>
@@ -12,22 +19,20 @@
     </el-col>
     <el-col :span="12">
       <el-card class="right-card">
-        <!-- <div class="user-tool-bar">
-        <el-button type="success" @click="addFormVisible = true" icon="el-icon-circle-plus-outline" size="mini">添加</el-button>
-        <el-button type="danger"  icon="el-icon-delete" @click="deleteMutiData" size="mini">删除</el-button>
-        <el-button type="primary"  icon="el-icon-s-data" @click="fetchData({})" size="mini">所有数据</el-button>
-      </div> -->
       </el-card>
-    </el-col>
+    </el-col> -->
+    <department-transfer />
   </div>
 </template>
 
 <script>
-import DepartmentTree from '@/components/department/DepartmentTree.vue'
+// import DepartmentTree from '@/components/department/DepartmentTree.vue'
+import DepartmentTransfer from '@/components/Personnel/PersonnelTransfer.vue'
 import { getDepartmentList } from '@/api/department'
 export default {
   name: 'Department',
-  components: { DepartmentTree },
+  // components: { DepartmentTree },
+  components: { DepartmentTransfer },
   data() {
     return {
       list: [],

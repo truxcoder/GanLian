@@ -1,10 +1,19 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-01-26 18:24:34
+ * @LastEditTime: 2022-02-14 12:11:56
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
+
+import { request } from '@/api/index'
+let fullTimeEduDict = []
+let partTimeEduDict = []
+
+request('personnel', 'dict').then(res => {
+  fullTimeEduDict = res.data ? res.data.filter(item => item.category === 1).map(item => item.name) : []
+  partTimeEduDict = res.data ? res.data.filter(item => item.category === 2).map(item => item.name) : []
+})
 
 export const nationDict = [
   '汉族',
@@ -67,22 +76,23 @@ export const nationDict = [
 
 export const politicalDict = ['中共党员', '中共预备党员', '共青团员', '群众']
 export const proCertDict = ['律师资格证', '三级心理咨询师', '二级心理咨询师', '一级建造师', '软件架构师', '教师资格证']
-export const fullTimeEduDict = ['博士研究生', '硕士研究生', '博士', '硕士', '大学本科学士', '大学本科', '大学专科', '中专', '中技', '高中', '初中']
-export const partTimeEduDict = [
-  '在职博士研究生',
-  '在职硕士研究生',
-  '在职大学',
-  '在职大专',
-  '成人教育大学',
-  '成人教育大专',
-  '省委党校硕士研究生',
-  '省委党校大学',
-  '省委党校大专',
-  '中央党校博士研究生',
-  '中央党校硕士研究生',
-  '中央党校大学'
-]
-export const subjectDict = ['法学', '新闻学', '监狱学', '汉语言文学', '经济学', '化学', '数学', '心理学', '物理', '医学']
+// export const fullTimeEduDict = ['博士研究生', '硕士研究生', '博士', '硕士', '大学本科学士', '大学本科', '大学专科', '中专', '中技', '高中', '初中']
+export { fullTimeEduDict, partTimeEduDict }
+// export const partTimeEduDict = [
+//   '在职博士研究生',
+//   '在职硕士研究生',
+//   '在职大学',
+//   '在职大专',
+//   '成人教育大学',
+//   '成人教育大专',
+//   '省委党校硕士研究生',
+//   '省委党校大学',
+//   '省委党校大专',
+//   '中央党校博士研究生',
+//   '中央党校硕士研究生',
+//   '中央党校大学'
+// ]
+
 export const conclusionDict = ['优秀', '称职', '基本称职', '不称职', '不确定等次']
 export const seasonDict = [
   { label: '年终', value: 0 },
@@ -125,3 +135,12 @@ export const eduCategory = [
   { label: '全日制', value: 1 },
   { label: '非全日制', value: 2 }
 ]
+export const permissionDict = {
+  ADD: '添加数据',
+  DELETE: '删除数据',
+  UPDATE: '修改数据',
+  READ: '查看数据',
+  MANAGE: '管理数据',
+  MENU: '进入菜单',
+  GLOBAL: '全局数据'
+}

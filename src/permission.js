@@ -1,9 +1,9 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-01-17 15:38:59
+ * @LastEditTime: 2022-02-08 10:13:49
  * @LastEditors: truxcoder
- * @Description:
+ * @Description: 导航守卫，动态获取路由
  */
 import router from './router'
 import store from './store'

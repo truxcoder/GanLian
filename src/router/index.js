@@ -25,9 +25,11 @@ const Discipline = () => import('@/views/incorruption/Discipline')
 const Report = () => import('@/views/incorruption/Report')
 const Department = () => import('@/views/organ/Department')
 const Role = () => import('@/views/system/Role')
+const RoleDict = () => import('@/views/system/RoleDict')
 const Permission = () => import('@/views/system/Permission')
 const Data = () => import('@/views/system/Data')
 const EduDict = () => import('@/views/personnel/EduDict')
+const Training = () => import('@/views/train/Training')
 
 export const componentList = {
   Personnel,
@@ -41,11 +43,13 @@ export const componentList = {
   Punish,
   Department,
   Role,
+  RoleDict,
   Permission,
   Discipline,
   Report,
   Data,
-  EduDict
+  EduDict,
+  Training
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1

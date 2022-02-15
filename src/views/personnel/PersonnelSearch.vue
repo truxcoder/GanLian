@@ -32,8 +32,8 @@
         <!-- <el-autocomplete v-model="form.fullTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryFullTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
       </el-form-item>
       <el-form-item label="全日制教育专业" prop="fullTimeMajor">
-        <el-select v-model="form.fullTimeMajor" :style="formItemWidth" multiple>
-          <el-option v-for="i in fullTimeMajorOption" :key="i" :label="i" :value="i" />
+        <el-select v-model="form.fullTimeMajor" :style="formItemWidth" filterable allow-create multiple :filter-method="subjectFilter">
+          <el-option v-for="i in subjectOption" :key="i" :label="i" :value="i" />
         </el-select>
         <!-- <el-autocomplete v-model="form.fullTimeMajor" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.querySubject" placeholder="请输入内容" @select="handleSelect" /> -->
       </el-form-item>
@@ -92,7 +92,8 @@
 <script>
 var lang = require('lodash/lang')
 import { suggestions } from '@/common/model/suggestions'
-import { nationDict, politicalDict, proCertDict, fullTimeEduDict, partTimeEduDict, subjectDict, awardGrade, punishGrade } from '@/utils/dict'
+import { nationDict, politicalDict, proCertDict, fullTimeEduDict, partTimeEduDict, awardGrade, punishGrade } from '@/utils/dict'
+import { subjectDict } from '@/utils/subject_dict'
 export default {
   name: 'PersonnelSearch',
   props: {
@@ -140,6 +141,7 @@ export default {
       loading: false,
       genderOption: ['男', '女'],
       YesOrNo: ['是', '否'],
+      subjectOption: [],
       // nationOption: nationDict,
       politicalOption: politicalDict,
       proCertOption: proCertDict,
@@ -188,6 +190,10 @@ export default {
   methods: {
     onSubmit() {
       if (this.allNullCheck(this.form)) {
+        if (!this.validate(this.form)) {
+          this.$message.error('查询数据不合法!')
+          return false
+        }
         const temp = lang.cloneDeep(this.form)
         if (temp?.ageStart === '') {
           temp.ageStart = 0
@@ -244,6 +250,7 @@ export default {
     resetFields() {
       this.form.ageStart = ''
       this.form.ageEnd = ''
+      this.subjectOption = []
       this.$refs.searchForm.resetFields()
       for (const k of Object.keys(this.form)) {
         switch (Object.prototype.toString.call(this.form[k])) {
@@ -284,6 +291,25 @@ export default {
         this.$message.error('查询字段不能全为空!')
       }
       return isValid
+    },
+    /**
+     * @description: 表单合法性检查
+     * @param {*} form
+     * @return {*}
+     */
+    validate(form) {
+      if ((form.ageStart !== '' && Object.prototype.toString.call(form.ageStart) !== '[object Number]') || (form.ageEnd !== '' && Object.prototype.toString.call(form.ageEnd) !== '[object Number]')) {
+        return false
+      }
+      return true
+    },
+    subjectFilter(sub) {
+      if (sub !== '') {
+        this.subjectOption = subjectDict.filter(item => item.includes(sub))
+        return
+      } else if (this.form.fullTimeMajor.length === 0) {
+        this.subjectOption = []
+      }
     }
   }
 }

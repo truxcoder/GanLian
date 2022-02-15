@@ -89,7 +89,7 @@ export default {
     },
     onCancel() {
       this.personnelOpitons = []
-      this.$emit('updateVisibleChange')
+      this.$emit('visibleChange', 'update')
       this.$refs.updateForm.resetFields()
     },
     onPersonnelChange(value) {

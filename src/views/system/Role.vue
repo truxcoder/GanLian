@@ -6,8 +6,7 @@
     <div class="tool-bar">
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加用户角色</el-button>
       <el-button v-if="can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除用户角色</el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
-      <el-button v-if="can.manage" type="primary" icon="el-icon-document" size="mini" @click="dictVisible = true">维护角色字典</el-button>
+      <!-- <el-button v-if="can.manage" type="primary" icon="el-icon-document" size="mini" @click="dictVisible = true">维护角色字典</el-button> -->
     </div>
     <el-table v-loading="listLoading" :data="currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
@@ -54,7 +53,6 @@
     />
     <role-add :visible="addVisible" :options="roleOption" @addSuccess="addSuccess" @visibleChange="visibleChange" />
     <role-update :visible="updateVisible" :options="roleOption" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
-    <role-dict :visible="dictVisible" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -65,11 +63,10 @@ import { list_mixin } from '@/common/mixin/list'
 import { permission_mixin } from '@/common/mixin/permission'
 import RoleAdd from './RoleAdd.vue'
 import RoleUpdate from './RoleUpdate.vue'
-import RoleDict from './RoleDict.vue'
 
 export default {
   name: 'Role',
-  components: { RoleAdd, RoleUpdate, RoleDict },
+  components: { RoleAdd, RoleUpdate },
   mixins: [common_mixin, permission_mixin, list_mixin],
   data() {
     return {
@@ -123,10 +120,6 @@ export default {
         this.currentData = response.data || []
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.currentPage = 1
-      this.fetchData()
     },
     handleSelectionChange(val) {
       this.multipleSelection = val

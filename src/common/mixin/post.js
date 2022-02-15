@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-11-16 09:13:38
- * @LastEditTime: 2022-01-18 14:46:50
+ * @LastEditTime: 2022-02-10 14:56:26
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -36,7 +36,7 @@ export const mixin = {
   },
   data() {
     return {
-      form: { personnelId: '', departmentId: '', organId: '', startDay: '', endDay: '', positionId: '', levelId: '' },
+      form: { personnelId: '', department: '', organ: '', startDay: '', endDay: '', positionId: '', levelId: '' },
       dialogWidth: '900px',
       formLabelWidth: '140px',
       formItemWidth: { width: '220px' },
@@ -63,7 +63,7 @@ export const mixin = {
       })
       const departmentOptions = this.$store.getters.departments.map(item => {
         const parent = this.organMap[item.busOrgCode] ? this.organMap[item.busOrgCode].name : ' '
-        return { label: item.name + ' 〔' + parent + '〕', value: item.id }
+        return { label: item.name + ' 〔' + parent + '〕', value: item.name }
       })
       return {
         department: departmentOptions,

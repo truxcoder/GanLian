@@ -6,15 +6,15 @@
         <personnel-option v-if="!isSingle" :rowdata="rowdata" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
       </el-form-item>
 
-      <el-form-item label="任职部门" prop="departmentId">
-        <el-select v-model="form.departmentId" :style="formItemWidth" filterable placeholder="请选择部门">
+      <el-form-item label="任职部门" prop="department">
+        <el-select v-model="form.department" :style="formItemWidth" filterable allow-create placeholder="请选择或输入部门">
           <el-option v-for="i in options.department" :key="i.vaule" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="任职单位" prop="organId">
-        <el-select v-model="form.organId" :style="formItemWidth" placeholder="请选择单位">
-          <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.id" />
+      <el-form-item label="任职单位" prop="organ">
+        <el-select v-model="form.organ" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位">
+          <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.name" />
         </el-select>
       </el-form-item>
 

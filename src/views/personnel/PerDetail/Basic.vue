@@ -38,14 +38,14 @@
     </div>
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
       <div class="h-12 flex items-center px-4 bg-blue-50">
-        <span class="font-semibold">取得专业证书情况</span>
+        <span>取得专业证书情况</span>
       </div>
       <hr class="border-gray-300" />
       <div class="min-h-0 p-4">
         <span>{{ originData.proCert }}</span>
       </div>
     </div>
-    <div class="mt-4 text-left border border-gray-300 rounded-sm">
+    <!-- <div class="mt-4 text-left border border-gray-300 rounded-sm">
       <div class="h-12 flex items-center px-4 bg-blue-50">
         <span>参加培训情况</span>
       </div>
@@ -53,7 +53,7 @@
       <div class="p-4 min-h-0">
         <span>{{ originData.training }}</span>
       </div>
-    </div>
+    </div> -->
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
       <div class="h-12 flex items-center px-4 bg-blue-50 justify-between">
         <span>个人简历</span>

@@ -8,7 +8,7 @@
       <el-button v-if="can.delete && awardData.length" type="danger" :disabled="!awardMultipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData('Award')">删除</el-button>
     </div>
     <div v-if="awardData.length" class="mt-4">
-      <el-table v-loading="loading" :data="awardData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleAwardSelectionChange">
+      <el-table v-loading="cpnLoading" :data="awardData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleAwardSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="奖励类型" width="150">
           <template slot-scope="scope">
@@ -157,6 +157,7 @@ export default {
       punishMultipleSelection: [],
       rowData: {},
       currentEditIndex: 0,
+      tabLoading: false,
       currentOperateCpn: ''
     }
   },
@@ -192,7 +193,16 @@ export default {
         category: categoryOptions,
         grade: gradeOptions
       }
+    },
+    cpnLoading() {
+      return this.loading || this.tabLoading
     }
+  },
+  created() {
+    this.tabLoading = true
+    this.check().then(() => {
+      this.tabLoading = false
+    })
   },
   methods: {
     handleDelete(index, id, module) {

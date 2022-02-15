@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 15:39:29
- * @LastEditTime: 2022-01-11 16:40:50
+ * @LastEditTime: 2022-02-10 15:33:02
  * @LastEditors: truxcoder
  * @Description: 人员详情页任职列表
 -->
@@ -18,10 +18,10 @@
           <template slot-scope="scope">{{ scope.row.positionName }}</template>
         </el-table-column>
         <el-table-column align="center" label="任职部门">
-          <template slot-scope="scope">{{ scope.row.departmentName }}</template>
+          <template slot-scope="scope">{{ scope.row.department }}</template>
         </el-table-column>
         <el-table-column align="center" label="任职单位">
-          <template slot-scope="scope">{{ scope.row.organName }}</template>
+          <template slot-scope="scope">{{ scope.row.organ }}</template>
         </el-table-column>
         <el-table-column align="center" label="级别" width="100">
           <template slot-scope="scope">{{ scope.row.levelName }}</template>

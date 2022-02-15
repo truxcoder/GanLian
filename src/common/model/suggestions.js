@@ -1,6 +1,10 @@
 import { request } from '@/api/index'
+import { subjectDict } from '@/utils/subject_dict'
 let fullTimeEdu = []
 let partTimeEdu = []
+const subjects = subjectDict.map(item => {
+  return { value: item }
+})
 request('personnel', 'dict').then(res => {
   fullTimeEdu = res.data
     ? res.data
@@ -189,7 +193,7 @@ export const suggestions = {
     cb(results)
   },
   querySubject(queryString, cb) {
-    const data = values.subject
+    const data = subjects
     var results = queryString ? data.filter(createFilter(queryString)) : data
     cb(results)
   },

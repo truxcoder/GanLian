@@ -1,9 +1,6 @@
 <template>
-  <div class="app-container">
-    <!-- <el-row v-if="!total">
-      <el-col :span="24"><h2>暂无数据</h2></el-col>
-    </el-row> -->
-    <el-form ref="addForm" :inline="true" :model="form" :rules="rules">
+  <el-dialog v-loading="dialogLoading" title="维护角色字典" width="900px" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="addForm" :inline="true" :model="form" :rules="rules">
       <el-form-item label="名称(英文)" prop="name">
         <el-input v-model="form.name" size="small" />
       </el-form-item>
@@ -34,21 +31,25 @@
           <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
           <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" @click="onUpdateSubmit(scope.row)">确定</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
-          <el-button size="mini" type="primary" @click="handlePermission(scope.row.name)">分配权限</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <permission-set :visible="visible" :role="role" @visibleChange="visibleChange" />
-  </div>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="primary" round plain size="small" @click="onCancel">关闭对话框</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
 import { roleDictAdd, roleDictUpdate, roleDictDelete } from '@/api/role'
-import PermissionSet from './PermissionSet.vue'
-
 export default {
   name: 'RoleDict',
-  components: { PermissionSet },
+  props: {
+    visible: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       form: { name: '', title: '' },
@@ -59,9 +60,7 @@ export default {
       },
       currentEditIndex: -1,
       rowSuccessClass: '',
-      dialogLoading: false,
-      visible: false,
-      role: ''
+      dialogLoading: false
     }
   },
   computed: {
@@ -69,14 +68,9 @@ export default {
       return [...this.$store.getters.roleDict]
     }
   },
-  created() {
-    if (this.$store.getters.roleDict.length === 0) {
-      this.$store.dispatch('role/setRoleDict')
-    }
-  },
   methods: {
     visibleChange() {
-      this.visible = false
+      this.$emit('dictVisibleChange')
     },
     onSubmit() {
       this.$refs.addForm.validate(valid => {
@@ -140,10 +134,6 @@ export default {
       this.updateForm.name = row.name
       this.updateForm.title = row.title
     },
-    handlePermission(role) {
-      this.role = role
-      this.visible = true
-    },
     handleDelete(index, id) {
       this.$confirm('将删除该条信息, 是否确定?', '提示', {
         confirmButtonText: '确定',
@@ -176,16 +166,15 @@ export default {
       this.updateForm.name = ''
       this.updateForm.title = ''
       this.currentEditIndex = -1
+    },
+    onCancel() {
+      this.$emit('visibleChange', 'dict')
+      this.resetUpdateForm()
+      // Object.keys(this.form).forEach(key => this.form[key]='')
+      this.$refs.addForm.resetFields()
     }
   }
 }
 </script>
 
-<style scoped>
-.tool-bar {
-  margin-bottom: 10px;
-}
-.pagination {
-  margin-top: 15px;
-}
-</style>
+<style></style>

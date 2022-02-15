@@ -39,7 +39,6 @@
       highlight-current-row
       @selection-change="handleSelectionChange"
     >
-      <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="序号" width="70">
         <template slot-scope="scope">
           {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
@@ -51,7 +50,7 @@
           <!-- <span :class="{'text_red':!scope.row.organId}">{{ scope.row.organId ? getOrganName(scope.row.organId, "short") : '未定义' }}</span> -->
         </template>
       </el-table-column>
-      <el-table-column label="所属部门" align="center" width="150">
+      <el-table-column label="所属部门" align="center">
         <template slot-scope="scope">
           <span :class="{ text_red: !scope.row.departmentShortName }">{{ scope.row.departmentShortName ? scope.row.departmentShortName : '未定义' }}</span>
           <!-- <span :class="{'text_red':!scope.row.organId}">{{ scope.row.organId ? getOrganName(scope.row.organId, "short") : '未定义' }}</span> -->
@@ -62,7 +61,7 @@
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="身份" width="90">
+      <el-table-column align="center" label="身份" width="70">
         <template slot-scope="scope">
           {{ scope.row.userType === 1 ? '民警' : '辅警' }}
         </template>
@@ -88,7 +87,7 @@
           {{ scope.row.nation }}
         </template>
       </el-table-column>
-      <el-table-column label="政治面貌" align="center">
+      <el-table-column label="政治面貌" align="center" width="120">
         <template slot-scope="scope">
           {{ scope.row.political }}
         </template>

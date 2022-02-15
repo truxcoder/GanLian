@@ -158,7 +158,9 @@ export default {
     if (this.$store.getters.roleDict.length === 0) {
       this.$store.dispatch('role/setRoleDict')
     }
-    this.fetchAllData()
+    this.check().then(() => {
+      this.fetchAllData()
+    })
   },
   methods: {
     fetchAllData(params = {}) {

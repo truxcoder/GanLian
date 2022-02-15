@@ -7,8 +7,8 @@
       <el-form-item label="姓名" prop="personnelId">
         <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
       </el-form-item>
-      <el-form-item label="单位" prop="organId">
-        <el-select v-model="searchForm.organId" size="small" placeholder="请选择单位">
+      <el-form-item label="单位" prop="organ">
+        <el-select v-model="searchForm.organ" size="small" placeholder="请选择单位">
           <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
@@ -31,7 +31,7 @@
           {{ scope.row.personnelName }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="警号/工号" width="110">
+      <el-table-column align="center" label="警号/工号" width="90">
         <template slot-scope="scope">
           {{ scope.row.policeCode }}
         </template>
@@ -41,19 +41,19 @@
           {{ scope.row.positionName }}
         </template>
       </el-table-column>
-      <el-table-column label="级别" align="center" width="80">
+      <el-table-column label="级别" align="center" width="70">
         <template slot-scope="scope">
           {{ scope.row.levelName }}
         </template>
       </el-table-column>
-      <el-table-column label="任职单位" align="center" width="90">
+      <el-table-column label="任职单位" align="center" width="220" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.organShortName }}
+          {{ scope.row.organ }}
         </template>
       </el-table-column>
-      <el-table-column label="任职部门" align="center">
+      <el-table-column label="任职部门" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.departmentName }}
+          {{ scope.row.department }}
         </template>
       </el-table-column>
       <el-table-column label="任职开始日期" align="center" width="130">
@@ -67,7 +67,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" width="180">
+      <el-table-column align="center" label="操作" width="160">
         <template slot-scope="scope">
           <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
@@ -113,7 +113,7 @@ export default {
       queryMeans: 'backend',
       originData: [],
       currentData: [],
-      searchForm: { personnelId: '', organId: '' }
+      searchForm: { personnelId: '', organ: '' }
     }
   },
   computed: {

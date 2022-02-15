@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 15:09:42
- * @LastEditTime: 2022-01-26 18:46:02
+ * @LastEditTime: 2022-02-10 15:44:08
  * @LastEditors: truxcoder
  * @Description: 学历字典
 -->
@@ -10,7 +10,6 @@
     <div class="tool-bar">
       <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
       <el-button v-if="total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
-      <el-button v-if="total" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <div class="tableZone">
       <el-table v-loading="listLoading" :data="currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
@@ -96,9 +95,6 @@ export default {
         this.currentData = response.data
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.fetchData()
     }
   }
 }
