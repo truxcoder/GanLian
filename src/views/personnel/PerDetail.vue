@@ -20,6 +20,9 @@
         <el-tab-pane label="处分情况">
           <discipline :loading="loading" :passed-data="disciplines" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
         </el-tab-pane>
+        <el-tab-pane label="信访举报">
+          <report :loading="loading" :passed-data="reports" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+        </el-tab-pane>
       </el-tabs>
     </el-main>
   </el-container>
@@ -34,12 +37,13 @@ import Post from './PerDetail/Post.vue'
 import Discipline from './PerDetail/Discipline.vue'
 import Basic from './PerDetail/Basic.vue'
 import Training from './PerDetail/Training.vue'
+import Report from './PerDetail/Report.vue'
 
 import { detail_permission_mixin } from '@/common/mixin/permission'
 
 export default {
   name: 'Pdetail',
-  components: { AwardAndPunish, Appraisal, Post, Basic, Discipline, Training },
+  components: { AwardAndPunish, Appraisal, Post, Basic, Discipline, Training, Report },
   mixins: [detail_permission_mixin],
   data() {
     return {
@@ -51,6 +55,7 @@ export default {
       punishes: [],
       disciplines: [],
       trainings: [],
+      reports: [],
       queryData: {},
       loading: true
     }
@@ -71,7 +76,8 @@ export default {
         request('award', 'detail', data),
         request('punish', 'detail', data),
         request('discipline', 'detail', data),
-        request('training', 'detail', data)
+        request('training', 'detail', data),
+        request('report', 'detail', data)
       ]
       Promise.all(promises).then(responses => {
         this.originData = responses[0].data
@@ -83,6 +89,7 @@ export default {
         this.punishes = responses[4].data
         this.disciplines = responses[5].data
         this.trainings = responses[6].data
+        this.reports = responses[7].data
         this.loading = false
       })
     },
@@ -119,6 +126,9 @@ export default {
           break
         case 'Training':
           this.fetchData('training', 'trainings')
+          break
+        case 'Report':
+          this.fetchData('report', 'reports')
           break
         default:
           console.log('cpn:', cpn)

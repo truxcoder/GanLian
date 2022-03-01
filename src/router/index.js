@@ -30,6 +30,8 @@ const Permission = () => import('@/views/system/Permission')
 const Data = () => import('@/views/system/Data')
 const EduDict = () => import('@/views/personnel/EduDict')
 const Training = () => import('@/views/train/Training')
+const EntryExit = () => import('@/views/incorruption/EntryExit')
+const Affair = () => import('@/views/incorruption/Affair')
 
 export const componentList = {
   Personnel,
@@ -49,7 +51,9 @@ export const componentList = {
   Report,
   Data,
   EduDict,
-  Training
+  Training,
+  EntryExit,
+  Affair
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1

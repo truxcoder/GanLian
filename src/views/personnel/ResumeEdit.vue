@@ -1,14 +1,25 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-01-27 14:34:20
+ * @LastEditTime: 2022-02-28 11:04:30
  * @LastEditors: truxcoder
  * @Description: 个人简历编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" title="编辑干部个人简历" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-card class="mb-4">
+      <div class="text-gray-600">
+        <ul>
+          <li>每行右侧图标的功能是<code class=" text-red-600">向下添加一行</code>和<code class=" text-red-600">删除本行</code></li>
+          <li>简历的时间必须连续, 即一条信息的开始时间须与上一条信息的结束时间在同一月</li>
+          <li>除最后一条信息外,其他信息起止时间必须填写</li>
+          <li>如果单位填“待业”或“转业待安置”, 部门和身份可以留空。否则身份必须填写</li>
+          <li>如果同一时间段兼任多个职务, 则在主要职务信息行勾选主任, 兼任职务信息行勾选兼任</li>
+        </ul>
+      </div>
+    </el-card>
     <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" size="medium" :label-width="formLabelWidth" label-position="right">
-      <el-table :data="currentData" element-loading-text="Loading" border :fit="true" highlight-current-row>
+      <el-table :data="currentData" element-loading-text="Loading" border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" label="开始日期" width="165">
           <template slot-scope="scope">
             <el-date-picker v-model="scope.row.start" :style="formItemWidth" type="month" value-format="yyyy-MM-dd" placeholder="选择日期" />
@@ -34,9 +45,26 @@
             <el-input v-model="scope.row.post" />
           </template>
         </el-table-column>
-        <el-table-column align="center" width="50">
+        <el-table-column align="center" label="主任" width="55">
           <template slot-scope="scope">
+            <el-checkbox v-model="scope.row.main" />
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="兼任" width="55">
+          <template slot-scope="scope">
+            <el-checkbox v-model="scope.row.cum" />
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="100">
+          <template slot-scope="scope">
+            <i class="el-icon-circle-plus cursor-pointer mr-2" @click="handleAdd(scope.$index)" />
             <i class="el-icon-delete cursor-pointer" @click="handleDelete(scope.$index)" />
+            <!-- <el-tooltip class="mr-2" placement="top" content="向下插入一行">
+              <i class="el-icon-circle-plus cursor-pointer" @click="handleAdd(scope.$index)" />
+            </el-tooltip>
+            <el-tooltip class="mr-2" placement="top" content="删除本行">
+              <i class="el-icon-delete cursor-pointer" @click="handleDelete(scope.$index)" />
+            </el-tooltip> -->
           </template>
         </el-table-column>
       </el-table>
@@ -78,6 +106,7 @@ export default {
       formLabelWidth: '160px',
       formItemWidth: { width: '140px' },
       formTextAreaWidth: { width: '940px' },
+      multipleSelection: [],
       loading: false,
       dialogLoading: false,
       currentData: []
@@ -102,9 +131,123 @@ export default {
       this.$emit('addVisibleChange')
     },
     onSubmit() {
+      if (!this.validate()) {
+        return false
+      }
+      const temp = JSON.stringify(this.currentData)
+      console.log('temp:----', temp)
+      request('personnel', 'resume', { personnelId: this.personnelId, content: temp })
+        .then(response => {
+          this.$message({
+            message: response.message,
+            type: 'success'
+          })
+          this.$emit('editSuccess')
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    handleAdd(index) {
+      const temp = { start: '', end: '', organ: '', dept: '', post: '' }
+      this.currentData.splice(index + 1, 0, temp)
+    },
+    handleDelete(index) {
+      this.currentData.splice(index, 1)
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    onAdd() {
+      const temp = { start: '', end: '', organ: '', dept: '', post: '' }
+      this.currentData.push(temp)
+    },
+    onCancel() {
+      this.$emit('visibleChange', 'resume')
+      // Object.keys(this.form).forEach(key => this.form[key]='')
+    },
+    onPersonnelChange(value) {
+      this.form.personnelId = value
+    },
+    organValidate(organ) {
+      const validList = ['待业', '待安置']
+      return validList.some(i => organ.includes(i))
+    },
+    /**
+     * @description: 简历提交时各条信息起止时间验证
+     * @param {*}
+     * @return {*}
+     */
+    timeValidate() {
+      const length = this.currentData.length
+      // 循环遍历currentData，确保所有元素符合要求
+      return this.currentData.every((value, index, array) => {
+        // 如果当前元素包含cum属性且cum属性为false，则删除此属性
+        if ('cum' in value && !value.cum) {
+          this.$delete(value, 'cum')
+        }
+        // 如果当前元素包含main属性且main属性为false，则删除此属性
+        if ('main' in value && !value.main) {
+          this.$delete(value, 'main')
+        }
+        // 如果首行的cum属性为真，报错返回
+        if (index === 0 && 'cum' in value) {
+          this.$message.error('首条信息不能为兼任信息!')
+          return false
+        }
+        // 如果最后一行的main属性为真，报错返回
+        if (index === length - 1 && 'main' in value) {
+          this.$message.error('最后一条信息不能为主任信息!')
+          return false
+        }
+        // 一条信息同时包含main和cum属性，报错返回
+        if ('cum' in value && 'main' in value) {
+          this.$message.error('一条信息不能同时为主任信息和兼任信息!')
+          return false
+        }
+        // 一条信息main为真，即勾选了主任，而下一条未勾选兼任，则报错返回
+        if ('main' in value && !('cum' in array[index + 1])) {
+          this.$message.error('兼任信息与主任信息不匹配!')
+          return false
+        }
+        if ('cum' in value) {
+          let isMainFound = false
+          // 一条信息勾选了兼任，则向前迭代，直到找到包含main的信息，即勾选了主任的信息，且在迭代过程中
+          // 除了main那一行，其他所有行必须勾选兼任。且所有行的起止时间必须相同。
+          for (let i = index; i >= 0; i--) {
+            if ('main' in array[i]) {
+              if (value.start !== array[i].start || value.end !== array[i].end) {
+                this.$message.error('兼任信息的起止时间必须相同!')
+                return false
+              }
+              isMainFound = true
+              break
+            }
+            if (!('cum' in array[i])) {
+              this.$message.error('兼任信息与主任信息不匹配!')
+              return false
+            }
+            if (value.start !== array[i].start || value.end !== array[i].end) {
+              this.$message.error('兼任信息的起止时间必须相同!')
+              return false
+            }
+          }
+          if (!isMainFound) {
+            this.$message.error('兼任信息与主任信息不匹配!')
+            return false
+          }
+          return true
+        }
+        if (index !== 0 && value.start !== array[index - 1].end) {
+          this.$message.error('简历多条记录起止时间必须连续!')
+          return false
+        }
+        return true
+      })
+    },
+    validate() {
       let isValid = 1
-      this.currentData.forEach(item => {
-        console.log(`start:${item.start}, end:${item.end}`)
+      this.currentData.every(item => {
         if (item.start === 'null') {
           item.start = ''
         }
@@ -113,25 +256,31 @@ export default {
         }
         if (item.organ === '') {
           isValid = 0
-          return
+          return false
         }
-        if (item.start === '' || (item.post === '' && item.organ !== '待业')) {
+        if (item.start === '' || (item.post === '' && !this.organValidate(item.organ))) {
           isValid = 0
-          return
+          return false
         }
         if (item.start !== '' && item.end !== '') {
           const start = new Date(item.start)
           const end = new Date(item.end)
           if (start > end) {
             isValid = -2
-            return
+            return false
           }
         }
-        Object.values(item).forEach(i => {
-          if (i.includes('#') || i.includes('$')) {
+        Object.values(item).every(i => {
+          if (i && Object.prototype.toString.call(i) !== '[object Boolean]' && (i.includes('#') || i.includes('$'))) {
             isValid = -1
+            return false
           }
+          return true
         })
+        if (isValid === -1) {
+          return false
+        }
+        return true
       })
       if (isValid === 0) {
         this.$message.error('必填字段不能为空')
@@ -145,56 +294,12 @@ export default {
         this.$message.error('开始时间不能大于结束时间!')
         return false
       }
-      this.currentData.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
-      let currentIndex = 0
+      // this.currentData.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
       const length = this.currentData.length
       if (length > 1) {
-        this.currentData.forEach(item => {
-          if (currentIndex !== 0) {
-            if (item.start !== this.currentData[currentIndex - 1].end) {
-              isValid = -2
-              return
-            }
-          }
-          currentIndex++
-        })
+        return this.timeValidate()
       }
-      if (isValid === -2) {
-        this.$message.error('简历多条记录起止时间必须连续!')
-        return false
-      }
-
-      // const result = this.currentData.map(item => item.start + '#' + item.end + '#' + item.organ + '#' + item.dept + '#' + item.post)
-      // const temp = result.join('$')
-      const temp = JSON.stringify(this.currentData)
-      // personnelUpdate({ id: this.personnelId, resume: temp })
-      request('personnel', 'resume', { personnelId: this.personnelId, content: temp })
-        .then(response => {
-          this.$message({
-            message: response.message,
-            type: 'success'
-          })
-          this.$emit('editSuccess')
-          // Object.keys(this.form).forEach(key => this.form[key]='')
-        })
-        .catch(err => {
-          // this.$message.error(err.message)
-          console.log(err)
-        })
-    },
-    handleDelete(index) {
-      this.currentData.splice(index, 1)
-    },
-    onAdd() {
-      const temp = { start: '', end: '', organ: '', dept: '', post: '' }
-      this.currentData.push(temp)
-    },
-    onCancel() {
-      this.$emit('visibleChange', 'resume')
-      // Object.keys(this.form).forEach(key => this.form[key]='')
-    },
-    onPersonnelChange(value) {
-      this.form.personnelId = value
+      return true
     }
   }
 }

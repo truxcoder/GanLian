@@ -9,7 +9,7 @@
         <el-select
           v-if="models[item].type == 'SELECT'"
           v-model="form[item]"
-          :style="models[item].multiple === true ? formTextAreaWidth : formItemWidth"
+          :style="models[item].style"
           :multiple="models[item].multiple === true"
           :filterable="models[item].multiple === true"
           :allow-create="models[item].multiple === true"
@@ -21,7 +21,7 @@
         <el-select
           v-else-if="models[item].type == 'SELECT2'"
           v-model="form[item]"
-          :style="models[item].multiple === true ? formTextAreaWidth : formItemWidth"
+          :style="models[item].style"
           :multiple="models[item].multiple === true"
           :filterable="models[item].multiple === true"
           :allow-create="models[item].multiple === true"
@@ -33,23 +33,23 @@
         <el-autocomplete
           v-else-if="models[item].type == 'AUTOCOMPLETE'"
           v-model="form[item]"
-          :style="formItemWidth"
+          :style="models[item].style"
           class="inline-input"
           :fetch-suggestions="models[item].suggestion"
           placeholder="请输入内容"
         />
 
-        <el-date-picker v-else-if="models[item].type == 'DATE'" v-model="form[item]" :style="formItemWidth" :picker-options="pickerOptions" type="date" placeholder="选择日期" />
-        <el-input v-else-if="models[item].type == 'NUMBER'" v-model.number="form[item]" :style="formItemWidth" autocomplete="off" />
+        <el-date-picker v-else-if="models[item].type == 'DATE'" v-model="form[item]" :style="models[item].style" :picker-options="pickerOptions" type="date" placeholder="选择日期" />
+        <el-input v-else-if="models[item].type == 'NUMBER'" v-model.number="form[item]" :style="models[item].style" autocomplete="off" />
         <el-input
           v-else-if="models[item].type == 'TEXT'"
           v-model="form[item]"
-          :style="formTextAreaWidth"
+          :style="models[item].style"
           type="textarea"
           :autosize="{ minRows: 2, maxRows: 6 }"
           :placeholder="'请输入' + models[item].label"
         />
-        <el-input v-else v-model="form[item]" :disabled="models[item].disabled" :style="formItemWidth" autocomplete="off" />
+        <el-input v-else v-model="form[item]" :disabled="models[item].disabled" :style="models[item].style" autocomplete="off" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -84,13 +84,18 @@ export default {
     }
   },
   watch: {
-    rowdata: function(val, oldval) {
+    visible: function(val, oldval) {
       // 因为Vue中父向子传值，数组和对象会传引用。直接修改props里面的值会直接影响父组件数据。Vue官方推荐用计算属性。
       // 这里想办法建立一个本地属性。用Json方法生生造了一个对象。
       // 重构：用spread语法
       // this.form = JSON.parse(JSON.stringify(val))
-      this.form = { ...val }
-      this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
+      if (val === true) {
+        this.form = { ...this.rowdata }
+        this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
+        this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
+      } else {
+        this.form = {}
+      }
     }
   },
   methods: {
@@ -100,6 +105,7 @@ export default {
           this.dialogLoading = true
           console.log('updateForm----:', this.form)
           this.form.proCert = this.form.proCert.toString()
+          this.form.passport = this.form.passport.length ? JSON.stringify(this.form.passport) : JSON.stringify([0])
           curd('update', this.form, { resource: this.resource })
             .then(response => {
               this.$message({

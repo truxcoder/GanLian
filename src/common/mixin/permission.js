@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-14 11:15:43
- * @LastEditTime: 2022-02-08 09:21:09
+ * @LastEditTime: 2022-03-01 09:51:11
  * @LastEditors: truxcoder
  * @Description: 权限检查相关
  */
@@ -37,9 +37,9 @@ export const permission_mixin = {
     }
   },
   methods: {
-    async check() {
+    async check(object = null) {
       const sub = this.$store.getters.id
-      const obj = this.$options.name
+      const obj = object ?? this.$options.name
       const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
       // permissionCheck({ sub, obj, act }).then(response => {
       //   Object.assign(this.permission, response.data)

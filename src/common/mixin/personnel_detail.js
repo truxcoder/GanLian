@@ -26,6 +26,7 @@ export const mixin = {
     return {
       dialogLoading: false,
       updateVisible: false,
+      detailVisible: false,
       addVisible: false,
       // mainData: [],
       multipleSelection: [],

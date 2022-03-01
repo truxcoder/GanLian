@@ -46,10 +46,10 @@
 
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
           <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" @click="onUpdateSubmit(scope.row)">确定</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
-          <el-button size="mini" type="primary" plain @click="resetUpdateForm">取消</el-button>
+          <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+          <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+          <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" plain @click="resetUpdateForm">取消</el-button>
         </template>
       </el-table-column>
     </el-table>

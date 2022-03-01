@@ -1,5 +1,12 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-02-28 20:54:40
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
-  <div :class="{'has-logo':showLogo}">
+  <div :class="{ 'has-logo': showLogo }">
     <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
@@ -28,10 +35,7 @@ import variables from '@/styles/variables.scss'
 export default {
   components: { SidebarItem, Logo },
   computed: {
-    ...mapGetters([
-      'permission_routes',
-      'sidebar'
-    ]),
+    ...mapGetters(['permission_routes', 'sidebar']),
     routes() {
       return this.$router.options.routes
     },

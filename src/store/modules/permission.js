@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-01-20 20:01:34
+ * @LastEditTime: 2022-02-28 20:53:59
  * @LastEditors: truxcoder
  * @Description: 根据角色处理路由，得到允许访问的路由，形成用户菜单。
  */
@@ -61,7 +61,6 @@ const mutations = {
 
 const actions = {
   async getOriginRoutes({ commit, state }, roles) {
-    console.log('getOriginRoutes roles:', roles)
     const response = await getModuleList({})
     // moduleNameList:模块名称数组
     const moduleNameList = response.data.map(i => i.name)
@@ -80,25 +79,32 @@ const actions = {
     let superModules = moduleList.filter(item => item.rank === 1)
     const subModules = moduleList.filter(item => item.rank === 2)
     superModules = superModules.map(item => {
-      const { id, path, redirect, name, title, icon } = item
+      const { id, path, redirect, name, title, icon, param } = item
+      let pathWithParam = path
+      if (param.includes(':')) {
+        pathWithParam = path + '/:' + param.split(':')[0]
+      }
       let children = subModules.filter(item => item.parent === id)
       children = children.map(item => {
-        const { path, name, component, title, icon } = item
+        const { path, name, component, title, icon, param } = item
+        let pathWithParam = path
+        // 如果param属性包含':',则表示这条路由是含动态参数的
+        if (param.includes(':')) {
+          pathWithParam = path + '/:' + param.split(':')[0]
+        }
         return {
-          path,
+          path: pathWithParam,
           name,
           component: componentList[component],
-          // meta: { title, icon, roles: ['admin'] }
-          meta: { title, icon, roles: roleMap[name] ?? [] }
+          meta: { title, icon, param, roles: roleMap[name] ?? [] }
         }
       })
       return {
-        path,
+        path: pathWithParam,
         component: Layout,
         redirect,
         name,
-        // meta: { title, icon, roles: ['admin'] },
-        meta: { title, icon, roles: roleMap[name] ?? [] },
+        meta: { title, icon, param, roles: roleMap[name] ?? [] },
         children
       }
     })
@@ -126,7 +132,6 @@ const actions = {
       } else {
         accessedRoutes = filterAsyncRoutes(state.originRoutes, roles)
       }
-      console.log('accessedRoutes:', accessedRoutes)
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

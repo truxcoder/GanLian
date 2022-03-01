@@ -43,8 +43,8 @@
         </el-select>
         <!-- <el-autocomplete v-model="form.partTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryPartTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
       </el-form-item>
-      <el-form-item v-if="can.global" label="所属单位" prop="organId">
-        <el-select v-model="form.organId" :style="formItemWidth" placeholder="请选择单位">
+      <el-form-item label="所属单位" prop="organId">
+        <el-select v-model="form.organId" :disabled="!can.global" :style="formItemWidth" placeholder="请选择单位">
           <el-option v-for="i in organOption" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
@@ -64,6 +64,14 @@
       <el-form-item label="县处级任职考试通过且有效" :label-width="formLabelLongWidth" prop="passExamDay">
         <el-radio v-model="form.passExamDay" label="是">是</el-radio>
         <el-radio v-model="form.passExamDay" label="否">否</el-radio>
+      </el-form-item>
+      <el-form-item label="配偶子女移居国外" prop="familyAbroad">
+        <el-radio v-model="form.familyAbroad" disabled label="是">是</el-radio>
+        <el-radio v-model="form.familyAbroad" disabled label="否">否</el-radio>
+      </el-form-item>
+      <el-form-item label="信访举报待查实或已查属实" :label-width="formLabelLongWidth" prop="hasReport">
+        <el-radio v-model="form.hasReport" label="是">是</el-radio>
+        <el-radio v-model="form.hasReport" label="否">否</el-radio>
       </el-form-item>
       <el-form-item label="取得专业证书情况" prop="proCert">
         <el-select v-model="form.proCert" :style="itemLineWidth" multiple filterable allow-create>
@@ -126,6 +134,8 @@ export default {
         hasPassport: '',
         passExamDay: '',
         hasAppraisalIncompetent: '',
+        familyAbroad: '',
+        hasReport: '',
         award: [],
         punish: []
       },
@@ -183,8 +193,9 @@ export default {
       return this.$store.getters.organs
     },
     nationOption() {
-      nationDict.splice(1, 0, '少数民族')
-      return nationDict
+      const temp = [...nationDict]
+      temp.splice(1, 0, '少数民族')
+      return temp
     }
   },
   methods: {

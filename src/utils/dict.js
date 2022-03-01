@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-02-14 12:11:56
+ * @LastEditTime: 2022-02-28 14:57:51
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
@@ -94,8 +94,9 @@ export { fullTimeEduDict, partTimeEduDict }
 // ]
 
 export const conclusionDict = ['优秀', '称职', '基本称职', '不称职', '不确定等次']
+export const aimDict = ['出差', '旅行', '学习']
 export const seasonDict = [
-  { label: '年终', value: 0 },
+  { label: '年终', value: 5 },
   { label: '一季度', value: 1 },
   { label: '二季度', value: 2 },
   { label: '三季度', value: 3 },
@@ -134,6 +135,12 @@ export const punishGrade = [
 export const eduCategory = [
   { label: '全日制', value: 1 },
   { label: '非全日制', value: 2 }
+]
+export const passportDict = [
+  { label: '无', value: 0 },
+  { label: '护照', value: 1 },
+  { label: '港澳通行证', value: 2 },
+  { label: '台湾通行证', value: 3 }
 ]
 export const permissionDict = {
   ADD: '添加数据',

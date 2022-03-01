@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-01-20 16:29:08
+ * @LastEditTime: 2022-03-01 16:43:43
  * @LastEditors: truxcoder
  * @Description: 列表mixin
  */
@@ -10,8 +10,11 @@ export const list_mixin = {
     return {
       updateVisible: false,
       addVisible: false,
+      editVisible: false,
+      detailVisible: false,
       dialogPrintVisible: false,
       rowData: {},
+      action: '',
       currentEditIndex: 0,
       currentPage: 1,
       pageSize: 10,
@@ -46,9 +49,22 @@ export const list_mixin = {
       this.addVisible = false
       this.fetchData(this.searchData)
     },
+    editSuccess() {
+      this.editVisible = false
+      this.fetchData(this.searchData)
+    },
     updateSuccess(row) {
       this.updateVisible = false
       this.fetchData(this.searchData)
+    },
+    handleEdit(act, row) {
+      this.action = act
+      if (act === 'add') {
+        this.rowData = {}
+      } else {
+        this.rowData = row
+      }
+      this.editVisible = true
     },
     handleSizeChange(size) {
       this.pageSize = size

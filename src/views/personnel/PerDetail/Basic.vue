@@ -30,6 +30,7 @@
             </div>
             <span v-else-if="item.type === 'bool'">{{ originData[item.field] ? '是' : '否' }}</span>
             <span v-else-if="item.field === 'age'">{{ originData.birthday | ageFilter }}</span>
+            <span v-else-if="item.field === 'passport'">{{ originData.passport | passportFilter }}</span>
             <span v-else-if="item.type === 'date'">{{ originData[item.field] | dateFilter }}</span>
             <span v-else>{{ originData[item.field] }}</span>
           </el-descriptions-item>
@@ -62,7 +63,8 @@
       <hr class="border-gray-300" />
       <div class="p-4">
         <!-- <pre>{{ originData.resume }}</pre> -->
-        <li v-for="(v, k) in resumeList" :key="k" class="list-none">{{ v.start | dateFilter }}-{{ v.end | dateFilter }} {{ v.organ }}{{ v.dept }} {{ v.post }}</li>
+        <!-- <li v-for="(v, k) in resumeList" v-show="isShow(v)" :key="k" class="list-none">{{ v.start | dateFilter }}-{{ v.end | dateFilter }} {{ v.organ }}{{ v.dept }} {{ v.post }}</li> -->
+        <li v-for="(v, k) in resumeList" v-show="isShow(v)" :key="k" class="list-none">{{ formatResume(k, v) }}</li>
       </div>
     </div>
     <personnel-update :visible="updateVisible" :rowdata="singlePersonnelData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
@@ -77,6 +79,7 @@ import PersonnelUpdate from '@/views/personnel/PerUpdate.vue'
 import ResumeEdit from '@/views/personnel/ResumeEdit.vue'
 
 import { getPhoto } from '@/utils/personnel'
+import { passportDict } from '@/utils/dict'
 
 export default {
   name: 'Basic',
@@ -90,6 +93,21 @@ export default {
         return ''
       }
       return dayjs(date).format('YYYY年MM月')
+    },
+    passportFilter(passport) {
+      passport = passport ?? ''
+      if (passport === '') {
+        return '无'
+      }
+      const _map = new Map()
+      passportDict.forEach(i => {
+        _map.set(i.value, i.label)
+      })
+      const temp = JSON.parse(passport)
+      if (Array.isArray(temp)) {
+        return temp.map(i => _map.get(i)).join(', ')
+      }
+      return '错误'
     }
   },
   mixins: [mixin],
@@ -116,8 +134,8 @@ export default {
         { label: '全日制教育', field: 'fullTimeEdu' },
         { label: '非全日制教育', field: 'partTimeEdu' },
         { label: '全日制专业', field: 'fullTimeMajor' },
-        { label: '是否持有护照', field: 'hasPassport', type: 'bool' },
-        { label: '通过县处级考试时间', field: 'passExamDay', type: 'date' }
+        { label: '通过县处级考试时间', field: 'passExamDay', type: 'date' },
+        { label: '持有护照情况', field: 'passport' }
       ]
     }
   },
@@ -148,6 +166,47 @@ export default {
     editSuccess() {
       this.resumeVisible = false
       this.$emit('reFetchCpnData', this.cpnName)
+    },
+    isShow(v) {
+      if ('cum' in v) {
+        return false
+      }
+      return true
+    },
+    dateFormat(date) {
+      if (date === '') {
+        return '今'
+      }
+      if (dayjs(date).year() === 1) {
+        return ''
+      }
+      return dayjs(date).format('YYYY年MM月')
+    },
+    formatResume(k, v) {
+      if ('cum' in v) {
+        return ''
+      }
+      let work = ''
+      if ('main' in v) {
+        for (let index = k; index < this.resumeList.length; index++) {
+          const element = this.resumeList[index]
+          if (index === k) {
+            work = element.organ + element?.dept + element?.post
+            continue
+          }
+          if (!('cum' in element)) {
+            break
+          }
+          if (element.organ === this.resumeList[index - 1].organ) {
+            work = work + '、' + element?.dept + element?.post
+          } else {
+            work = work + '兼' + element.organ + element?.dept + element?.post
+          }
+        }
+      } else {
+        work = v.organ + v?.dept + v?.post
+      }
+      return this.dateFormat(v.start) + '-' + this.dateFormat(v.end) + ' ' + work
     }
   }
 }
