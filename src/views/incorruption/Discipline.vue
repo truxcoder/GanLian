@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-01-24 11:23:40
+ * @LastEditTime: 2022-03-03 09:08:45
  * @LastEditors: truxcoder
  * @Description:处分，前端分页
 -->
@@ -29,7 +29,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">
         添加
       </el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
@@ -89,7 +89,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
             编辑
           </el-button>
           <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
@@ -113,10 +113,9 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <discipline-add :visible="addVisible" :options="options" :dis-dict="disDict" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <discipline-update :visible="updateVisible" :options="options" :dis-dict="disDict" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
-    <discipline-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
-    <dis-dict :visible="dictVisible" :list="disDict" :options="options" @dictChange="dictChange" @visibleChange="visibleChange" />
+    <DisciplineEdit :visible="editVisible" :action="action" :row="rowData" :dis-dict="disDict" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <DisciplineDetail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
+    <DisDict :visible="dictVisible" :list="disDict" :options="options" @dictChange="dictChange" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -130,14 +129,13 @@ import { search_mixin } from '@/common/mixin/search'
 import { permission_mixin } from '@/common/mixin/permission'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
-import DisciplineAdd from './DisciplineAdd'
-import DisciplineUpdate from './DisciplineUpdate'
-import DisciplineDetail from './DisciplineDetail'
+import DisciplineEdit from './DisciplineEdit.vue'
+import DisciplineDetail from './DisciplineDetail.vue'
 import DisDict from '@/views/incorruption/DisDict.vue'
 
 export default {
   name: 'Discipline',
-  components: { DisciplineAdd, DisciplineUpdate, PersonnelOption, DisciplineDetail, DisDict },
+  components: { DisciplineEdit, PersonnelOption, DisciplineDetail, DisDict },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -196,12 +194,6 @@ export default {
       request('dis_dict', 'list').then(response => {
         this.disDict = response.data
       })
-    },
-
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     },
     handleDetail(row) {
       this.rowData = row

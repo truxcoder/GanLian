@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-02-28 16:18:43
+ * @LastEditTime: 2022-03-02 14:08:11
  * @LastEditors: truxcoder
  * @Description: 出入境管理
 -->
@@ -15,17 +15,17 @@
         <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
       </el-form-item>
       <el-form-item label="所用证件" prop="passport">
-        <el-select v-model="searchForm.passport" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择证件">
+        <el-select v-model="searchForm.passport" size="small" filterable allow-create placeholder="请选择证件">
           <el-option v-for="i in options.passport" :key="i.vaule" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="出境事由" prop="aim">
-        <el-select v-model="searchForm.aim" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择或输入出境事由">
+        <el-select v-model="searchForm.aim" size="small" filterable allow-create placeholder="请选择或输入出境事由">
           <el-option v-for="(v, i) in options.aim" :key="i" :label="v" :value="v" />
         </el-select>
       </el-form-item>
       <el-form-item label="是否报备" prop="isReport">
-        <el-select v-model="searchForm.isReport" size="small" :style="formItemWidth">
+        <el-select v-model="searchForm.isReport" size="small">
           <el-option v-for="i in options.isReport" :key="i.vaule" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
@@ -173,11 +173,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     },
     getPassport(value) {
       return value ? this.passportMap.get(value) : '未定义'

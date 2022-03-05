@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-02-10 11:25:45
+ * @LastEditTime: 2022-03-03 19:16:31
  * @LastEditors: truxcoder
  * @Description:培训，后端分页
 -->
@@ -30,7 +30,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">
         添加
       </el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
@@ -69,7 +69,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="300">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
             编辑
           </el-button>
           <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
@@ -96,8 +96,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <training-add :visible="addVisible" :options="options" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <training-update :visible="updateVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <TrainingEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
     <training-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
     <training-personnel :visible="personnelVisible" :row="rowData" @visibleChange="visibleChange" />
   </div>
@@ -112,14 +111,13 @@ import { search_mixin } from '@/common/mixin/search'
 
 import { permission_mixin } from '@/common/mixin/permission'
 
-import TrainingAdd from './TrainingAdd.vue'
+import TrainingEdit from './TrainingEdit.vue'
 import TrainingPersonnel from './TrainingPersonnel.vue'
-import TrainingUpdate from './TrainingUpdate.vue'
 import TrainingDetail from './TrainingDetail.vue'
 
 export default {
   name: 'Training',
-  components: { TrainingAdd, TrainingUpdate, TrainingDetail, TrainingPersonnel },
+  components: { TrainingEdit, TrainingDetail, TrainingPersonnel },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -131,6 +129,7 @@ export default {
       detailVisible: false,
       personnelVisible: false,
       formTitleWidth: { width: '500px' },
+      formItemWidth: { width: '220px' },
       searchForm: { title: '', organ: '' }
     }
   },
@@ -171,12 +170,6 @@ export default {
         this.count = response.count
         this.listLoading = false
       })
-    },
-
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     },
     handleDetail(row) {
       this.rowData = row

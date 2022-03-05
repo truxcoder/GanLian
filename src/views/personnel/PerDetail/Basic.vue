@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <div class="flex mt-2">
       <div class="flex-none">
         <div class="photoZone border border-gray-300 mr-4 p-4">
           <img :src="photoURL" alt class="photo" />
         </div>
         <div class=" mt-1 mr-4">
-          <el-button size="mini" type="primary" plain style="width:100%" @click="updateVisible = true">修改人员信息</el-button>
+          <el-button size="mini" type="primary" plain style="width:100%" @click="handleEdit('update', baseData)">修改人员信息</el-button>
           <!-- <button class="text-base font-medium rounded-lg w-full py-1 bg-blue-500 text-white" @click="handleUpdate">修改人员信息</button> -->
         </div>
       </div>
@@ -16,7 +16,7 @@
             <el-button type="primary" size="small">操作</el-button>
           </template> -->
           <el-descriptions-item v-for="item in models" :key="item.field" :label="item.label">
-            <div v-if="item.field === 'political' && originData[item.field] === '中共党员'" class=" flex justify-start items-center">
+            <div v-if="item.field === 'political' && baseData[item.field] === '中共党员'" class=" flex justify-start items-center">
               <span>
                 <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
                   <path
@@ -28,11 +28,11 @@
               </span>
               <span>中共党员</span>
             </div>
-            <span v-else-if="item.type === 'bool'">{{ originData[item.field] ? '是' : '否' }}</span>
-            <span v-else-if="item.field === 'age'">{{ originData.birthday | ageFilter }}</span>
-            <span v-else-if="item.field === 'passport'">{{ originData.passport | passportFilter }}</span>
-            <span v-else-if="item.type === 'date'">{{ originData[item.field] | dateFilter }}</span>
-            <span v-else>{{ originData[item.field] }}</span>
+            <span v-else-if="item.field === 'isSecret'">{{ baseData.isSecret === 2 ? '是' : '否' }}</span>
+            <span v-else-if="item.field === 'age'">{{ baseData.birthday | ageFilter }}</span>
+            <span v-else-if="item.field === 'passport'">{{ baseData.passport | passportFilter }}</span>
+            <span v-else-if="item.type === 'date'">{{ baseData[item.field] | dateFilter }}</span>
+            <span v-else>{{ baseData[item.field] }}</span>
           </el-descriptions-item>
         </el-descriptions>
       </div>
@@ -43,7 +43,7 @@
       </div>
       <hr class="border-gray-300" />
       <div class="min-h-0 p-4">
-        <span>{{ originData.proCert }}</span>
+        <span>{{ baseData.proCert }}</span>
       </div>
     </div>
     <!-- <div class="mt-4 text-left border border-gray-300 rounded-sm">
@@ -52,7 +52,7 @@
       </div>
       <hr class="border-gray-300" />
       <div class="p-4 min-h-0">
-        <span>{{ originData.training }}</span>
+        <span>{{ baseData.training }}</span>
       </div>
     </div> -->
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
@@ -62,20 +62,23 @@
       </div>
       <hr class="border-gray-300" />
       <div class="p-4">
-        <!-- <pre>{{ originData.resume }}</pre> -->
+        <!-- <pre>{{ baseData.resume }}</pre> -->
         <!-- <li v-for="(v, k) in resumeList" v-show="isShow(v)" :key="k" class="list-none">{{ v.start | dateFilter }}-{{ v.end | dateFilter }} {{ v.organ }}{{ v.dept }} {{ v.post }}</li> -->
         <li v-for="(v, k) in resumeList" v-show="isShow(v)" :key="k" class="list-none">{{ formatResume(k, v) }}</li>
       </div>
     </div>
-    <personnel-update :visible="updateVisible" :rowdata="singlePersonnelData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
-    <resume-edit :visible="resumeVisible" :personnel-id="originData.id" :resume="originData.resume" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <PersonnelEdit :visible="editVisible" :action="action" :row="baseData" @editSuccess="updateSuccess" @visibleChange="visibleChange" />
+
+    <!-- <personnel-update :visible="updateVisible" :rowdata="baseData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
+    <ResumeEdit :visible="resumeVisible" :personnel-id="baseData.id" :resume="baseData.resume" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
 <script>
 import dayjs from 'dayjs'
-import { mixin } from '@/common/mixin/personnel_detail'
-import PersonnelUpdate from '@/views/personnel/PerUpdate.vue'
+import { getAge } from '@/utils/index'
+import { permission_mixin } from '@/common/mixin/permission'
+import PersonnelEdit from '@/views/personnel/PerEdit.vue'
 import ResumeEdit from '@/views/personnel/ResumeEdit.vue'
 
 import { getPhoto } from '@/utils/personnel'
@@ -83,8 +86,11 @@ import { passportDict } from '@/utils/dict'
 
 export default {
   name: 'Basic',
-  components: { PersonnelUpdate, ResumeEdit },
+  components: { PersonnelEdit, ResumeEdit },
   filters: {
+    ageFilter(age) {
+      return getAge(dayjs(age).format('YYYY-MM-DD'))
+    },
     dateFilter(date) {
       if (date === '') {
         return '今'
@@ -110,10 +116,27 @@ export default {
       return '错误'
     }
   },
-  mixins: [mixin],
+  mixins: [permission_mixin],
+  props: {
+    loading: {
+      type: Boolean,
+      default() {
+        return false
+      }
+    },
+    baseData: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
+  },
   data() {
     return {
-      cpnName: 'Basic',
+      obj: 'DetailBasic',
+      resource: 'personnel',
+      action: '',
+      editVisible: false,
       resumeVisible: false,
       models: [
         { label: '姓名', field: 'name' },
@@ -125,15 +148,18 @@ export default {
         { label: '身份证号码', field: 'idCode' },
         { label: '政治面貌', field: 'political' },
         { label: '通讯方式', field: 'phone' },
-        { label: '岗位是否涉密', field: 'isSecret', type: 'bool' },
+        { label: '岗位是否涉密', field: 'isSecret' },
         { label: '年龄', field: 'age' },
         { label: '出生日期', field: 'birthday', type: 'date' },
         { label: '入党日期', field: 'joinPartyDay', type: 'date' },
         { label: '参加工作日期', field: 'startJobDay', type: 'date' },
         { label: '录警日期', field: 'bePoliceDay', type: 'date' },
-        { label: '全日制教育', field: 'fullTimeEdu' },
-        { label: '非全日制教育', field: 'partTimeEdu' },
-        { label: '全日制专业', field: 'fullTimeMajor' },
+        { label: '全日制教育学历', field: 'fullTimeEdu' },
+        { label: '全日制教育专业', field: 'fullTimeMajor' },
+        { label: '全日制毕业院校', field: 'fullTimeSchool' },
+        { label: '非全日制教育学历', field: 'partTimeEdu' },
+        { label: '非全日制教育专业', field: 'partTimeMajor' },
+        { label: '非全日制毕业院校', field: 'partTimeSchool' },
         { label: '通过县处级考试时间', field: 'passExamDay', type: 'date' },
         { label: '持有护照情况', field: 'passport' }
       ]
@@ -143,13 +169,13 @@ export default {
     photoURL() {
       // return this.$store.getters.staticURL+"/static/lxb2.jpg"
       // return '/image/lxb2.jpg'
-      return this.singlePersonnelData.id ? getPhoto(this.singlePersonnelData.id, 'small') : ''
+      return this.baseData.id ? getPhoto(this.baseData.id, 'small') : ''
     },
-    originData() {
-      return this.singlePersonnelData
-    },
+    // baseData() {
+    //   return this.baseData
+    // },
     resumeList() {
-      const resume = this.originData.resume ?? ''
+      const resume = this.baseData.resume ?? ''
       let result = []
 
       if (resume === '') {
@@ -159,13 +185,33 @@ export default {
       return result
     }
   },
+  created() {
+    this.check(this.obj).then(() => {})
+  },
   methods: {
+    visibleChange(cpn) {
+      const visible = cpn + 'Visible'
+      this[visible] = false
+    },
+    handleEdit(act, row) {
+      this.action = act
+      if (act === 'add') {
+        this.rowData = {}
+      } else {
+        this.rowData = row
+      }
+      this.editVisible = true
+    },
+    updateSuccess() {
+      this.editVisible = false
+      this.$emit('updateSuccess')
+    },
     resumeVisibleChange() {
       this.resumeVisible = false
     },
     editSuccess() {
       this.resumeVisible = false
-      this.$emit('reFetchCpnData', this.cpnName)
+      this.$emit('updateSuccess')
     },
     isShow(v) {
       if ('cum' in v) {

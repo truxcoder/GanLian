@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
-      <el-button v-if="mainData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button type="primary" size="mini" @click="handleEdit('add')">添加信息</el-button>
+      <el-button v-if="currentData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
-    <div v-if="mainData.length" class="mt-4">
-      <el-table v-loading="loading" :data="mainData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
+    <div v-if="currentData.length" class="mt-4">
+      <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column label="处分类型" align="center">
           <template slot-scope="scope">
@@ -34,10 +34,10 @@
         </el-table-column>
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
-            <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">
+            <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">
               编辑
             </el-button>
-            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
+            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
               删除
             </el-button>
             <el-button size="mini" type="primary" @click="handleDetail(scope.row)">
@@ -48,48 +48,40 @@
       </el-table>
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
-    <discipline-add
+    <DisciplineEdit
+      :visible="editVisible"
       :is-single="true"
-      :single-personnel-data="singlePersonnelData"
-      :visible="addVisible"
-      :options="options"
+      :single-personnel-data="baseData"
+      :action="action"
+      :row="rowData"
       :dis-dict="disDict"
-      @addSuccess="addSuccess"
+      :options="options"
+      @editSuccess="editSuccess"
       @visibleChange="visibleChange"
     />
-    <discipline-update
-      :is-single="true"
-      :single-personnel-data="singlePersonnelData"
-      :visible="updateVisible"
-      :options="options"
-      :dis-dict="disDict"
-      :rowdata="rowData"
-      @updateSuccess="updateSuccess"
-      @visibleChange="visibleChange"
-    />
-    <discipline-detail :visible="detailVisible" :is-single="true" :single-personnel-data="singlePersonnelData" :dis-dict="disDict" :options="options" :row="rowData" @visibleChange="visibleChange" />
+
+    <DisciplineDetail :visible="detailVisible" :is-single="true" :single-personnel-data="baseData" :dis-dict="disDict" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
 
 <script>
-import DisciplineAdd from '@/views/incorruption/DisciplineAdd.vue'
-import DisciplineUpdate from '@/views/incorruption/DisciplineUpdate.vue'
+import DisciplineEdit from '@/views/incorruption/DisciplineEdit.vue'
 import DisciplineDetail from '@/views/incorruption/DisciplineDetail.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
-import { detail_permission_mixin } from '@/common/mixin/permission'
+import { permission_mixin } from '@/common/mixin/permission'
+
 import { common_mixin } from '@/common/mixin/mixin'
 import { request } from '@/api'
 
 export default {
   name: 'Discipline',
-  components: { DisciplineAdd, DisciplineUpdate, DisciplineDetail },
-  mixins: [mixin, detail_permission_mixin, common_mixin],
+  components: { DisciplineEdit, DisciplineDetail },
+  mixins: [mixin, permission_mixin, common_mixin],
   data() {
     return {
-      cpnName: 'Discipline',
       resource: 'discipline',
-      obj: 'Discipline',
+      obj: 'DetailDiscipline',
       disDict: [],
       detailVisible: false
     }
@@ -107,9 +99,9 @@ export default {
     }
   },
   created() {
-    if (this.$store.state.department.departments.length === 0) {
-      this.$store.dispatch('department/setDepartments')
-    }
+    this.check(this.obj).then(() => {
+      this.fetchData()
+    })
     this.fetchDictData()
   },
   methods: {

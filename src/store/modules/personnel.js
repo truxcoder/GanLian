@@ -1,18 +1,23 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-01 16:25:23
- * @LastEditTime: 2022-01-24 11:19:37
+ * @LastEditTime: 2022-03-04 14:38:39
  * @LastEditors: truxcoder
  * @Description:
  */
 import { getPersonnelName } from '@/api/personnel'
+import { request } from '@/api'
 const state = {
-  personnelOptions: []
+  personnelOptions: [],
+  perDptMap: {}
 }
 
 const mutations = {
   CHANGE_PER_OPTIONS: (state, payload) => {
     state.personnelOptions = payload
+  },
+  CHANGE_PER_DPT_MAP: (state, payload) => {
+    state.perDptMap = payload
   }
 }
 
@@ -22,7 +27,6 @@ const actions = {
       const data = { personnelId: rootGetters.id, organId: rootGetters.organ }
       getPersonnelName(data)
         .then(response => {
-          console.log('response:--', response)
           const personnelOptions = response.data.map(item => {
             return {
               value: item.id,
@@ -35,6 +39,11 @@ const actions = {
         .catch(error => {
           reject(error)
         })
+    })
+  },
+  changePerDptMap({ commit }) {
+    request('user', 'organs').then(res => {
+      commit('CHANGE_PER_DPT_MAP', res.data)
     })
   }
 }

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-01-24 14:35:33
+ * @LastEditTime: 2022-03-02 21:12:04
  * @LastEditors: truxcoder
  * @Description:组织处理，后端分页
 -->
@@ -32,7 +32,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">
         添加
       </el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
@@ -76,7 +76,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
             编辑
           </el-button>
           <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
@@ -100,8 +100,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <punish-add :visible="addVisible" :options="options" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <punish-update :visible="updateVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <PunishEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
     <punish-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
@@ -117,13 +116,12 @@ import { punishCategory, punishGrade } from '@/utils/dict'
 
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
-import PunishAdd from './PunishAdd'
-import PunishUpdate from './PunishUpdate'
 import PunishDetail from './PunishDetail'
+import PunishEdit from './PunishEdit'
 
 export default {
   name: 'Punish',
-  components: { PunishAdd, PunishUpdate, PersonnelOption, PunishDetail },
+  components: { PunishEdit, PersonnelOption, PunishDetail },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -169,11 +167,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     },
     handleDetail(row) {
       this.rowData = row

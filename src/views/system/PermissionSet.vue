@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-02-11 09:43:26
+ * @LastEditTime: 2022-03-04 11:39:00
  * @LastEditors: truxcoder
  * @Description: 重构分配权限
 -->
@@ -9,7 +9,7 @@
   <el-dialog v-loading="dialogLoading" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
     <div>
       <table v-if="Object.keys(permissionMap).length">
-        <tr v-for="item in moduleData" :key="item.name" class="h-10">
+        <tr v-for="item in objList" :key="item.name" class="h-10">
           <td class=" px-2">{{ item.title }}</td>
           <td>
             <el-button-group>
@@ -29,6 +29,7 @@
 <script>
 import { request } from '@/api'
 import { permissionDict } from '@/utils/dict'
+import { detailObj } from '@/utils/detail'
 export default {
   name: 'PermissionSet',
   props: {
@@ -57,6 +58,9 @@ export default {
     },
     actList() {
       return Object.keys(permissionDict)
+    },
+    objList() {
+      return this.moduleData.concat(detailObj)
     }
   },
   watch: {
@@ -173,7 +177,8 @@ export default {
     },
     resetMap() {
       if (this.moduleData.length > 0) {
-        this.moduleData.forEach(item => {
+        // this.moduleData.forEach(item => {
+        this.objList.forEach(item => {
           this.$set(this.originMap, item.name, {})
           this.$set(this.permissionMap, item.name, {})
           this.actList.forEach(i => {

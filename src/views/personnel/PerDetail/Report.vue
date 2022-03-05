@@ -1,14 +1,14 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 15:39:29
- * @LastEditTime: 2022-02-21 10:58:09
+ * @LastEditTime: 2022-03-02 20:23:29
  * @LastEditors: truxcoder
  * @Description: 人员详情页举报列表
 -->
 <template>
   <div>
-    <div v-if="mainData.length" class="mt-4">
-      <el-table v-loading="loading" :data="mainData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row>
+    <div v-if="currentData.length" class="mt-4">
+      <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row>
         <el-table-column align="center" label="标题">
           <template slot-scope="scope">
             {{ scope.row.title }}
@@ -42,6 +42,7 @@
 import ReportDetail from '@/views/incorruption/ReportDetail.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
+import { permission_mixin } from '@/common/mixin/permission'
 
 export default {
   name: 'Post',
@@ -79,11 +80,11 @@ export default {
       return result
     }
   },
-  mixins: [mixin],
+  mixins: [mixin, permission_mixin],
   data() {
     return {
-      cpnName: 'Report',
-      resource: 'report'
+      resource: 'report',
+      obj: 'DetailReport'
     }
   },
   computed: {
@@ -99,6 +100,11 @@ export default {
         step
       }
     }
+  },
+  created() {
+    this.check(this.obj).then(() => {
+      this.fetchData()
+    })
   },
   methods: {
     handleDetail(row) {

@@ -95,7 +95,7 @@
 
       <el-table-column align="center" label="操作" width="180">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
         </template>
       </el-table-column>
@@ -112,8 +112,9 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <!-- <personnel-add :form-visible="addFormVisible" :organ-list="organList" @addSuccess="addSuccess" @addVisibleChange="addVisibleChange" /> -->
-    <personnel-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+
+    <!-- <personnel-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
     <personnel-search :visible="searchVisible" :can="can" @advanceSearch="advanceSearch" @visibleChange="visibleChange" />
   </div>
 </template>
@@ -130,11 +131,12 @@ import { search_mixin } from '@/common/mixin/search'
 import { permission_mixin } from '@/common/mixin/permission'
 import { getAge } from '@/utils/index'
 import PersonnelSearch from './PersonnelSearch'
-import PersonnelUpdate from './PerUpdate'
+// import PersonnelUpdate from './PerUpdate'
+import PersonnelEdit from './PerEdit.vue'
 
 export default {
   name: 'Personnel',
-  components: { PersonnelUpdate, PersonnelSearch },
+  components: { PersonnelEdit, PersonnelSearch },
   filters: {
     ageFilter(age) {
       return getAge(dayjs(age).format('YYYY-MM-DD'))
@@ -200,22 +202,12 @@ export default {
       })
     },
     handleDetail(index, row) {
-      const routeUrl = this.$router.resolve({
+      const url = this.$router.resolve({
         path: '/perdetail',
         query: { id: row.id }
       })
-      window.open(routeUrl.href, '_blank')
+      window.open(url.href, '_blank')
       // this.$router.push({ path: 'pdetail' })
-    },
-    handleAllData() {
-      // this.queryMeans === 'backend' ? this.fetchData() : (this.currentData = [...this.originData])
-      if (this.queryMeans === 'backend') {
-        this.searchData = {}
-        this.currentPage = 1
-        this.fetchData()
-      } else {
-        this.currentData = [...this.originData]
-      }
     },
     advanceSearch(data) {
       this.searchData = data

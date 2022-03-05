@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-03-01 16:43:43
+ * @LastEditTime: 2022-03-04 09:15:33
  * @LastEditors: truxcoder
  * @Description: 列表mixin
  */
@@ -47,15 +47,21 @@ export const list_mixin = {
     },
     addSuccess() {
       this.addVisible = false
-      this.fetchData(this.searchData)
+      this.fetchData(this.searchData, this.queryParam)
     },
     editSuccess() {
       this.editVisible = false
-      this.fetchData(this.searchData)
+      this.fetchData(this.searchData, this.queryParam)
     },
     updateSuccess(row) {
       this.updateVisible = false
-      this.fetchData(this.searchData)
+      this.fetchData(this.searchData, this.queryParam)
+    },
+    handleAllData() {
+      this.searchData = {}
+      this.queryParam = {}
+      this.currentPage = 1
+      this.fetchData()
     },
     handleEdit(act, row) {
       this.action = act
@@ -69,24 +75,37 @@ export const list_mixin = {
     handleSizeChange(size) {
       this.pageSize = size
       if (this.queryMeans === 'backend') {
-        this.fetchData(this.searchData)
+        this.fetchData(this.searchData, this.queryParam)
       }
     },
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage
       if (this.queryMeans === 'backend') {
-        this.fetchData(this.searchData)
+        this.fetchData(this.searchData, this.queryParam)
       }
     },
-    buildParams(queryMeans) {
+    onDetail(row) {
+      const url = this.$router.resolve({
+        path: '/perdetail',
+        query: { id: row.id }
+      })
+      window.open(url.href, '_blank')
+      // this.$router.push({ path: 'pdetail' })
+    },
+    buildParams(queryMeans, param) {
+      // 如果接收到的param里包含organId，则用此参数替换defaultSearchData
+      let organParam = this.defaultSearchData
+      if (param && 'organId' in param) {
+        organParam = param
+      }
       if (queryMeans !== 'backend') {
-        return this.defaultSearchData
+        return organParam
       }
       let params = {}
       params.currentPage = this.currentPage
       params.pageSize = this.pageSize
       params.queryMeans = this.queryMeans
-      params = { ...params, ...this.defaultSearchData }
+      params = { ...params, ...organParam }
       return params
     }
   }

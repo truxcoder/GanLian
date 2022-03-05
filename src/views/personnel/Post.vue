@@ -1,3 +1,10 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-15 09:48:14
+ * @LastEditTime: 2022-03-03 17:33:32
+ * @LastEditors: truxcoder
+ * @Description: 任职管理
+-->
 <template>
   <div class="app-container">
     <!-- <el-row v-if="!total">
@@ -7,8 +14,8 @@
       <el-form-item label="姓名" prop="personnelId">
         <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
       </el-form-item>
-      <el-form-item label="单位" prop="organ">
-        <el-select v-model="searchForm.organ" size="small" placeholder="请选择单位">
+      <el-form-item v-if="can.global" label="单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" placeholder="请选择单位">
           <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
@@ -20,7 +27,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
       <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
@@ -46,7 +53,7 @@
           {{ scope.row.levelName }}
         </template>
       </el-table-column>
-      <el-table-column label="任职单位" align="center" width="220" :show-overflow-tooltip="true">
+      <el-table-column label="任职单位" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ scope.row.organ }}
         </template>
@@ -69,7 +76,7 @@
 
       <el-table-column align="center" label="操作" width="160">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -86,8 +93,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <post-add :visible="addVisible" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <post-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <PostEdit :visible="editVisible" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -100,12 +106,11 @@ import { search_mixin } from '@/common/mixin/search'
 import { permission_mixin } from '@/common/mixin/permission'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
-import PostAdd from './PostAdd'
-import PostUpdate from './PostUpdate'
+import PostEdit from './PostEdit.vue'
 
 export default {
   name: 'Post',
-  components: { PostAdd, PostUpdate, PersonnelOption },
+  components: { PostEdit, PersonnelOption },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -113,7 +118,7 @@ export default {
       queryMeans: 'backend',
       originData: [],
       currentData: [],
-      searchForm: { personnelId: '', organ: '' }
+      searchForm: { personnelId: '', organParam: '' }
     }
   },
   computed: {
@@ -129,7 +134,7 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
       request(this.resource, 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
@@ -142,11 +147,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     }
   }
 }

@@ -1,58 +1,30 @@
 import dayjs from 'dayjs'
 import { getAge } from '@/utils/index'
-import { curd } from '@/api/index'
+import { request, curd } from '@/api/index'
+
 export const mixin = {
   props: {
-    passedData: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    singlePersonnelData: {
+    baseData: {
       type: Object,
       default() {
         return {}
-      }
-    },
-    loading: {
-      type: Boolean,
-      default() {
-        return false
       }
     }
   },
   data() {
     return {
-      dialogLoading: false,
+      loading: false,
+      action: '',
+      editVisible: false,
       updateVisible: false,
       detailVisible: false,
       addVisible: false,
-      // mainData: [],
+      originData: [],
+      currentData: [],
       multipleSelection: [],
       rowData: {},
       currentEditIndex: 0
     }
-  },
-  computed: {
-    mainData: {
-      get: function() {
-        return this.passedData
-      },
-      set: function(index) {
-        this.mainData.splice(index, 1)
-      }
-    }
-  },
-  watch: {
-    // passedData: function(val, oldval) {
-    //   // this.mainData = { ...val }
-    //   if (Object.keys(val).length) {
-    //     for (const i of Object.keys(val)) {
-    //       this.$set(this.mainData, i, val[i])
-    //     }
-    //   }
-    // }
   },
   filters: {
     ageFilter(age) {
@@ -63,9 +35,28 @@ export const mixin = {
         return '今'
       }
       return dayjs(date).format('YYYY年MM月DD日')
+    },
+    dateEndFilter(date) {
+      if (date === '') {
+        return date
+      }
+      const endDate = new Date(date)
+      const now = new Date()
+      if (endDate > now) {
+        return '今'
+      }
+      return dayjs(date).format('YYYY年MM月DD日')
     }
   },
+
   methods: {
+    fetchData() {
+      this.queryData = { id: this.$route.query.id }
+      request(this.resource, 'detail', this.queryData).then(response => {
+        this.originData = response.data ?? []
+        this.currentData = response.data ?? []
+      })
+    },
     visibleChange(cpn) {
       const visible = cpn + 'Visible'
       this[visible] = false
@@ -76,16 +67,29 @@ export const mixin = {
     updateVisibleChange() {
       this.updateVisible = false
     },
+    editSuccess() {
+      this.editVisible = false
+      this.fetchData()
+    },
     addSuccess() {
       this.addVisible = false
-      this.$emit('reFetchCpnData', this.cpnName)
+      this.fetchData()
     },
-    updateSuccess(row) {
+    updateSuccess() {
       this.updateVisible = false
-      this.$emit('reFetchCpnData', this.cpnName)
+      this.fetchData()
     },
     handleSelectionChange(val) {
       this.multipleSelection = val
+    },
+    handleEdit(act, row) {
+      this.action = act
+      if (act === 'add') {
+        this.rowData = {}
+      } else {
+        this.rowData = row
+      }
+      this.editVisible = true
     },
     handleUpdate(index, row) {
       // console.log(index, row)
@@ -106,7 +110,7 @@ export const mixin = {
                 message: response.message,
                 type: 'success'
               })
-              this.mainData = index
+              this.fetchData()
             })
             .catch(err => {
               console.log(err)
@@ -132,7 +136,7 @@ export const mixin = {
                 message: response.message,
                 type: 'success'
               })
-              this.$emit('reFetchCpnData', this.cpnName)
+              this.fetchData()
             })
             .catch(err => {
               console.log(err)

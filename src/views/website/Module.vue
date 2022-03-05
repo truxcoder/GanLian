@@ -10,7 +10,7 @@
     </el-card>
     <el-card class="right-card">
       <div class="user-tool-bar">
-        <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
+        <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
         <el-button type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
         <el-button type="primary" icon="el-icon-circle-plus-outline" size="mini" @click="orderVisible = true">更新模块排序</el-button>
       </div>
@@ -72,7 +72,7 @@
         </el-table-column>
         <el-table-column align="center" label="操作" width="150" fixed="right">
           <template slot-scope="scope">
-            <el-link type="success" class="oper-btn" icon="el-icon-edit" :underline="false" @click="handleUpdate(scope.$index, scope.row)">编辑</el-link>
+            <el-link type="success" class="oper-btn" icon="el-icon-edit" :underline="false" @click="handleEdit('update', scope.row)">编辑</el-link>
             <el-link type="danger" class="oper-btn" icon="el-icon-delete" :underline="false" @click="handleDelete(scope.$index, scope.row.id)">删除</el-link>
           </template>
         </el-table-column>
@@ -90,8 +90,10 @@
         @current-change="handleCurrentChange"
       />
     </el-card>
-    <module-add :visible="addVisible" :module-list="originData" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <module-update :visible="updateVisible" :rowdata="rowData" :module-list="originData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <ModuleEdit :visible="editVisible" :action="action" :module-list="originData" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+
+    <!-- <module-add :visible="addVisible" :module-list="originData" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <module-update :visible="updateVisible" :rowdata="rowData" :module-list="originData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
     <module-order :visible="orderVisible" :module-list="orderCpnData" @visibleChange="visibleChange" @updateOrderSuccess="updateOrderSuccess" />
   </div>
 </template>
@@ -102,15 +104,16 @@ import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
 import { permission_mixin } from '@/common/mixin/permission'
-import ModuleAdd from './ModuleAdd.vue'
-import ModuleUpdate from './ModuleUpdate.vue'
+import ModuleEdit from './ModuleEdit.vue'
+// import ModuleAdd from './ModuleAdd.vue'
+// import ModuleUpdate from './ModuleUpdate.vue'
 import ModuleOrder from './ModuleOrder.vue'
 
 import { transToTreeData } from '@/utils/module'
 
 export default {
   name: 'Module',
-  components: { ModuleAdd, ModuleUpdate, ModuleOrder },
+  components: { ModuleEdit, ModuleOrder },
   filters: {
     rankFilter(rank) {
       return { 1: '一级', 2: '二级' }[rank]
@@ -240,8 +243,6 @@ export default {
 
 .user-tool-bar {
   padding: 0 0 10px 0;
-}
-.custom-tree-node {
 }
 .custom-tree-node i {
   margin: 0 10px;

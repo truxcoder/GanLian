@@ -1,21 +1,13 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 10:24:13
- * @LastEditTime: 2022-02-10 09:57:48
+ * @LastEditTime: 2022-03-03 19:20:49
  * @LastEditors: truxcoder
  * @Description: 培训选择人员页面
 -->
 
 <template>
   <el-dialog v-loading="dialogLoading" :title="row.title" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <!-- <div class="mb-4">
-      <el-card>
-        <div>
-          <p>培训标题: {{ row.title }}</p>
-          <p>培训时间: {{ row.startTime | dateFilter }} - {{ row.endTime | dateFilter }}</p>
-        </div>
-      </el-card>
-    </div> -->
     <div class="flex">
       <div class=" w-80">
         <el-card>
@@ -44,7 +36,6 @@
 <script>
 import { request, curd } from '@/api/index'
 import DepartmentTree from '@/components/department/DepartmentTree.vue'
-import { mixin } from '@/common/mixin/training'
 import { common_mixin } from '@/common/mixin/mixin'
 
 // const array = require('lodash/array')
@@ -53,7 +44,7 @@ const _ = require('lodash')
 export default {
   name: 'TrainingPersonnel',
   components: { DepartmentTree },
-  mixins: [common_mixin, mixin],
+  mixins: [common_mixin],
   props: {
     visible: {
       type: Boolean,

@@ -1,9 +1,9 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 19:46:18
- * @LastEditTime: 2022-02-09 10:50:44
+ * @LastEditTime: 2022-03-03 19:18:11
  * @LastEditors: truxcoder
- * @Description:
+ * @Description: 培训详情
 -->
 <template>
   <el-dialog v-loading="dialogLoading" width="1200px" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
@@ -31,42 +31,6 @@
         </el-card>
       </div>
     </div>
-    <!-- <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
-      <el-form-item label="培训标题" prop="title">
-        <el-input v-model="form.title" :style="formLineWidth" placeholder="请输入标题" />
-      </el-form-item>
-      <el-form-item label="培训地点" prop="place">
-        <el-input v-model="form.place" :style="formLineWidth" placeholder="请输入地点" />
-      </el-form-item>
-      <el-form-item label="组织单位" prop="organ">
-        <el-select v-model="form.organ" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位名称">
-          <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.name" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="组织部门" prop="department">
-        <el-select v-model="form.department" :style="formItemWidth" filterable allow-create placeholder="请选择或输入部门名称">
-          <el-option v-for="i in options.department" :key="i.vaule" :label="i.label" :value="i.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="性质" prop="property">
-        <el-select v-model="form.property" :style="formItemWidth" placeholder="请选择性质">
-          <el-option v-for="i in options.property" :key="i.value" :label="i.label" :value="i.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="学时" prop="period">
-        <el-input v-model.number="form.period" type="number" :style="formItemWidth" placeholder="请输入学时(数字)" />
-      </el-form-item>
-      <el-form-item label="开始时间" prop="startTime">
-        <el-date-picker v-model="form.startTime" :style="formItemWidth" type="date" placeholder="选择日期" />
-      </el-form-item>
-      <el-form-item label="结束时间" prop="endTime">
-        <el-date-picker v-model="form.endTime" :style="formItemWidth" type="date" placeholder="选择日期" />
-      </el-form-item>
-
-      <el-form-item label="培训简介" prop="intro">
-        <el-input v-model="form.intro" type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" :style="formLineWidth" placeholder="输入培训简介" />
-      </el-form-item>
-    </el-form> -->
     <div slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取 消</el-button>
     </div>

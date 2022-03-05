@@ -1,11 +1,14 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2022-03-02 20:29:43
+ * @LastEditTime: 2022-03-03 16:11:09
+ * @LastEditors: truxcoder
+ * @Description: 考核信息添加编辑
+-->
 <template>
-  <el-dialog v-loading="dialogLoading" title="编辑人员信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="updateForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" :title="actName + '人员信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item v-for="item in formItemData" :key="item" :label="models[item].label" :prop="item">
-        <!-- <el-select v-if="item=='organId'" v-model="form[item]" :style="formItemWidth" :placeholder="'请选择'+models[item].label">
-          <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
-        </el-select> -->
-
         <el-select
           v-if="models[item].type == 'SELECT'"
           v-model="form[item]"
@@ -60,67 +63,91 @@
 </template>
 
 <script>
-import { curd } from '@/api'
-import { mixin } from '@/common/mixin/personnel'
-
+import { curd } from '@/api/index'
+import { edit_mixin } from '@/common/mixin/edit'
+import rules from '@/common/rules/personnel'
+import models from '@/common/model/personnel'
 export default {
-  name: 'PersonnelUpdate',
-  mixins: [mixin],
+  name: 'PersonnelEdit',
+  mixins: [edit_mixin],
   props: {
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    rowdata: {
-      type: Object,
+    organList: {
+      type: Array,
       default() {
-        return {}
+        return []
       }
     }
   },
   data() {
     return {
-      resource: 'personnel'
+      resource: 'personnel',
+      form: {},
+      rules,
+      models,
+      dialogWidth: '1200px',
+      formLabelWidth: '140px',
+      formItemWidth: { width: '220px' },
+      formTextAreaWidth: { width: '940px' },
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: '今天',
+            onClick(picker) {
+              picker.$emit('pick', new Date())
+            }
+          },
+          {
+            text: '昨天',
+            onClick(picker) {
+              const date = new Date()
+              date.setTime(date.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', date)
+            }
+          },
+          {
+            text: '一年前',
+            onClick(picker) {
+              const date = new Date()
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 365)
+              picker.$emit('pick', date)
+            }
+          }
+        ]
+      }
+    }
+  },
+  computed: {
+    formItemData() {
+      return Object.keys(models).sort((a, b) => models[a].order - models[b].order)
     }
   },
   watch: {
     visible: function(val, oldval) {
-      // 因为Vue中父向子传值，数组和对象会传引用。直接修改props里面的值会直接影响父组件数据。Vue官方推荐用计算属性。
-      // 这里想办法建立一个本地属性。用Json方法生生造了一个对象。
-      // 重构：用spread语法
-      // this.form = JSON.parse(JSON.stringify(val))
       if (val === true) {
-        this.form = { ...this.rowdata }
-        this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
-        this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
+        this.form.personnelId = this.singlePersonnelData?.id ?? ''
+        if (this.action === 'update') {
+          this.form = { ...this.row }
+          this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
+          this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
+        }
       } else {
         this.form = {}
+        this.$refs.editForm.resetFields()
       }
     }
   },
   methods: {
     onSubmit() {
-      this.$refs.updateForm.validate(valid => {
+      this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          console.log('updateForm----:', this.form)
           this.form.proCert = this.form.proCert.toString()
           this.form.passport = this.form.passport.length ? JSON.stringify(this.form.passport) : JSON.stringify([0])
-          curd('update', this.form, { resource: this.resource })
+          curd(this.action, this.form, { resource: this.resource })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
+              this.$message.success(response.message)
               this.dialogLoading = false
-              // let selected_dept
-              // this.departmentList.forEach( item => {
-              //   if (item.id === this.form.department_id){
-              //     selected_dept = item.name
-              //   }
-              // })
-              // this.form.department = { name: selected_dept }
-              this.$emit('updateSuccess')
+              this.$emit('editSuccess')
             })
             .catch(err => {
               console.log(err)
@@ -131,10 +158,6 @@ export default {
           return false
         }
       })
-    },
-    onCancel() {
-      this.$emit('visibleChange', 'update')
-      this.$refs.updateForm.resetFields()
     }
   }
 }

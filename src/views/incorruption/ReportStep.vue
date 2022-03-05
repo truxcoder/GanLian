@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-15 10:13:03
- * @LastEditTime: 2022-02-17 11:40:01
+ * @LastEditTime: 2022-03-03 10:53:17
  * @LastEditors: truxcoder
  * @Description: 管理举报处理步骤, 本dialog又嵌套了添加和修改dialog。子dialog用了append-to-body属性，子组件取消或完成动作emit到本组件，
  ****************本组件又emit给上级父组件，由上级组件修改visible，然后再一层层传递到子组件
@@ -17,7 +17,7 @@
               <span>{{ item.step | stepFilter }}</span>
             </div>
             <div class=" pl-2 self-center ">
-              <el-button type="text" size="small" icon="el-icon-edit" @click="onUpdate(index)" />
+              <el-button type="text" size="small" icon="el-icon-edit" @click="handleEdit('update', index)" />
               <el-button type="text" size="small" icon="el-icon-delete" @click="onDelete(index)" />
             </div>
           </div>
@@ -25,10 +25,9 @@
         </el-card>
       </el-timeline-item>
     </el-timeline>
-    <report-step-add :visible="addVisible" :options="options" :row="row" :steps="steps" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <report-step-update :visible="updateVisible" :options="options" :row="row" :steps="steps" :index="currentIndex" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <ReportStepEdit :visible="editVisible" :action="action" :options="options" :row="row" :steps="steps" :index="currentIndex" @editSuccess="editSuccess" @visibleChange="visibleChange" />
     <div slot="footer" class="dialog-footer">
-      <el-button type="success" @click="onAdd">添加步骤</el-button>
+      <el-button type="success" @click="handleEdit('add')">添加步骤</el-button>
       <el-button @click="onCancel">关 闭</el-button>
       <!-- <el-button type="primary" @click="onSubmit">确 定</el-button> -->
     </div>
@@ -37,13 +36,11 @@
 
 <script>
 import { request, curd } from '@/api/index'
-import { mixin } from '@/common/mixin/report'
-import ReportStepAdd from './ReportStepAdd.vue'
-import ReportStepUpdate from './ReportStepUpdate.vue'
+import ReportStepEdit from './ReportStepEdit.vue'
 var lang = require('lodash/lang')
 export default {
   name: 'ReportStep',
-  components: { ReportStepAdd, ReportStepUpdate },
+  components: { ReportStepEdit },
   filters: {
     personList(arr) {
       if (!arr) {
@@ -77,7 +74,6 @@ export default {
       return result
     }
   },
-  mixins: [mixin],
   props: {
     visible: {
       type: Boolean,
@@ -89,13 +85,13 @@ export default {
         return {}
       }
     },
-    addVisible: {
-      type: Boolean,
+    options: {
+      type: Object,
       default() {
-        return false
+        return {}
       }
     },
-    updateVisible: {
+    editVisible: {
       type: Boolean,
       default() {
         return false
@@ -112,6 +108,7 @@ export default {
       formItemWidth: { width: '395px' },
       formTextAreaWidth: { width: '940px' },
       currentIndex: 0,
+      action: '',
       loading: false,
       dialogLoading: false
     }
@@ -134,12 +131,14 @@ export default {
         }
       })
     },
-    onAdd() {
-      this.$emit('stepVisibleChange', 'add')
-    },
-    onUpdate(index) {
-      this.currentIndex = index
-      this.$emit('stepVisibleChange', 'update')
+    handleEdit(act, index) {
+      this.action = act
+      if (act === 'add') {
+        this.currentIndex = 0
+      } else {
+        this.currentIndex = index
+      }
+      this.$emit('stepVisibleChange')
     },
     onDelete(index) {
       this.$confirm('将删除该条信息, 是否确定?', '提示', {
@@ -165,13 +164,9 @@ export default {
           this.$message.info('已取消删除')
         })
     },
-    addSuccess() {
-      this.$emit('stepVisibleChange', 'add')
+    editSuccess() {
       this.fetchData()
-    },
-    updateSuccess(row) {
-      this.$emit('stepVisibleChange', 'update')
-      this.fetchData()
+      this.$emit('stepVisibleChange')
     },
     visibleChange(cpn) {
       this.$emit('stepVisibleChange', cpn)

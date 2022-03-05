@@ -1,12 +1,12 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-15 10:13:03
- * @LastEditTime: 2022-02-18 14:51:13
+ * @LastEditTime: 2022-03-03 11:09:39
  * @LastEditors: truxcoder
  * @Description: 添加和修改举报信息
 -->
 <template>
-  <el-dialog v-loading="dialogLoading" title="添加处理信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+  <el-dialog v-loading="dialogLoading" :title="actName + '信访举报信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item label="举报标题" prop="title">
         <el-input v-model="form.title" :style="formLineWidth" placeholder="请输入标题" />
@@ -36,15 +36,17 @@
 
 <script>
 import { request } from '@/api/index'
-import { mixin } from '@/common/mixin/report'
+import { edit_mixin } from '@/common/mixin/edit'
 import PersonMultiSelect from '@/components/Personnel/PersonMultiSelect.vue'
+
+import rules from '@/common/rules/report'
 
 const array = require('lodash/array')
 // const _ = require('lodash')
 export default {
   name: 'ReportEdit',
   components: { PersonMultiSelect },
-  mixins: [mixin],
+  mixins: [edit_mixin],
   props: {
     visible: {
       type: Boolean,
@@ -53,7 +55,15 @@ export default {
   },
   data() {
     return {
-      resource: 'report'
+      resource: 'report',
+      form: { title: '', reportTime: '', step: '', intro: '' },
+      rules,
+      personnels: '',
+      dialogWidth: '1200px',
+      formLabelWidth: '140px',
+      formLineWidth: { width: '940px' },
+      formItemWidth: { width: '395px' },
+      formTextAreaWidth: { width: '940px' }
     }
   },
   computed: {
@@ -141,9 +151,6 @@ export default {
           return false
         }
       })
-    },
-    onCancel() {
-      this.$emit('visibleChange', 'edit')
     },
     onPersonnelChange(value) {
       this.personnels = value

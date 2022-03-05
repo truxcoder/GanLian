@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 15:09:42
- * @LastEditTime: 2022-02-10 15:46:12
+ * @LastEditTime: 2022-03-03 14:27:00
  * @LastEditors: truxcoder
  * @Description: 职务等级
 -->
@@ -11,7 +11,7 @@
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
     <div class="tool-bar">
-      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
+      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div class="tableZone">
@@ -29,7 +29,7 @@
         </el-table-column>
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+            <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -48,8 +48,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <level-add :visible="addVisible" :passed-data="currentData" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <level-update :visible="updateVisible" :passed-data="currentData" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <LevelEdit :visible="editVisible" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -58,13 +57,11 @@ import { request } from '@/api/index'
 import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
-
-import LevelAdd from './LevelAdd'
-import LevelUpdate from './LevelUpdate'
+import LevelEdit from './LevelEdit.vue'
 
 export default {
   name: 'Level',
-  components: { LevelAdd, LevelUpdate },
+  components: { LevelEdit },
   mixins: [common_mixin, delete_mixin, list_mixin],
   data() {
     return {

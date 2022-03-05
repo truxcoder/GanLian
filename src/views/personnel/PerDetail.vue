@@ -1,27 +1,34 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-11-09 12:43:53
+ * @LastEditTime: 2022-03-04 14:51:21
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
   <el-container>
     <el-main>
       <el-tabs type="border-card">
         <el-tab-pane label="人员基本情况">
-          <basic :loading="loading" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <basic :loading="loading" :base-data="baseData" @updateSuccess="updateSuccess" />
         </el-tab-pane>
         <el-tab-pane label="培训情况">
-          <training :loading="loading" :passed-data="trainings" :personnel-id="originData.id" @reFetchCpnData="reFetchCpnData" />
+          <training />
         </el-tab-pane>
         <el-tab-pane label="任职情况">
-          <post :loading="loading" :passed-data="posts" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <post :base-data="baseData" />
         </el-tab-pane>
         <el-tab-pane label="奖惩情况">
-          <award-and-punish :loading="loading" :award-passed-data="awards" :punish-passed-data="punishes" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <award-and-punish :base-data="baseData" />
         </el-tab-pane>
         <el-tab-pane label="考核情况">
-          <appraisal :loading="loading" :passed-data="appraisals" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <appraisal :base-data="baseData" />
         </el-tab-pane>
         <el-tab-pane label="处分情况">
-          <discipline :loading="loading" :passed-data="disciplines" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <discipline :base-data="baseData" />
         </el-tab-pane>
         <el-tab-pane label="信访举报">
-          <report :loading="loading" :passed-data="reports" :single-personnel-data="originData" @reFetchCpnData="reFetchCpnData" />
+          <report :base-data="baseData" />
         </el-tab-pane>
       </el-tabs>
     </el-main>
@@ -29,8 +36,6 @@
 </template>
 
 <script>
-// import 'tailwindcss/tailwind.css'
-import { request } from '@/api/index'
 import AwardAndPunish from './PerDetail/AwardAndPunish.vue'
 import Appraisal from './PerDetail/Appraisal.vue'
 import Post from './PerDetail/Post.vue'
@@ -39,101 +44,54 @@ import Basic from './PerDetail/Basic.vue'
 import Training from './PerDetail/Training.vue'
 import Report from './PerDetail/Report.vue'
 
-import { detail_permission_mixin } from '@/common/mixin/permission'
+import { request } from '@/api/index'
+import { permission_mixin } from '@/common/mixin/permission'
 
 export default {
   name: 'Pdetail',
   components: { AwardAndPunish, Appraisal, Post, Basic, Discipline, Training, Report },
-  mixins: [detail_permission_mixin],
+  mixins: [permission_mixin],
   data() {
     return {
-      originData: {},
-      posts: [],
-      trains: [],
-      appraisals: [],
-      awards: [],
-      punishes: [],
-      disciplines: [],
-      trainings: [],
-      reports: [],
-      queryData: {},
-      loading: true
+      baseData: {},
+      loading: false
     }
   },
   created() {
-    this.check().then(() => {
-      this.queryData = { id: this.$route.query.id }
-      this.fetchAllData(this.queryData)
+    if (this.$store.getters.departments.length === 0) {
+      this.$store.dispatch('department/setDepartments')
+    }
+    // if (Object.keys(this.$store.getters.perDptMap).length === 0) {
+    //   console.log('----changePerDptMap----')
+    //   this.$store.dispatch('personnel/changePerDptMap')
+    // }
+    this.check('DetailBasic').then(() => {
+      if (this.$route.query.id === this.$store.getters.id || this.can.global) {
+        this.fetchData()
+        return
+      } else {
+        request('user', 'organ', { id: this.$route.query.id }).then(res => {
+          if (!res.data || res.data !== this.$store.getters.organ) {
+            this.$message.error('你无权查看此人信息!')
+            this.$router.push('/401')
+            return
+          }
+          this.fetchData()
+        })
+      }
     })
   },
   methods: {
-    fetchAllData(data = {}) {
+    fetchData() {
       this.loading = true
-      const promises = [
-        request('personnel', 'detail', data),
-        request('post', 'detail', data),
-        request('appraisal', 'detail', data),
-        request('award', 'detail', data),
-        request('punish', 'detail', data),
-        request('discipline', 'detail', data),
-        request('training', 'detail', data),
-        request('report', 'detail', data)
-      ]
-      Promise.all(promises).then(responses => {
-        this.originData = responses[0].data
-        this.trains = responses[0].trains
-        this.posts = responses[1].data
-        // this.appraisals = responses[2].data.sort((a, b) => a.years - b.years)
-        this.appraisals = responses[2].data
-        this.awards = responses[3].data
-        this.punishes = responses[4].data
-        this.disciplines = responses[5].data
-        this.trainings = responses[6].data
-        this.reports = responses[7].data
+      this.queryData = { id: this.$route.query.id }
+      request('personnel', 'detail', this.queryData).then(response => {
+        this.baseData = response.data ?? []
         this.loading = false
       })
     },
-    /**
-     * @description: 获取组件数据值
-     * @param {*} obj 组件对象的resource值
-     * @param {*} key 本地data里对应组件的数据对象
-     * @return {*}
-     */
-    fetchData(obj, key) {
-      request(obj, 'detail', this.queryData).then(response => {
-        this[key] = response.data
-      })
-    },
-    reFetchCpnData(cpn) {
-      switch (cpn) {
-        case 'Basic':
-          this.fetchData('personnel', 'originData')
-          break
-        case 'Post':
-          this.fetchData('post', 'posts')
-          break
-        case 'Award':
-          this.fetchData('award', 'awards')
-          break
-        case 'Punish':
-          this.fetchData('punish', 'punishes')
-          break
-        case 'Appraisal':
-          this.fetchData('appraisal', 'appraisals')
-          break
-        case 'Discipline':
-          this.fetchData('discipline', 'disciplines')
-          break
-        case 'Training':
-          this.fetchData('training', 'trainings')
-          break
-        case 'Report':
-          this.fetchData('report', 'reports')
-          break
-        default:
-          console.log('cpn:', cpn)
-          break
-      }
+    updateSuccess() {
+      this.fetchData()
     }
   }
 }

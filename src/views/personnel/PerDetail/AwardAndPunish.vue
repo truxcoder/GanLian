@@ -4,11 +4,11 @@
     <div class=" mr-4  font-semibold text-gray-500">组织奖励</div>
     <hr class="mb-2" />
     <div class=" flex items-center text-left">
-      <el-button v-if="can.add" type="primary" size="mini" @click="handleAdd('Award')">添加信息</el-button>
-      <el-button v-if="can.delete && awardData.length" type="danger" :disabled="!awardMultipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData('Award')">删除</el-button>
+      <el-button type="primary" size="mini" @click="handleEdit('award', 'add')">添加信息</el-button>
+      <el-button v-if="currentAwardData.length" type="danger" icon="el-icon-delete" size="mini" @click="deleteMutiData('award')">删除</el-button>
     </div>
-    <div v-if="awardData.length" class="mt-4">
-      <el-table v-loading="cpnLoading" :data="awardData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleAwardSelectionChange">
+    <div v-if="currentAwardData.length" class="mt-4">
+      <el-table v-loading="loading" :data="currentAwardData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleAwardSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="奖励类型" width="150">
           <template slot-scope="scope">
@@ -28,8 +28,8 @@
         </el-table-column>
         <el-table-column align="center" label="操作" width="240" fixed="right">
           <template slot-scope="scope">
-            <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row, 'Award')">编辑</el-button>
-            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id, 'Award')">删除</el-button>
+            <el-button size="mini" type="success" @click="handleEdit('award', 'update', scope.row)">编辑</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id, 'award')">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -40,11 +40,11 @@
     <div class=" mr-4 mt-4 font-semibold text-gray-500">组织处理</div>
     <hr class="mb-2" />
     <div class=" flex items-center text-left">
-      <el-button v-if="can.add" type="primary" size="mini" @click="handleAdd('Punish')">添加信息</el-button>
-      <el-button v-if="can.delete && punishData.length" type="danger" :disabled="!punishMultipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData('Punish')">删除</el-button>
+      <el-button type="primary" size="mini" @click="handleEdit('punish', 'add')">添加信息</el-button>
+      <el-button v-if="currentPunishData.length" type="danger" icon="el-icon-delete" size="mini" @click="deleteMutiData('punish')">删除</el-button>
     </div>
-    <div v-if="punishData.length" class="mt-4">
-      <el-table v-loading="loading" :data="punishData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handlePunishSelectionChange">
+    <div v-if="currentPunishData.length" class="mt-4">
+      <el-table v-loading="loading" :data="currentPunishData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handlePunishSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="处理类型" width="150">
           <template slot-scope="scope">
@@ -64,32 +64,32 @@
         </el-table-column>
         <el-table-column align="center" label="操作" width="240" fixed="right">
           <template slot-scope="scope">
-            <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row, 'Punish')">编辑</el-button>
-            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id, 'Punish')">删除</el-button>
+            <el-button size="mini" type="success" @click="handleEdit('punish', 'update', scope.row)">编辑</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id, 'punish')">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
     <!-- 处理部分结束 -->
-    <award-add :is-single="true" :single-personnel-data="singlePersonnelData" :visible="awardAddVisible" :options="awardOptions" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <award-update
-      :visible="awardUpdateVisible"
+    <AwardEdit
       :is-single="true"
-      :single-personnel-data="singlePersonnelData"
+      :visible="awardVisible"
+      :single-personnel-data="baseData"
+      :action="action"
+      :row="rowData"
       :options="awardOptions"
-      :rowdata="rowData"
-      @updateSuccess="updateSuccess"
+      @editSuccess="editSuccess"
       @visibleChange="visibleChange"
     />
-    <punish-add :is-single="true" :single-personnel-data="singlePersonnelData" :visible="punishAddVisible" :options="punishOptions" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <punish-update
-      :visible="punishUpdateVisible"
+    <PunishEdit
       :is-single="true"
-      :single-personnel-data="singlePersonnelData"
+      :visible="punishVisible"
+      :single-personnel-data="baseData"
+      :action="action"
+      :row="rowData"
       :options="punishOptions"
-      :rowdata="rowData"
-      @updateSuccess="updateSuccess"
+      @editSuccess="editSuccess"
       @visibleChange="visibleChange"
     />
   </div>
@@ -97,18 +97,17 @@
 
 <script>
 import { awardCategory, awardGrade, punishCategory, punishGrade } from '@/utils/dict'
-import AwardAdd from '@/views/award_and_punish/AwardAdd.vue'
-import AwardUpdate from '@/views/award_and_punish/AwardUpdate.vue'
-import PunishAdd from '@/views/award_and_punish/PunishAdd.vue'
-import PunishUpdate from '@/views/award_and_punish/PunishUpdate.vue'
-import { detail_permission_mixin } from '@/common/mixin/permission'
-import { curd } from '@/api/index'
+import PunishEdit from '@/views/award_and_punish/PunishEdit.vue'
+import AwardEdit from '@/views/award_and_punish/AwardEdit.vue'
+import { permission_mixin } from '@/common/mixin/permission'
+
+import { request, curd } from '@/api/index'
 
 import dayjs from 'dayjs'
 
 export default {
   name: 'AwardAndPunish',
-  components: { AwardAdd, AwardUpdate, PunishAdd, PunishUpdate },
+  components: { AwardEdit, PunishEdit },
   filters: {
     dateFilter(date) {
       if (dayjs(date).year() === 2100) {
@@ -117,67 +116,34 @@ export default {
       return dayjs(date).format('YYYY年MM月DD日')
     }
   },
-  mixins: [detail_permission_mixin],
+  mixins: [permission_mixin],
   props: {
-    awardPassedData: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    punishPassedData: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    singlePersonnelData: {
+    baseData: {
       type: Object,
       default() {
         return {}
-      }
-    },
-    loading: {
-      type: Boolean,
-      default() {
-        return false
       }
     }
   },
   data() {
     return {
-      cpnName: 'AwardAndPunish',
-      obj: 'Award',
-      dialogLoading: false,
-      awardUpdateVisible: false,
-      awardAddVisible: false,
+      obj: 'DetailAwardPunish',
+      originAwardData: [],
+      originPunishData: [],
+      currentAwardData: [],
+      currentPunishData: [],
+      awardVisible: false,
       awardMultipleSelection: [],
-      punishUpdateVisible: false,
-      punishAddVisible: false,
+      punishVisible: false,
       punishMultipleSelection: [],
       rowData: {},
+      action: '',
       currentEditIndex: 0,
-      tabLoading: false,
+      loading: false,
       currentOperateCpn: ''
     }
   },
   computed: {
-    awardData: {
-      get: function() {
-        return this.awardPassedData
-      },
-      set: function(index) {
-        this.awardData.splice(index, 1)
-      }
-    },
-    punishData: {
-      get: function() {
-        return this.punishPassedData
-      },
-      set: function(index) {
-        this.punishData.splice(index, 1)
-      }
-    },
     awardOptions() {
       const categoryOptions = awardCategory
       const gradeOptions = awardGrade
@@ -193,36 +159,49 @@ export default {
         category: categoryOptions,
         grade: gradeOptions
       }
-    },
-    cpnLoading() {
-      return this.loading || this.tabLoading
     }
   },
   created() {
-    this.tabLoading = true
-    this.check().then(() => {
-      this.tabLoading = false
+    this.check(this.obj).then(() => {
+      this.fetchAllData()
     })
   },
   methods: {
-    handleDelete(index, id, module) {
+    fetchAllData(data = {}) {
+      this.loading = true
+      this.queryData = { id: this.$route.query.id }
+      const promises = [request('award', 'detail', this.queryData), request('punish', 'detail', this.queryData)]
+      Promise.all(promises).then(responses => {
+        this.originAwardData = responses[0].data ?? []
+        this.originPunishData = responses[0].data ?? []
+        this.currentAwardData = responses[1].data ?? []
+        this.currentPunishData = responses[1].data ?? []
+        this.loading = false
+      })
+    },
+    fetchData(resource) {
+      this.queryData = { id: this.$route.query.id }
+      request(resource, 'detail', this.queryData).then(response => {
+        if (resource === 'award') {
+          this.originAwardData = response.data ?? []
+          this.currentAwardData = response.data ?? []
+        } else if (resource === 'punish') {
+          this.originPunishData = response.data ?? []
+          this.currentPunishData = response.data ?? []
+        }
+      })
+    },
+    handleDelete(id, module) {
       this.$confirm('将删除该条信息, 是否确定?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          curd('delete', { id: [id] }, { resource: module.toLowerCase() })
+          curd('delete', { id: [id] }, { resource: module })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              if (module === 'Award') {
-                this.awardData = index
-              } else if (module === 'Punish') {
-                this.punishData = index
-              }
+              this.$message.success(response.message)
+              this.fetchData(module)
             })
             .catch(err => {
               console.log(err)
@@ -243,47 +222,35 @@ export default {
       })
         .then(() => {
           let data
-          if (module === 'Award') {
+          if (module === 'award') {
             data = { id: this.awardMultipleSelection.map(item => item.id) }
-          } else if (module === 'Punish') {
+          } else if (module === 'punish') {
             data = { id: this.punishMultipleSelection.map(item => item.id) }
           }
-          curd('delete', data, { resource: module.toLowerCase() })
+          curd('delete', data, { resource: module })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.$emit('reFetchCpnData', module)
+              this.$message.success(response.message)
+              this.fetchData(module)
             })
             .catch(err => {
               console.log(err)
             })
         })
         .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
+          this.$message.info('已取消删除')
         })
     },
-    visibleChange(cpn) {
-      cpn = cpn.trim().replace(cpn[0], cpn[0].toUpperCase())
-      const module = this.currentOperateCpn.trim().replace(this.currentOperateCpn[0], this.currentOperateCpn[0].toLowerCase())
-      const visible = module + cpn + 'Visible'
-      console.log('visible:', visible)
+    visibleChange() {
+      const visible = this.currentOperateCpn + 'Visible'
       this[visible] = false
       this.currentOperateCpn = ''
     },
-    addSuccess() {
+    editSuccess() {
       const cpn = this.currentOperateCpn + ''
-      this.visibleChange('add')
-      this.$emit('reFetchCpnData', cpn)
-    },
-    updateSuccess() {
-      const cpn = this.currentOperateCpn + ''
-      this.visibleChange('update')
-      this.$emit('reFetchCpnData', cpn)
+      const visible = this.currentOperateCpn + 'Visible'
+      this[visible] = false
+      this.currentOperateCpn = ''
+      this.fetchData(cpn)
     },
     handleAwardSelectionChange(val) {
       this.awardMultipleSelection = val
@@ -291,22 +258,18 @@ export default {
     handlePunishSelectionChange(val) {
       this.punishMultipleSelection = val
     },
-    handleAdd(module) {
-      this.currentOperateCpn = module
-      if (module === 'Award') {
-        this.awardAddVisible = true
-      } else if (module === 'Punish') {
-        this.punishAddVisible = true
+    handleEdit(resource, act, row) {
+      this.currentOperateCpn = resource
+      this.action = act
+      if (act === 'add') {
+        this.rowData = {}
+      } else {
+        this.rowData = row
       }
-    },
-    handleUpdate(index, row, module) {
-      this.rowData = row
-      this.currentOperateCpn = module
-      this.currentEditIndex = index
-      if (module === 'Award') {
-        this.awardUpdateVisible = true
-      } else if (module === 'Punish') {
-        this.punishUpdateVisible = true
+      if (resource === 'award') {
+        this.awardVisible = true
+      } else if (resource === 'punish') {
+        this.punishVisible = true
       }
     }
   }

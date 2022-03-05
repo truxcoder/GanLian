@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-03-01 20:01:52
+ * @LastEditTime: 2022-03-02 14:08:39
  * @LastEditors: truxcoder
  * @Description: 各类事项管理
 -->
@@ -89,6 +89,8 @@ function getCategoryName(category) {
   switch (category) {
     case '1':
       return 'Audit'
+    case '2':
+      return 'PersonCheck'
 
     default:
       return ''
@@ -157,11 +159,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     },
     getPassport(value) {
       return value ? this.passportMap.get(value) : '未定义'

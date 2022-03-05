@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:24:30
- * @LastEditTime: 2022-03-01 20:20:49
+ * @LastEditTime: 2022-03-02 09:31:59
  * @LastEditors: truxcoder
  * @Description: 添加修改各类事项信息
  * wangEditor使用说明:
@@ -82,6 +82,8 @@ export default {
           }
           this.form.id = this.row.id
           this.fetchData()
+        } else {
+          this.editor ? this.setIntro() : this.initEditor()
         }
       } else {
         this.form = { title: '', personnelId: '', category: '', intro: '' }

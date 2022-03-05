@@ -1,6 +1,13 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2022-03-02 20:29:43
+ * @LastEditTime: 2022-03-03 19:03:32
+ * @LastEditors: truxcoder
+ * @Description: 培训信息添加编辑
+-->
 <template>
-  <el-dialog v-loading="dialogLoading" title="添加培训信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" :title="actName + '培训信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item label="培训标题" prop="title">
         <el-input v-model="form.title" :style="formLineWidth" placeholder="请输入标题" />
       </el-form-item>
@@ -45,40 +52,50 @@
 
 <script>
 import { curd } from '@/api/index'
-import { mixin } from '@/common/mixin/training'
+import { edit_mixin } from '@/common/mixin/edit'
+import rules from '@/common/rules/training'
 export default {
-  name: 'TrainingAdd',
-  mixins: [mixin],
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    }
-  },
+  name: 'TrainingEdit',
+  mixins: [edit_mixin],
   data() {
     return {
-      resource: 'training'
+      resource: 'training',
+      form: { title: '', place: '', organ: '', department: '', property: '', period: '', startTime: '', endTime: '', intro: '' },
+      rules,
+      dialogWidth: '1200px',
+      formLabelWidth: '140px',
+      formLineWidth: { width: '940px' },
+      formItemWidth: { width: '395px' },
+      formTextAreaWidth: { width: '940px' }
+    }
+  },
+  watch: {
+    visible: function(val, oldval) {
+      if (val === true) {
+        if (this.action === 'update') {
+          for (const key in this.form) {
+            this.form[key] = this.row[key]
+          }
+          this.form.id = this.row.id
+        }
+      } else {
+        this.form = { title: '', place: '', organ: '', department: '', property: '', period: '', startTime: '', endTime: '', intro: '' }
+        this.$refs.editForm.resetFields()
+      }
     }
   },
   methods: {
     onSubmit() {
-      this.$refs.addForm.validate(valid => {
+      this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          curd('add', this.form, { resource: this.resource })
+          curd(this.action, this.form, { resource: this.resource })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
+              this.$message.success(response.message)
               this.dialogLoading = false
-              this.$emit('addSuccess')
-              this.$refs.addForm.resetFields()
-              this.personnelOpitons = []
-              // Object.keys(this.form).forEach(key => this.form[key]='')
+              this.$emit('editSuccess')
             })
             .catch(err => {
-              // this.$message.error(err.message)
               console.log(err)
               this.dialogLoading = false
             })
@@ -87,15 +104,6 @@ export default {
           return false
         }
       })
-    },
-    onCancel() {
-      this.personnelOpitons = []
-      this.$emit('visibleChange', 'add')
-      // Object.keys(this.form).forEach(key => this.form[key]='')
-      this.$refs.addForm.resetFields()
-    },
-    onPersonnelChange(value) {
-      this.form.personnelId = value
     }
   }
 }

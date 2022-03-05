@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 10:59:14
- * @LastEditTime: 2022-02-10 10:05:21
+ * @LastEditTime: 2022-03-03 19:42:51
  * @LastEditors: truxcoder
  * @Description: 人员详情页个人培训模块编辑参与培训信息，本页列出培训列表供用户选择或取消参与
 -->
@@ -90,7 +90,6 @@
 
 <script>
 import { request } from '@/api/index'
-import { mixin } from '@/common/mixin/training'
 import { common_mixin } from '@/common/mixin/mixin'
 import { search_mixin } from '@/common/mixin/search'
 import { list_mixin } from '@/common/mixin/list'
@@ -100,7 +99,7 @@ const _ = require('lodash')
 
 export default {
   name: 'TrainPersonAdd',
-  mixins: [common_mixin, mixin, list_mixin, search_mixin],
+  mixins: [common_mixin, list_mixin, search_mixin],
   props: {
     visible: {
       type: Boolean,

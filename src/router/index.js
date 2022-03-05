@@ -104,6 +104,12 @@ export const constantRoutes = [
   },
 
   {
+    path: '/401',
+    component: () => import('@/views/401'),
+    hidden: true
+  },
+
+  {
     path: '/nologin',
     component: () => import('@/views/website/NoLogin'),
     hidden: true

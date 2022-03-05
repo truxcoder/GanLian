@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 09:40:38
- * @LastEditTime: 2022-02-09 19:20:51
+ * @LastEditTime: 2022-03-02 20:23:38
  * @LastEditors: truxcoder
  * @Description: 人员个人培训列表
 -->
@@ -9,10 +9,10 @@
   <div>
     <div class=" flex items-center text-left">
       <el-button type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
-      <el-button v-if="passedData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="currentData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
-    <div v-if="passedData.length" class="mt-4">
-      <el-table v-loading="cpnLoading" :data="passedData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
+    <div v-if="currentData.length" class="mt-4">
+      <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column label="开始时间" align="center">
           <template slot-scope="scope">
@@ -45,7 +45,7 @@
       </el-table>
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
-    <train-person-add :visible="addVisible" :passed="passedData" :personnel-id="personnelId" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <train-person-add :visible="addVisible" :passed="originData" :personnel-id="personnelId" @addSuccess="addSuccess" @visibleChange="visibleChange" />
     <training-detail :visible="detailVisible" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
@@ -55,7 +55,8 @@
 import TrainPersonAdd from '@/views/personnel/PerDetail/TrainPersonAdd.vue'
 import TrainingDetail from '@/views/train/TrainingDetail.vue'
 
-import { detail_permission_mixin } from '@/common/mixin/permission'
+import { permission_mixin } from '@/common/mixin/permission'
+
 import { common_mixin } from '@/common/mixin/mixin'
 // import { request } from '@/api'
 import { request } from '@/api/index'
@@ -63,56 +64,46 @@ import { request } from '@/api/index'
 export default {
   name: 'Training',
   components: { TrainingDetail, TrainPersonAdd },
-  mixins: [detail_permission_mixin, common_mixin],
+  mixins: [permission_mixin, common_mixin],
   props: {
-    passedData: {
-      type: Array,
+    baseData: {
+      type: Object,
       default() {
-        return []
-      }
-    },
-    loading: {
-      type: Boolean,
-      default() {
-        return false
-      }
-    },
-    personnelId: {
-      type: String,
-      default() {
-        return ''
+        return {}
       }
     }
   },
   data() {
     return {
-      cpnName: 'Training',
       resource: 'training',
-      obj: 'Training',
+      obj: 'DetailTraining',
+      personnelId: this.$route.query.id,
       disDict: [],
       detailVisible: false,
-      tabLoading: false,
+      loading: false,
       addVisible: false,
+      originData: [],
+      currentData: [],
       multipleSelection: [],
       rowData: {},
       currentEditIndex: 0
     }
   },
-  computed: {
-    cpnLoading() {
-      return this.loading || this.tabLoading
-    }
-  },
   created() {
-    if (this.$store.state.department.departments.length === 0) {
-      this.$store.dispatch('department/setDepartments')
-    }
-    this.tabLoading = true
-    this.check().then(() => {
-      this.tabLoading = false
+    this.loading = true
+    this.check(this.obj).then(() => {
+      this.fetchData()
+      this.loading = false
     })
   },
   methods: {
+    fetchData() {
+      this.queryData = { id: this.$route.query.id }
+      request(this.resource, 'detail', this.queryData).then(response => {
+        this.originData = response.data ?? []
+        this.currentData = response.data ?? []
+      })
+    },
     handleDetail(row) {
       this.rowData = row
       this.detailVisible = true
@@ -129,7 +120,7 @@ export default {
     },
     addSuccess() {
       this.addVisible = false
-      this.$emit('reFetchCpnData', this.cpnName)
+      this.fetchData()
     },
     handleSelectionChange(val) {
       this.multipleSelection = val

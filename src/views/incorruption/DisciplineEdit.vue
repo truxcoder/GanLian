@@ -1,9 +1,16 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2022-03-02 20:29:43
+ * @LastEditTime: 2022-03-03 17:06:42
+ * @LastEditors: truxcoder
+ * @Description: 处分信息添加编辑
+-->
 <template>
-  <el-dialog v-loading="dialogLoading" title="编辑处理信息" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="updateForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+  <el-dialog v-loading="dialogLoading" :title="actName + '处分信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="rowdata" :is-update="true" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
       </el-form-item>
       <el-form-item label="分类" prop="category">
         <el-select v-model="form.category" :style="formItemWidth" placeholder="请选择分类" @change="onCategoryChange">
@@ -40,48 +47,60 @@
 </template>
 
 <script>
-import { curd } from '@/api'
-import { mixin } from '@/common/mixin/discipline'
+import { curd } from '@/api/index'
+import { edit_mixin } from '@/common/mixin/edit'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
+import rules from '@/common/rules/discipline'
 export default {
-  name: 'DisciplineUpdate',
+  name: 'DisciplineEdit',
   components: { PersonnelOption },
-  mixins: [mixin],
+  mixins: [edit_mixin],
   props: {
-    visible: {
-      type: Boolean,
-      default: false
+    disDict: {
+      type: Array,
+      default() {
+        return []
+      }
     }
   },
   data() {
     return {
       resource: 'discipline',
-      testData: this.rowdata
+      form: { personnelId: '', category: '', getTime: '', dictId: '', content: '', docNumber: '', deadline: '' },
+      rules
+    }
+  },
+  computed: {
+    disDictList() {
+      return this.disDict.filter(item => item.category === this.form.category)
     }
   },
   watch: {
     visible: function(val, oldval) {
       if (val === true) {
-        this.form = { ...this.rowdata }
+        this.form.personnelId = this.singlePersonnelData?.id ?? ''
+        if (this.action === 'update') {
+          for (const key in this.form) {
+            this.form[key] = this.row[key]
+          }
+          this.form.id = this.row.id
+        }
       } else {
-        this.form = { personnelId: '', category: '', getTime: '', dictId: '', content: '', deadline: '', docNumber: '' }
+        this.form = { personnelId: '', category: '', getTime: '', dictId: '', content: '', docNumber: '', deadline: '' }
+        this.$refs.editForm.resetFields()
       }
     }
   },
   methods: {
     onSubmit() {
-      this.$refs.updateForm.validate(valid => {
+      this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          curd('update', this.form, { resource: this.resource })
+          curd(this.action, this.form, { resource: this.resource })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
+              this.$message.success(response.message)
               this.dialogLoading = false
-              this.personnelOpitons = []
-              this.$emit('updateSuccess')
+              this.$emit('editSuccess')
             })
             .catch(err => {
               console.log(err)
@@ -93,13 +112,8 @@ export default {
         }
       })
     },
-    onCancel() {
-      this.personnelOpitons = []
-      this.$emit('visibleChange', 'update')
-      this.$refs.updateForm.resetFields()
-    },
-    onPersonnelChange(value) {
-      this.form.personnelId = value
+    onCategoryChange() {
+      this.form.dictId = ''
     }
   }
 }

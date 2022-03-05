@@ -4,7 +4,7 @@
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加用户角色</el-button>
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加用户角色</el-button>
       <el-button v-if="can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除用户角色</el-button>
       <!-- <el-button v-if="can.manage" type="primary" icon="el-icon-document" size="mini" @click="dictVisible = true">维护角色字典</el-button> -->
     </div>
@@ -34,7 +34,7 @@
 
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -51,8 +51,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <role-add :visible="addVisible" :options="roleOption" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <role-update :visible="updateVisible" :options="roleOption" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <RoleEdit :visible="editVisible" :action="action" :options="options" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -61,12 +60,11 @@ import { request } from '@/api/index'
 import { common_mixin } from '@/common/mixin/mixin'
 import { list_mixin } from '@/common/mixin/list'
 import { permission_mixin } from '@/common/mixin/permission'
-import RoleAdd from './RoleAdd.vue'
-import RoleUpdate from './RoleUpdate.vue'
+import RoleEdit from './RoleEdit.vue'
 
 export default {
   name: 'Role',
-  components: { RoleAdd, RoleUpdate },
+  components: { RoleEdit },
   mixins: [common_mixin, permission_mixin, list_mixin],
   data() {
     return {
@@ -94,12 +92,12 @@ export default {
       this.$store.getters.roleDict.forEach(item => (map[item.name] = item.title))
       return map
     },
-    roleOption() {
+    options() {
       const list = []
       for (const k in this.roleMap) {
         list.push({ label: this.roleMap[k], value: k })
       }
-      return list
+      return { role: list }
     }
   },
   created() {

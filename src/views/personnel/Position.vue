@@ -4,7 +4,7 @@
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
     <div class="tool-bar">
-      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
+      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <el-table v-loading="listLoading" :data="currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
@@ -16,12 +16,12 @@
       </el-table-column>
       <el-table-column align="center" label="是否为领导职务">
         <template slot-scope="scope">
-          {{ scope.row.isLeader ? '是' : '否' }}
+          {{ scope.row.isLeader === 2 ? '是' : '否' }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="性质">
         <template slot-scope="scope">
-          {{ scope.row.isChief ? '正职' : '副职' }}
+          {{ scope.row.isChief === 2 ? '正职' : '副职' }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="级别">
@@ -31,7 +31,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -48,8 +48,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <position-add :visible="addVisible" :passed-data="levelList" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <position-update :visible="updateVisible" :passed-data="levelList" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <PositionEdit :visible="editVisible" :levels="levelList" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -59,13 +58,11 @@ import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
 import { permission_mixin } from '@/common/mixin/permission'
-
-import PositionAdd from './PositionAdd'
-import PositionUpdate from './PositionUpdate'
+import PositionEdit from './PositionEdit.vue'
 
 export default {
   name: 'Position',
-  components: { PositionAdd, PositionUpdate },
+  components: { PositionEdit },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin],
   data() {
     return {

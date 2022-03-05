@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-01-25 17:44:23
+ * @LastEditTime: 2022-03-02 21:03:57
  * @LastEditors: truxcoder
  * @Description:奖励信息，后端分页
 -->
@@ -32,7 +32,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">
         添加
       </el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
@@ -76,7 +76,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
             编辑
           </el-button>
           <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
@@ -100,9 +100,8 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <award-add :visible="addVisible" :options="options" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <award-update :visible="updateVisible" :options="options" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
-    <award-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
+    <AwardEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <AwardDetail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -116,13 +115,12 @@ import { permission_mixin } from '@/common/mixin/permission'
 import { awardCategory, awardGrade } from '@/utils/dict'
 
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
-import AwardAdd from './AwardAdd.vue'
-import AwardUpdate from './AwardUpdate.vue'
 import AwardDetail from './AwardDetail.vue'
+import AwardEdit from './AwardEdit.vue'
 
 export default {
   name: 'Award',
-  components: { AwardAdd, AwardUpdate, PersonnelOption, AwardDetail },
+  components: { AwardEdit, PersonnelOption, AwardDetail },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -168,11 +166,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     },
     handleDetail(row) {
       this.rowData = row

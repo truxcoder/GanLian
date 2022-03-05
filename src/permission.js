@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-02-08 10:13:49
+ * @LastEditTime: 2022-03-04 11:00:42
  * @LastEditors: truxcoder
  * @Description: 导航守卫，动态获取路由
  */
@@ -36,7 +36,8 @@ router.beforeEach(async (to, from, next) => {
   if (hasToken) {
     if (to.path === '/403' || to.path === '/auth') {
       // if is logged in, redirect to the home page
-      next(to.path)
+      // next(to.path)
+      next()
       NProgress.done()
     } else {
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
@@ -44,13 +45,13 @@ router.beforeEach(async (to, from, next) => {
         next()
       } else {
         try {
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
+          // note: roles 必须为数组! 如: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
+          // 如果用户仅为普通用户，则强制跳转到其个人页面
           if (roles[0] === 'normal') {
             next(`/perdetail?id=${hasToken}`)
           } else {
             const accessRoutes = await store.dispatch('permission/getOriginRoutes', roles)
-            // dynamically add accessible routes
             router.addRoutes(accessRoutes)
             // hack method to ensure that addRoutes is complete
             // set the replace: true, so the navigation will not leave a history record

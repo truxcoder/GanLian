@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-03-01 16:42:29
+ * @LastEditTime: 2022-03-03 09:12:17
  * @LastEditors: truxcoder
  * @Description: 编辑页mixin
  */
@@ -47,7 +47,7 @@ export const edit_mixin = {
       formLabelLongWidth: '600px',
       formItemWidth: { width: '220px' },
       formLineWidth: { width: '720px' },
-      formTextAreaWidth: { width: '940px' },
+      formTextAreaWidth: { width: '590px' },
       loading: false,
       dialogLoading: false
     }

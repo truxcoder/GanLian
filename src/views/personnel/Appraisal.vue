@@ -35,7 +35,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="addVisible = true">添加</el-button>
+      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
@@ -74,7 +74,7 @@
         </el-table-column>
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
+            <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -93,8 +93,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <appraisal-add :visible="addVisible" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <appraisal-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" />
+    <AppraisalEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -108,13 +107,12 @@ import { permission_mixin } from '@/common/mixin/permission'
 
 import { conclusionDict, seasonDict } from '@/utils/dict'
 
-import AppraisalAdd from './AppraisalAdd.vue'
-import AppraisalUpdate from './AppraisalUpdate.vue'
+import AppraisalEdit from './AppraisalEdit.vue'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
 export default {
   name: 'Appraisal',
-  components: { AppraisalAdd, AppraisalUpdate, PersonnelOption },
+  components: { AppraisalEdit, PersonnelOption },
   filters: {
     seasonFilter(season) {
       let result = '未知'
@@ -181,11 +179,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
     }
   }
 }

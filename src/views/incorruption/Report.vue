@@ -68,15 +68,7 @@
       @current-change="handleCurrentChange"
     />
     <report-edit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
-    <report-step
-      :visible="stepVisible"
-      :add-visible="stepAddVisible"
-      :update-visible="stepUpdateVisible"
-      :options="options"
-      :row="rowData"
-      @visibleChange="visibleChange"
-      @stepVisibleChange="stepVisibleChange"
-    />
+    <report-step :visible="stepVisible" :edit-visible="stepEditVisible" :options="options" :row="rowData" @visibleChange="visibleChange" @stepVisibleChange="stepVisibleChange" />
     <report-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
@@ -139,8 +131,7 @@ export default {
       currentData: [],
       detailVisible: false,
       stepVisible: false,
-      stepAddVisible: false,
-      stepUpdateVisible: false,
+      stepEditVisible: false,
       action: '',
       searchForm: { personnelId: '', category: '', dictId: '' }
     }
@@ -174,11 +165,6 @@ export default {
         this.listLoading = false
       })
     },
-    handleAllData() {
-      this.searchData = {}
-      this.currentPage = 1
-      this.fetchData()
-    },
     handleDetail(row) {
       this.rowData = row
       this.detailVisible = true
@@ -196,13 +182,8 @@ export default {
       this.rowData = row
       this.stepVisible = true
     },
-    stepVisibleChange(act) {
-      if (act === 'add') {
-        this.stepAddVisible = !this.stepAddVisible
-      }
-      if (act === 'update') {
-        this.stepUpdateVisible = !this.stepUpdateVisible
-      }
+    stepVisibleChange() {
+      this.stepEditVisible = !this.stepEditVisible
     }
   }
 }

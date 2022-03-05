@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-02-10 10:23:14
+ * @LastEditTime: 2022-03-02 14:21:36
  * @LastEditors: truxcoder
  * @Description: 列表页搜索mixin
  */
@@ -9,6 +9,7 @@ export const search_mixin = {
   data() {
     return {
       searchData: {},
+      queryParam: {},
       isClean: false
     }
   },
@@ -29,8 +30,15 @@ export const search_mixin = {
             this.$message.error('查询参数包含非法字符!')
             return false
           }
-          searchData[key] = this.searchForm[key]
+          // 如果查询key不是organParam，则添加searchData中，否则往fetchData里传一个param，包含单位id, 以便buildParams接收。
+          if (key !== 'organParam') {
+            searchData[key] = this.searchForm[key]
+          } else {
+            this.queryParam = { organId: this.searchForm[key] }
+          }
           searchParamNumber++
+        } else if (key === 'organParam') {
+          this.queryParam = {}
         }
       }
       if (!searchParamNumber) {
@@ -42,12 +50,13 @@ export const search_mixin = {
       }
       this.searchData = searchData
       this.currentPage = 1
-      this.fetchData(searchData)
+      this.fetchData(searchData, this.queryParam)
       this.onClean()
     },
     // 清空搜索框
     onClean() {
       this.$refs.searchForm.resetFields()
+      // this.queryParam = {}
       this.isClean = true
     }
   }
