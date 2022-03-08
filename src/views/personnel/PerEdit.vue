@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 16:11:09
+ * @LastEditTime: 2022-03-07 18:21:21
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -11,7 +11,7 @@
       <el-form-item v-for="item in formItemData" :key="item" :label="models[item].label" :prop="item">
         <el-select
           v-if="models[item].type == 'SELECT'"
-          v-model="form[item]"
+          v-model.trim="form[item]"
           :style="models[item].style"
           :multiple="models[item].multiple === true"
           :filterable="models[item].multiple === true"
@@ -23,7 +23,7 @@
 
         <el-select
           v-else-if="models[item].type == 'SELECT2'"
-          v-model="form[item]"
+          v-model.trim="form[item]"
           :style="models[item].style"
           :multiple="models[item].multiple === true"
           :filterable="models[item].multiple === true"
@@ -35,7 +35,7 @@
 
         <el-autocomplete
           v-else-if="models[item].type == 'AUTOCOMPLETE'"
-          v-model="form[item]"
+          v-model.trim="form[item]"
           :style="models[item].style"
           class="inline-input"
           :fetch-suggestions="models[item].suggestion"
@@ -52,7 +52,7 @@
           :autosize="{ minRows: 2, maxRows: 6 }"
           :placeholder="'请输入' + models[item].label"
         />
-        <el-input v-else v-model="form[item]" :disabled="models[item].disabled" :style="models[item].style" autocomplete="off" />
+        <el-input v-else v-model.trim="form[item]" :disabled="models[item].disabled" :style="models[item].style" autocomplete="off" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -67,6 +67,7 @@ import { curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import rules from '@/common/rules/personnel'
 import models from '@/common/model/personnel'
+import { setDateFieldNull, setDateFieldZero } from '@/utils/date'
 export default {
   name: 'PersonnelEdit',
   mixins: [edit_mixin],
@@ -119,6 +120,16 @@ export default {
   computed: {
     formItemData() {
       return Object.keys(models).sort((a, b) => models[a].order - models[b].order)
+    },
+    modelKeys() {
+      return Object.entries(this.models)
+        .filter(item => !item[1]?.disabled)
+        .map(item => item[0])
+    },
+    modelDateKeys() {
+      return Object.entries(this.models)
+        .filter(item => !item[1]?.disabled && item[1]?.type === 'DATE')
+        .map(item => item[0])
     }
   },
   watch: {
@@ -129,6 +140,11 @@ export default {
           this.form = { ...this.row }
           this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
           this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
+          // const firstDay = new Date('0001-01-01T00:00:01Z')
+          // this.modelDateKeys.forEach(item => {
+          //   this.form[item] = dayjs(this.form[item]).year() !== 1 ? this.form[item] : null
+          // })
+          setDateFieldNull(this.form, this.modelDateKeys)
         }
       } else {
         this.form = {}
@@ -143,6 +159,11 @@ export default {
           this.dialogLoading = true
           this.form.proCert = this.form.proCert.toString()
           this.form.passport = this.form.passport.length ? JSON.stringify(this.form.passport) : JSON.stringify([0])
+          // const firstDay = new Date('0001-01-01T00:00:01Z')
+          // this.modelDateKeys.forEach(item => {
+          //   this.form[item] = this.form[item] ?? firstDay
+          // })
+          setDateFieldZero(this.form, this.modelDateKeys)
           curd(this.action, this.form, { resource: this.resource })
             .then(response => {
               this.$message.success(response.message)

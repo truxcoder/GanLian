@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-02-28 16:04:48
+ * @LastEditTime: 2022-03-07 18:54:58
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -25,6 +25,9 @@ export const common_mixin = {
     dateEndFilter(date) {
       if (date === '') {
         return date
+      }
+      if (dayjs(date).year() === 1) {
+        return '今'
       }
       const endDate = new Date(date)
       const now = new Date()

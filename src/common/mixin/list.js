@@ -32,31 +32,31 @@ export const list_mixin = {
     }
   },
   methods: {
-    handleUpdate(index, row) {
-      // console.log(index, row)
-      this.rowData = row
-      this.currentEditIndex = index
-      this.updateVisible = true
-    },
+    // handleUpdate(index, row) {
+    //   // console.log(index, row)
+    //   this.rowData = row
+    //   this.currentEditIndex = index
+    //   this.updateVisible = true
+    // },
     visibleChange(cpn) {
       const visible = cpn + 'Visible'
       this[visible] = false
     },
-    updateVisibleChange() {
-      this.updateVisible = false
-    },
-    addSuccess() {
-      this.addVisible = false
-      this.fetchData(this.searchData, this.queryParam)
-    },
+    // updateVisibleChange() {
+    //   this.updateVisible = false
+    // },
+    // addSuccess() {
+    //   this.addVisible = false
+    //   this.fetchData(this.searchData, this.queryParam)
+    // },
     editSuccess() {
       this.editVisible = false
       this.fetchData(this.searchData, this.queryParam)
     },
-    updateSuccess(row) {
-      this.updateVisible = false
-      this.fetchData(this.searchData, this.queryParam)
-    },
+    // updateSuccess(row) {
+    //   this.updateVisible = false
+    //   this.fetchData(this.searchData, this.queryParam)
+    // },
     handleAllData() {
       this.searchData = {}
       this.queryParam = {}

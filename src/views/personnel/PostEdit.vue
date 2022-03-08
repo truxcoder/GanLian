@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 17:09:06
+ * @LastEditTime: 2022-03-07 18:59:11
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -56,6 +56,8 @@ import { request, curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import rules from '@/common/rules/post'
+import { setDateFieldNull, setDateFieldZero } from '@/utils/date'
+
 export default {
   name: 'PostEdit',
   components: { PersonnelOption },
@@ -80,6 +82,9 @@ export default {
       const newMap = {}
       this.$store.getters.organs.forEach(item => (newMap[item.busOrgCode] = item))
       return newMap
+    },
+    modelDateKeys() {
+      return ['endDay']
     },
     op() {
       const positionOptions = this.remotePositionList.map(item => {
@@ -119,6 +124,7 @@ export default {
         if (this.action === 'update') {
           for (const key in this.form) {
             this.form[key] = this.row[key]
+            setDateFieldNull(this.form, this.modelDateKeys)
           }
           this.form.id = this.row.id
         }
@@ -152,6 +158,7 @@ export default {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
+          setDateFieldZero(this.form, this.modelDateKeys)
           curd(this.action, this.form, { resource: this.resource })
             .then(response => {
               this.$message.success(response.message)
