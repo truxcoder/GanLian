@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 15:09:42
- * @LastEditTime: 2022-03-03 14:27:00
+ * @LastEditTime: 2022-03-16 18:47:18
  * @LastEditors: truxcoder
  * @Description: 职务等级
 -->
@@ -17,16 +17,8 @@
     <div class="tableZone">
       <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
-        <el-table-column align="center" label="名称">
-          <template slot-scope="scope">
-            {{ scope.row.name }}
-          </template>
-        </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.order }}
-          </template>
-        </el-table-column>
+        <el-table-column align="center" label="名称" prop="name" />
+        <el-table-column label="排序" prop="order" width="100" align="center" />
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
             <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>

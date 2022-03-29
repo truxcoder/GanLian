@@ -22,6 +22,11 @@
               个人详情
             </el-dropdown-item>
           </router-link>
+          <!-- <router-link target="_blank" :to="{ path: '/upload'}">
+            <el-dropdown-item>
+              上传文件
+            </el-dropdown-item>
+          </router-link> -->
           <!-- <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>

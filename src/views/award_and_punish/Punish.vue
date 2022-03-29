@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-02 21:12:04
+ * @LastEditTime: 2022-03-22 17:49:12
  * @LastEditors: truxcoder
  * @Description:组织处理，后端分页
 -->
@@ -28,7 +28,7 @@
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="text" @click="onClean">清空</el-button>
+        <el-link icon="el-icon-delete" :underline="false" @click="onClean">清空</el-link>
       </el-form-item>
     </el-form>
     <div class="tool-bar">
@@ -44,27 +44,28 @@
     </div>
     <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="姓名">
+      <el-table-column align="center" label="单位" prop="organShortName" width="100" />
+      <el-table-column align="center" label="姓名" width="120">
         <template slot-scope="scope">
-          {{ scope.row.personnelName }}
+          <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="警号/工号">
+      <el-table-column align="center" label="警号/工号" width="100">
         <template slot-scope="scope">
           {{ scope.row.policeCode }}
         </template>
       </el-table-column>
-      <el-table-column label="处理类型" align="center">
+      <el-table-column label="处理类型" align="center" width="120">
         <template slot-scope="scope">
           {{ options.category[scope.row.category - 1] && options.category[scope.row.category - 1].label }}
         </template>
       </el-table-column>
-      <el-table-column label="处理项" align="center">
+      <el-table-column label="处理项" align="center" width="120">
         <template slot-scope="scope">
           {{ options.grade[scope.row.grade - 1] && options.grade[scope.row.grade - 1].label }}
         </template>
       </el-table-column>
-      <el-table-column label="处理时间" align="center">
+      <el-table-column label="处理时间" align="center" width="150">
         <template slot-scope="scope">
           {{ scope.row.getTime | dateFilter }}
         </template>

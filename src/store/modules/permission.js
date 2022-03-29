@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-02-28 20:53:59
+ * @LastEditTime: 2022-03-09 09:40:35
  * @LastEditors: truxcoder
  * @Description: 根据角色处理路由，得到允许访问的路由，形成用户菜单。
  */
@@ -80,27 +80,18 @@ const actions = {
     const subModules = moduleList.filter(item => item.rank === 2)
     superModules = superModules.map(item => {
       const { id, path, redirect, name, title, icon, param } = item
-      let pathWithParam = path
-      if (param.includes(':')) {
-        pathWithParam = path + '/:' + param.split(':')[0]
-      }
       let children = subModules.filter(item => item.parent === id)
       children = children.map(item => {
         const { path, name, component, title, icon, param } = item
-        let pathWithParam = path
-        // 如果param属性包含':',则表示这条路由是含动态参数的
-        if (param.includes(':')) {
-          pathWithParam = path + '/:' + param.split(':')[0]
-        }
         return {
-          path: pathWithParam,
+          path: path,
           name,
           component: componentList[component],
           meta: { title, icon, param, roles: roleMap[name] ?? [] }
         }
       })
       return {
-        path: pathWithParam,
+        path: path,
         component: Layout,
         redirect,
         name,

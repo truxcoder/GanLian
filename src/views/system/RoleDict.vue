@@ -33,7 +33,7 @@
         <template slot-scope="scope">
           <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
           <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" @click="onUpdateSubmit(scope.row)">确定</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           <el-button size="mini" type="primary" @click="handlePermission(scope.row.name)">分配权限</el-button>
         </template>
       </el-table-column>
@@ -144,15 +144,15 @@ export default {
       this.role = role
       this.visible = true
     },
-    handleDelete(index, id) {
+    handleDelete(index, row) {
+      console.log('row:', row)
       this.$confirm('将删除该条信息, 是否确定?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          console.log('id:', [id])
-          roleDictDelete({ id: [id] })
+          roleDictDelete(row)
             .then(response => {
               this.$message({
                 message: response.message,

@@ -1,6 +1,17 @@
 <template>
   <el-drawer title="人员信息高级检索" :visible.sync="visible" :size="900" :wrapper-closable="false" :show-close="false">
-    <el-form v-if="visible" ref="searchForm" v-loading="loading" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="searchForm"
+      v-loading="loading"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="年龄">
         <el-input v-model.number="form.ageStart" :style="itemShortWidth">
           <template slot="append">岁</template>
@@ -45,7 +56,7 @@
       </el-form-item>
       <el-form-item label="所属单位" prop="organId">
         <el-select v-model="form.organId" :disabled="!can.global" :style="formItemWidth" placeholder="请选择单位">
-          <el-option v-for="i in organOption" :key="i.id" :label="i.name" :value="i.id" />
+          <el-option v-for="i in organOption" :key="i.id" :label="i.shortName" :value="i.id" />
         </el-select>
       </el-form-item>
 
@@ -66,8 +77,8 @@
         <el-radio v-model="form.passExamDay" label="否">否</el-radio>
       </el-form-item>
       <el-form-item label="配偶子女移居国外" prop="familyAbroad">
-        <el-radio v-model="form.familyAbroad" disabled label="是">是</el-radio>
-        <el-radio v-model="form.familyAbroad" disabled label="否">否</el-radio>
+        <el-radio v-model="form.familyAbroad" label="是">是</el-radio>
+        <el-radio v-model="form.familyAbroad" label="否">否</el-radio>
       </el-form-item>
       <el-form-item label="信访举报待查实或已查属实" :label-width="formLabelLongWidth" prop="hasReport">
         <el-radio v-model="form.hasReport" label="是">是</el-radio>
@@ -216,39 +227,6 @@ export default {
         this.$emit('advanceSearch', temp)
         // this.resetFields()
       }
-      // this.form.forEach(item => {
-      //   if (Array.isArray(item) && item.length >0) {
-      //     isValid = true
-      //     return
-      //   } else if (Object.prototype.toString.call(item) === '[object String]') {
-
-      //   }
-      // })
-      // this.$refs.searchForm.validate(valid => {
-      //   if (valid) {
-      //     this.dialogLoading = true
-      //     console.log('this.form:', this.form)
-      //     personnelSearch(this.form)
-      //       .then(response => {
-      //         this.$message({
-      //           message: response.message,
-      //           type: 'success'
-      //         })
-      //         this.dialogLoading = false
-      //         this.$emit('addSuccess')
-      //         this.resetFields()
-      //         // Object.keys(this.form).forEach(key => this.form[key]='')
-      //       })
-      //       .catch(err => {
-      //         // this.$message.error(err.message)
-      //         console.log(err)
-      //         this.dialogLoading = false
-      //       })
-      //   } else {
-      //     this.$message.error('请按规则填写表格！')
-      //     return false
-      //   }
-      // })
     },
     handleSelect(item) {
       console.log(item)

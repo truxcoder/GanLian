@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-03-04 11:00:42
+ * @LastEditTime: 2022-03-09 22:38:15
  * @LastEditors: truxcoder
  * @Description: 导航守卫，动态获取路由
  */
@@ -58,13 +58,10 @@ router.beforeEach(async (to, from, next) => {
             next({ ...to, replace: true })
           }
         } catch (error) {
-          // remove token and go to login page to re-login
+          console.log('permission err', error)
           await store.dispatch('user/resetToken')
           Message.error(error || '发生错误！')
-          // next(`/login?redirect=${to.path}`)
           next(`/nologin?redirect=${to.path}`)
-          // 省局单点登陆地址
-          // next(loginURL)
           NProgress.done()
         }
       }

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-01-19 14:15:53
- * @LastEditTime: 2022-01-19 17:39:45
+ * @LastEditTime: 2022-03-22 17:00:10
  * @LastEditors: truxcoder
  * @Description: 数据同步页面
 -->
@@ -12,25 +12,13 @@
     </div>
     <el-tabs type="border-card">
       <el-tab-pane label="增加的数据">
-        <div v-if="addData.length" class=" mb-4 text-red-500">
-          <span class=" pr-4">以下为大数据平台新增的数据。确定同步添加到数据库?</span>
-          <el-button type="danger" plain size="mini" @click="onAdd">确定</el-button>
-        </div>
-        <data-list v-if="addData.length" :passed="addData" :organ-map="organMap" :department-map="departmentMap" />
+        <data-list v-if="addData.length" :passed="addData" :tab="'add'" :organ-map="organMap" :department-map="departmentMap" />
       </el-tab-pane>
       <el-tab-pane label="更新的数据">
-        <div v-if="updateData.length" class=" mb-4 text-red-500">
-          <span class=" pr-4">以下为大数据平台更新的数据。确定同步更新到数据库?</span>
-          <el-button type="danger" plain size="mini" @click="onUpdate">确定</el-button>
-        </div>
-        <data-list v-if="updateData.length" :passed="updateData" :organ-map="organMap" :department-map="departmentMap" />
+        <data-list v-if="updateData.length" :passed="updateData" :tab="'update'" :organ-map="organMap" :department-map="departmentMap" />
       </el-tab-pane>
       <el-tab-pane label="删除的数据">
-        <div v-if="deleteData.length" class=" mb-4 text-red-500">
-          <span class=" pr-4">以下为大数据平台删除的数据。确定同步从数据库删除?</span>
-          <el-button type="danger" plain size="mini" @click="onDelete">确定</el-button>
-        </div>
-        <data-list v-if="deleteData.length" :passed="deleteData" :organ-map="organMap" :department-map="departmentMap" />
+        <data-list v-if="deleteData.length" :passed="deleteData" :tab="'delete'" :organ-map="organMap" :department-map="departmentMap" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -162,7 +150,7 @@ export default {
       })
         .then(() => {
           this.loading = true
-          request('data', 'sure', { id: this.deleteData.map(item => item.userId) }, { method: 'delete' })
+          request('data', 'sure', { id: this.deleteData.map(item => item.idCode) }, { method: 'delete' })
             .then(res => {
               this.$message.success(res.message)
               this.deleteData = []

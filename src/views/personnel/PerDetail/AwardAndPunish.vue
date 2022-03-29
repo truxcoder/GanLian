@@ -4,11 +4,20 @@
     <div class=" mr-4  font-semibold text-gray-500">组织奖励</div>
     <hr class="mb-2" />
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="handleEdit('award', 'add')">添加信息</el-button>
-      <el-button v-if="currentAwardData.length" type="danger" icon="el-icon-delete" size="mini" @click="deleteMutiData('award')">删除</el-button>
+      <el-button v-if="can.add" type="primary" size="mini" @click="handleEdit('award', 'add')">添加信息</el-button>
+      <el-button v-if="currentAwardData.length && can.delete" :disabled="!awardMultipleSelection.length" type="danger" icon="el-icon-delete" size="mini" @click="deleteMutiData('award')">删除</el-button>
     </div>
     <div v-if="currentAwardData.length" class="mt-4">
-      <el-table v-loading="loading" :data="currentAwardData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleAwardSelectionChange">
+      <el-table
+        v-loading="loading"
+        :data="currentAwardData"
+        element-loading-text="Loading"
+        stripe
+        border
+        :fit="true"
+        highlight-current-row
+        @selection-change="handleAwardSelectionChange"
+      >
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="奖励类型" width="150">
           <template slot-scope="scope">
@@ -26,10 +35,10 @@
         <el-table-column align="center" label="奖励文号">
           <template slot-scope="scope">{{ scope.row.docNumber }}</template>
         </el-table-column>
-        <el-table-column align="center" label="操作" width="240" fixed="right">
+        <el-table-column v-if="canOperate" align="center" label="操作" width="240" fixed="right">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleEdit('award', 'update', scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id, 'award')">删除</el-button>
+            <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('award', 'update', scope.row)">编辑</el-button>
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row.id, 'award')">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -40,11 +49,20 @@
     <div class=" mr-4 mt-4 font-semibold text-gray-500">组织处理</div>
     <hr class="mb-2" />
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="handleEdit('punish', 'add')">添加信息</el-button>
-      <el-button v-if="currentPunishData.length" type="danger" icon="el-icon-delete" size="mini" @click="deleteMutiData('punish')">删除</el-button>
+      <el-button v-if="can.add" type="primary" size="mini" @click="handleEdit('punish', 'add')">添加信息</el-button>
+      <el-button v-if="currentPunishData.length && can.delete" :disabled="!punishMultipleSelection.length" type="danger" icon="el-icon-delete" size="mini" @click="deleteMutiData('punish')">删除</el-button>
     </div>
     <div v-if="currentPunishData.length" class="mt-4">
-      <el-table v-loading="loading" :data="currentPunishData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handlePunishSelectionChange">
+      <el-table
+        v-loading="loading"
+        :data="currentPunishData"
+        element-loading-text="Loading"
+        stripe
+        border
+        :fit="true"
+        highlight-current-row
+        @selection-change="handlePunishSelectionChange"
+      >
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="处理类型" width="150">
           <template slot-scope="scope">
@@ -62,10 +80,10 @@
         <el-table-column align="center" label="处理文号">
           <template slot-scope="scope">{{ scope.row.docNumber }}</template>
         </el-table-column>
-        <el-table-column align="center" label="操作" width="240" fixed="right">
+        <el-table-column v-if="canOperate" align="center" label="操作" width="240" fixed="right">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleEdit('punish', 'update', scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id, 'punish')">删除</el-button>
+            <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('punish', 'update', scope.row)">编辑</el-button>
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row.id, 'punish')">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -144,6 +162,9 @@ export default {
     }
   },
   computed: {
+    canOperate() {
+      return this.can.update || this.can.delete
+    },
     awardOptions() {
       const categoryOptions = awardCategory
       const gradeOptions = awardGrade
@@ -173,8 +194,8 @@ export default {
       const promises = [request('award', 'detail', this.queryData), request('punish', 'detail', this.queryData)]
       Promise.all(promises).then(responses => {
         this.originAwardData = responses[0].data ?? []
-        this.originPunishData = responses[0].data ?? []
-        this.currentAwardData = responses[1].data ?? []
+        this.originPunishData = responses[1].data ?? []
+        this.currentAwardData = responses[0].data ?? []
         this.currentPunishData = responses[1].data ?? []
         this.loading = false
       })

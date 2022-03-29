@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-03-02 17:07:28
+ * @LastEditTime: 2022-03-16 21:30:05
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
@@ -199,6 +199,7 @@ export { fullTimeEduDict, partTimeEduDict }
 
 export const conclusionDict = ['优秀', '称职', '基本称职', '不称职', '不确定等次']
 export const aimDict = ['出差', '旅行', '学习']
+export const relationDict = ['妻子', '丈夫', '父亲', '母亲', '儿子', '女儿', '养父', '养母', '养子', '养女']
 export const seasonDict = [
   { label: '年终', value: 5 },
   { label: '一季度', value: 1 },
@@ -255,6 +256,7 @@ export const permissionDict = {
   MENU: '进入菜单',
   GLOBAL: '全局数据'
 }
+export const affairCategoryDict = ['未定义', '经济责任审计情况', '个人事项核查情况', '检查巡视巡查']
 export const oldDepartmentDict = [
   '安全生产科',
   '八大队',

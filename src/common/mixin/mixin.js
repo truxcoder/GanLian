@@ -1,13 +1,17 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-03-07 18:54:58
+ * @LastEditTime: 2022-03-16 21:35:07
  * @LastEditors: truxcoder
  * @Description:
  */
 import dayjs from 'dayjs'
+import { getAge } from '@/utils/index'
 export const common_mixin = {
   filters: {
+    ageFilter(age) {
+      return getAge(dayjs(age).format('YYYY-MM-DD'))
+    },
     dateFilter(date) {
       if (dayjs(date).year() === 2100) {
         return '今'
@@ -38,6 +42,9 @@ export const common_mixin = {
     },
     boolFilter(bool) {
       return bool === 2 ? '是' : '否'
+    },
+    ynFilter(bool) {
+      return bool ? '是' : '否'
     }
   }
 }

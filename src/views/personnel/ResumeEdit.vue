@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-02-28 11:04:30
+ * @LastEditTime: 2022-03-22 15:19:39
  * @LastEditors: truxcoder
  * @Description: 个人简历编辑
 -->
@@ -149,7 +149,8 @@ export default {
         })
     },
     handleAdd(index) {
-      const temp = { start: '', end: '', organ: '', dept: '', post: '' }
+      // const temp = { start: '', end: '', organ: '', dept: '', post: '' }
+      const temp = { start: this.currentData[index].end, end: '', organ: '', dept: '', post: '' }
       this.currentData.splice(index + 1, 0, temp)
     },
     handleDelete(index) {
@@ -248,10 +249,10 @@ export default {
     validate() {
       let isValid = 1
       this.currentData.every(item => {
-        if (item.start === 'null') {
+        if (item.start === 'null' || item.start === null) {
           item.start = ''
         }
-        if (item.end === 'null') {
+        if (item.end === 'null' || item.end === null) {
           item.end = ''
         }
         if (item.organ === '') {

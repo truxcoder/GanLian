@@ -1,11 +1,13 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-14 11:15:43
- * @LastEditTime: 2022-03-01 09:51:11
+ * @LastEditTime: 2022-03-10 08:47:32
  * @LastEditors: truxcoder
  * @Description: 权限检查相关
  */
+import { request } from '@/api'
 import { permissionCheck } from '@/api/permission'
+
 export const permission_mixin = {
   data() {
     return {
@@ -37,16 +39,28 @@ export const permission_mixin = {
     }
   },
   methods: {
-    async check(object = null) {
-      const sub = this.$store.getters.id
-      const obj = object ?? this.$options.name
-      const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
-      // permissionCheck({ sub, obj, act }).then(response => {
-      //   Object.assign(this.permission, response.data)
-      // })
-      const res = await permissionCheck({ sub, obj, act })
-      Object.assign(this.permission, res.data)
+    check(object = null) {
+      return new Promise((resolve, reject) => {
+        const sub = this.$store.getters.id
+        const obj = object ?? this.$options.name
+        const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
+        request('permission', 'check', { sub, obj, act })
+          .then(res => {
+            Object.assign(this.permission, res.data)
+            resolve()
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
     }
+    // async check(object = null) {
+    //   const sub = this.$store.getters.id
+    //   const obj = object ?? this.$options.name
+    //   const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
+    //   const res = await request('permission', 'check', { sub, obj, act })
+    //   Object.assign(this.permission, res.data)
+    // }
   }
 }
 

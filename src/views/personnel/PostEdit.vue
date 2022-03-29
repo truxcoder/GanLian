@@ -1,13 +1,23 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-07 18:59:11
+ * @LastEditTime: 2022-03-29 15:23:07
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '任职信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
         <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
@@ -31,7 +41,7 @@
       </el-form-item>
 
       <el-form-item label="所任级别" prop="levelId">
-        <el-select v-model="form.levelId" :style="formItemWidth" filterable placeholder="请选择级别">
+        <el-select v-model="form.levelId" :style="formItemWidth" filterable disabled placeholder="请选择级别">
           <el-option v-for="i in op.level" :key="i.vaule" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>

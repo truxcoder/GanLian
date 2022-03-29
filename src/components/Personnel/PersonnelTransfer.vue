@@ -1,14 +1,14 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-07 18:11:48
- * @LastEditTime: 2022-02-08 09:30:18
+ * @LastEditTime: 2022-03-23 17:32:35
  * @LastEditors: truxcoder
  * @Description:
 -->
 <template>
   <div>
     <div class="flex">
-      <div class=" w-80">
+      <div class=" w-80 tree-zone">
         <el-card>
           <department-tree @nodeClick="nodeClick" />
         </el-card>
@@ -81,10 +81,13 @@ export default {
       })
     },
     nodeClick(id) {
+      const start = Date.now()
       console.log('---id:', id)
       const levelCode = this.departmentMap[id]?.levelCode ?? ''
       const dep = this.$store.getters.departments.filter(item => item.levelCode.indexOf(levelCode) > -1).map(item => item.id)
       this.currentData = this.originData.filter(item => dep.includes(item.departmentId))
+      const end = Date.now()
+      console.info('所用时间:', end - start)
     },
     filterMethod(query, item) {
       return item.name.indexOf(query) > -1
@@ -93,7 +96,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 /* .el-transfer-panel__list.is-filterable {
   height: 400px !important;
 }
@@ -101,4 +104,7 @@ export default {
 .el-transfer-panel {
   height: 500px !important;
 } */
+.tree-zone ::v-deep .collapse-transition {
+  transition: none;
+}
 </style>

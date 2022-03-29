@@ -1,17 +1,13 @@
 <template>
   <div class="app-container">
-    <!-- <el-row v-if="!total">
-      <el-col :span="24"><h2>暂无数据</h2></el-col>
-    </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
         <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
       </el-form-item>
       <el-form-item label="单位" prop="organId">
-        <el-select v-model="searchForm.organId" size="small" placeholder="请选择单位">
-          <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
-        </el-select>
+        <OrganSelect v-model="searchForm.organId" />
       </el-form-item>
+
       <el-form-item label="年份" prop="years">
         <el-select v-model="searchForm.years" size="small" :style="searchItemWidth" placeholder="请选择年份">
           <el-option v-for="i in options.years" :key="i.value" :label="i.label" :value="i.value" />
@@ -31,51 +27,44 @@
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="text" @click="onClean">清空</el-button>
+        <el-link icon="el-icon-delete" :underline="false" @click="onClean">清空</el-link>
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
-      <el-button v-if="total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
-      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
+      <el-button v-if="total && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <div class="tableZone">
-      <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
+      <el-table
+        v-loading="listLoading"
+        :data="currentData"
+        element-loading-text="Loading"
+        stripe
+        border
+        :fit="true"
+        highlight-current-row
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="人员">
           <template slot-scope="scope">
-            {{ scope.row.personnelName }}
+            <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="警号/工号">
-          <template slot-scope="scope">
-            {{ scope.row.policeCode }}
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="考核单位">
-          <template slot-scope="scope">
-            {{ scope.row.organShortName }}
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="考核年份">
-          <template slot-scope="scope">
-            {{ scope.row.years }}
-          </template>
-        </el-table-column>
+        <el-table-column align="center" label="警号/工号" prop="policeCode" />
+        <el-table-column align="center" label="考核单位" prop="organShortName" />
+        <el-table-column align="center" label="考核年份" prop="years" />
         <el-table-column align="center" label="考核季度">
           <template slot-scope="scope">
             {{ scope.row.season | seasonFilter }}
           </template>
         </el-table-column>
-        <el-table-column align="center" label="考核结果">
-          <template slot-scope="scope">
-            {{ scope.row.conclusion }}
-          </template>
-        </el-table-column>
+        <el-table-column align="center" label="考核结果" prop="conclusion" />
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+            <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -110,9 +99,11 @@ import { conclusionDict, seasonDict } from '@/utils/dict'
 import AppraisalEdit from './AppraisalEdit.vue'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
+import OrganSelect from '@/components/department/OrganSelect.vue'
+
 export default {
   name: 'Appraisal',
-  components: { AppraisalEdit, PersonnelOption },
+  components: { AppraisalEdit, PersonnelOption, OrganSelect },
   filters: {
     seasonFilter(season) {
       let result = '未知'
@@ -153,6 +144,15 @@ export default {
         conclusion,
         season: seasonDict
       }
+    },
+    items() {
+      return [
+        { key: 'personnelId', label: '人员' },
+        { key: 'organId', label: '单位' },
+        { key: 'years', label: '年份', type: 'select', placeholder: '请选择年份', option: this.options.years },
+        { key: 'season', label: '季度', type: 'select', placeholder: '请选择季度', option: this.options.season },
+        { key: 'conclusion', label: '结果', type: 'select', placeholder: '请选择结果', option: this.options.conclusion }
+      ]
     }
   },
   created() {

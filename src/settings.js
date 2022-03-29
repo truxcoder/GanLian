@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-02-23 10:34:59
+ * @LastEditTime: 2022-03-21 19:36:18
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -30,5 +30,6 @@ module.exports = {
   // URL: '30.29.2.218:9528',
   // URL: 'localhost:9528',
   // 静态资源地址
-  staticURL: 'http://30.29.2.65/static/'
+  staticURL: 'http://30.29.2.67/static/',
+  uploadURL: 'http://30.29.2.67:5000'
 }

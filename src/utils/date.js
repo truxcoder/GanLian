@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-03-07 17:30:09
- * @LastEditTime: 2022-03-07 19:04:03
+ * @LastEditTime: 2022-03-29 15:22:18
  * @LastEditors: truxcoder
  * @Description: 日期相关函数
  */
@@ -35,7 +35,7 @@ export function setDateFieldZero(form, fields) {
     console.log('setDataField error: 传入的field参数不是数组')
     return
   }
-  const firstDay = new Date('0001-01-01T00:00:01Z')
+  const firstDay = new Date('0001-01-01T00:00:00Z')
   fields.forEach(item => {
     form[item] = form[item] ? form[item] : firstDay
   })

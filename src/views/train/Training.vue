@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-03 19:16:31
+ * @LastEditTime: 2022-03-22 17:46:09
  * @LastEditors: truxcoder
  * @Description:培训，后端分页
 -->
@@ -140,10 +140,13 @@ export default {
       return newMap
     },
     options() {
-      const departmentOptions = this.$store.getters.departments.map(item => {
-        const parent = this.organMap[item.busOrgCode] ? this.organMap[item.busOrgCode].name : ' '
-        return { label: item.name + ' 〔' + parent + '〕', value: item.name }
+      const departmentOptions = this.$store.getters.departmentNames.map(item => {
+        return { label: item, value: item }
       })
+      // const departmentOptions = this.$store.getters.departments.map(item => {
+      //   const parent = this.organMap[item.busOrgCode] ? this.organMap[item.busOrgCode].name : ' '
+      //   return { label: item.name + ' 〔' + parent + '〕', value: item.name }
+      // })
       const property = [
         { label: '系统内培训', value: 1 },
         { label: '系统外培训', value: 2 }

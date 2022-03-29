@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 19:46:18
- * @LastEditTime: 2022-03-01 16:53:53
+ * @LastEditTime: 2022-03-16 17:05:31
  * @LastEditors: truxcoder
  * @Description: 事件详情
 -->
@@ -9,7 +9,7 @@
   <el-dialog v-loading="dialogLoading" width="1200px" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-card>
       <div class=" font-semibold text-center text-lg">{{ row.title }}</div>
-      <div class="text-center mt-2">涉及人员: {{ row.personnelName }}</div>
+      <div class="text-center mt-2">涉及人员: {{ person }}</div>
       <el-divider />
       <div v-html="intro">
         <!-- <pre>{{ intro }}</pre> -->
@@ -39,6 +39,10 @@ export default {
       default() {
         return {}
       }
+    },
+    personName: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -47,6 +51,11 @@ export default {
       currentData: {},
       intro: '',
       dialogLoading: false
+    }
+  },
+  computed: {
+    person() {
+      return this.row.personnelName ?? this.personName
     }
   },
   watch: {

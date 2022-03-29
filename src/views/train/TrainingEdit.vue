@@ -1,13 +1,23 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 19:03:32
+ * @LastEditTime: 2022-03-22 17:46:32
  * @LastEditors: truxcoder
  * @Description: 培训信息添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '培训信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="培训标题" prop="title">
         <el-input v-model="form.title" :style="formLineWidth" placeholder="请输入标题" />
       </el-form-item>

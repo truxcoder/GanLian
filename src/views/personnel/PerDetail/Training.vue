@@ -1,15 +1,15 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 09:40:38
- * @LastEditTime: 2022-03-02 20:23:38
+ * @LastEditTime: 2022-03-08 15:45:41
  * @LastEditors: truxcoder
  * @Description: 人员个人培训列表
 -->
 <template>
   <div>
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
-      <el-button v-if="currentData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="can.add" type="primary" size="mini" @click="addVisible = true">添加信息</el-button>
+      <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div v-if="currentData.length" class="mt-4">
       <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
@@ -134,21 +134,15 @@ export default {
         .then(() => {
           request('training', 'delete', { personnelId: this.personnelId, trainId: [id] })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.$emit('reFetchCpnData', this.cpnName)
+              this.$message.success(response.message)
+              this.fetchData()
             })
             .catch(err => {
-              console.log(err)
+              this.$message.error(err.message)
             })
         })
         .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
+          this.$message.info('已取消删除')
         })
     },
     deleteMutiData() {
@@ -160,21 +154,16 @@ export default {
         .then(() => {
           request('training', 'delete', { personnelId: this.personnelId, trainId: this.multipleSelection.map(item => item.id) })
             .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.$emit('reFetchCpnData', this.cpnName)
+              this.$message.success(response.message)
+              this.multipleSelection.length = 0
+              this.fetchData()
             })
             .catch(err => {
-              console.log(err)
+              this.$message.error(err.message)
             })
         })
         .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
+          this.$message.info('已取消删除')
         })
     }
   }

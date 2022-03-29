@@ -5,15 +5,20 @@
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item v-if="can.global" label="单位" prop="organId">
-        <el-select v-model="searchForm.organId" size="small" placeholder="请选择单位">
-          <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
+        <el-select v-model="searchForm.organId" :style="formItemWidth" size="small" placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
         </el-select>
       </el-form-item>
       <el-form-item label="警号/工号" prop="policeCode">
-        <el-input v-model="searchForm.policeCode" size="small" placeholder="警号/工号" />
+        <el-input v-model="searchForm.policeCode" :style="formItemWidth" size="small" placeholder="警号/工号" />
       </el-form-item>
       <el-form-item label="姓名" prop="name">
-        <el-input v-model="searchForm.name" size="small" placeholder="姓名" />
+        <el-input v-model="searchForm.name" :style="formItemWidth" size="small" placeholder="姓名" />
+      </el-form-item>
+      <el-form-item label="级别" prop="level">
+        <el-select v-model="searchForm.level" :style="formItemWidth" size="small" placeholder="请选择级别" multiple>
+          <el-option v-for="i in levelList" :key="i.id" :label="i.name" :value="i.id" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
@@ -23,7 +28,7 @@
         <el-button type="success" size="small" icon="el-icon-search" @click="searchVisible = true">高级查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="text" @click="onClean">清空</el-button>
+        <el-link icon="el-icon-delete" :underline="false" @click="onClean">清空</el-link>
       </el-form-item>
     </el-form>
     <div class="tool-bar">
@@ -56,46 +61,25 @@
           <!-- <span :class="{'text_red':!scope.row.organId}">{{ scope.row.organId ? getOrganName(scope.row.organId, "short") : '未定义' }}</span> -->
         </template>
       </el-table-column>
-      <el-table-column align="center" label="姓名">
-        <template slot-scope="scope">
-          {{ scope.row.name }}
-        </template>
-      </el-table-column>
+      <el-table-column align="center" label="姓名" prop="name" />
       <el-table-column align="center" label="身份" width="70">
         <template slot-scope="scope">
           {{ scope.row.userType === 1 ? '民警' : '辅警' }}
         </template>
       </el-table-column>
-      <el-table-column align="center" width="100" label="警号/工号" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          {{ scope.row.policeCode }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="性别" width="60" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.gender }}
-        </template>
-      </el-table-column>
+      <el-table-column align="center" width="100" label="警号/工号" prop="policeCode" :show-overflow-tooltip="true" />
+      <el-table-column label="性别" prop="gender" width="60" align="center" />
       <el-table-column label="年龄" width="60" align="center">
         <template slot-scope="scope">
           <span :class="{ text_red: isBirthdayZero(scope.row.birthday) }">{{ scope.row.birthday | ageFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="民族" width="90" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.nation }}
-        </template>
-      </el-table-column>
-      <el-table-column label="政治面貌" align="center" width="120">
-        <template slot-scope="scope">
-          {{ scope.row.political }}
-        </template>
-      </el-table-column>
-
+      <el-table-column label="民族" prop="nation" width="90" align="center" />
+      <el-table-column label="政治面貌" prop="political" align="center" width="120" />
       <el-table-column align="center" label="操作" width="180">
         <template slot-scope="scope">
           <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button> -->
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
         </template>
       </el-table-column>
@@ -129,7 +113,6 @@ import { list_mixin } from '@/common/mixin/list'
 import { search_mixin } from '@/common/mixin/search'
 
 import { permission_mixin } from '@/common/mixin/permission'
-import { getAge } from '@/utils/index'
 import PersonnelSearch from './PersonnelSearch'
 // import PersonnelUpdate from './PerUpdate'
 import PersonnelEdit from './PerEdit.vue'
@@ -137,11 +120,6 @@ import PersonnelEdit from './PerEdit.vue'
 export default {
   name: 'Personnel',
   components: { PersonnelEdit, PersonnelSearch },
-  filters: {
-    ageFilter(age) {
-      return getAge(dayjs(age).format('YYYY-MM-DD'))
-    }
-  },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -150,10 +128,13 @@ export default {
       originData: [],
       currentData: [],
       searchVisible: false,
+      levelList: [],
+      formItemWidth: { width: '180px' },
       searchForm: {
         name: '',
         policeCode: '',
-        organId: ''
+        organId: '',
+        level: ''
       }
     }
   },
@@ -168,6 +149,7 @@ export default {
     }
     this.check().then(() => {
       this.fetchData()
+      this.fetchOtherData()
     })
   },
   methods: {
@@ -176,17 +158,11 @@ export default {
       params.currentPage = this.currentPage
       params.pageSize = this.pageSize
       params.queryMeans = this.queryMeans
-      params.searchMeans = 'normal'
-      // 判断如果data的key超过一定数量，则认定是高级搜索，把搜索方式改为advance
-      if (Object.keys(data).length > 5) {
-        params.searchMeans = 'advance'
-      }
       if (!Object.keys(data).includes('organId')) {
         data = { ...data, ...this.defaultSearchData }
       } else if (data.organId === '') {
         data.organId = this.defaultSearchData.organId ?? ''
       }
-      console.log('send search data:', data)
       request('personnel', 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
@@ -199,6 +175,11 @@ export default {
           this.count = 0
           this.listLoading = false
         }
+      })
+    },
+    fetchOtherData() {
+      request('level', 'list').then(res => {
+        this.levelList = res.data ?? []
       })
     },
     handleDetail(index, row) {
@@ -217,6 +198,39 @@ export default {
     },
     isBirthdayZero(birthday) {
       return dayjs(birthday).year() === 1
+    },
+    handleDelete(index, id) {
+      this.$confirm('将删除该条信息, 是否确定?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          request('personnel', 'delete', { id: [id] })
+            .then(response => {
+              this.$message({
+                message: response.message,
+                type: 'success'
+              })
+              this.fetchData()
+            })
+            .catch(err => {
+              // this.$message.error(err.message)
+              console.log(err)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    onClean() {
+      this.$refs.searchForm.resetFields()
+      this.$set(this.searchForm, 'level', '')
+      // this.queryParam = {}
+      this.isClean = true
     }
   }
 }

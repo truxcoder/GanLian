@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 09:48:14
- * @LastEditTime: 2022-03-03 17:33:32
+ * @LastEditTime: 2022-03-23 16:11:59
  * @LastEditors: truxcoder
  * @Description: 任职管理
 -->
@@ -14,16 +14,21 @@
       <el-form-item label="姓名" prop="personnelId">
         <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
       </el-form-item>
-      <el-form-item v-if="can.global" label="单位" prop="organParam">
+      <el-form-item v-if="can.global" label="人员所属单位" prop="organParam">
         <el-select v-model="searchForm.organParam" size="small" placeholder="请选择单位">
-          <el-option v-for="i in organList" :key="i.id" :label="i.name" :value="i.id" />
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="任职级别" prop="levelId">
+        <el-select v-model="searchForm.levelId" size="small" placeholder="请选择级别">
+          <el-option v-for="i in levelList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="text" @click="onClean">清空</el-button>
+        <el-link icon="el-icon-delete" :underline="false" @click="onClean">清空</el-link>
       </el-form-item>
     </el-form>
     <div class="tool-bar">
@@ -35,34 +40,14 @@
       <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="姓名" width="100">
         <template slot-scope="scope">
-          {{ scope.row.personnelName }}
+          <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="警号/工号" width="90">
-        <template slot-scope="scope">
-          {{ scope.row.policeCode }}
-        </template>
-      </el-table-column>
-      <el-table-column label="担任职务" align="center" width="110">
-        <template slot-scope="scope">
-          {{ scope.row.positionName }}
-        </template>
-      </el-table-column>
-      <el-table-column label="级别" align="center" width="70">
-        <template slot-scope="scope">
-          {{ scope.row.levelName }}
-        </template>
-      </el-table-column>
-      <el-table-column label="任职单位" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          {{ scope.row.organ }}
-        </template>
-      </el-table-column>
-      <el-table-column label="任职部门" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          {{ scope.row.department }}
-        </template>
-      </el-table-column>
+      <el-table-column align="center" label="警号/工号" width="90" prop="policeCode" />
+      <el-table-column label="担任职务" align="center" width="110" prop="positionName" />
+      <el-table-column label="级别" align="center" width="70" prop="levelName" />
+      <el-table-column label="任职单位" align="center" :show-overflow-tooltip="true" prop="organ" />
+      <el-table-column label="任职部门" align="center" :show-overflow-tooltip="true" prop="department" />
       <el-table-column label="任职开始日期" align="center" width="130">
         <template slot-scope="scope">
           {{ scope.row.startDay | dateFilter }}
@@ -118,7 +103,8 @@ export default {
       queryMeans: 'backend',
       originData: [],
       currentData: [],
-      searchForm: { personnelId: '', organParam: '' }
+      levelList: [],
+      searchForm: { personnelId: '', organParam: '', levelId: '' }
     }
   },
   computed: {
@@ -129,6 +115,7 @@ export default {
   created() {
     this.check().then(() => {
       this.fetchData()
+      this.fetchOtherData()
     })
   },
   methods: {
@@ -146,6 +133,11 @@ export default {
           this.count = 0
         }
         this.listLoading = false
+      })
+    },
+    fetchOtherData() {
+      request('level', 'list').then(res => {
+        this.levelList = res.data ?? []
       })
     }
   }

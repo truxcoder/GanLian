@@ -1,7 +1,4 @@
-import dayjs from 'dayjs'
-import { getAge } from '@/utils/index'
 import { request, curd } from '@/api/index'
-
 export const mixin = {
   props: {
     baseData: {
@@ -26,29 +23,11 @@ export const mixin = {
       currentEditIndex: 0
     }
   },
-  filters: {
-    ageFilter(age) {
-      return getAge(dayjs(age).format('YYYY-MM-DD'))
-    },
-    dateFilter(date) {
-      if (dayjs(date).year() === 2100) {
-        return '今'
-      }
-      return dayjs(date).format('YYYY年MM月DD日')
-    },
-    dateEndFilter(date) {
-      if (date === '') {
-        return date
-      }
-      const endDate = new Date(date)
-      const now = new Date()
-      if (endDate > now) {
-        return '今'
-      }
-      return dayjs(date).format('YYYY年MM月DD日')
+  computed: {
+    canOperate() {
+      return this.can.update || this.can.delete
     }
   },
-
   methods: {
     fetchData() {
       this.queryData = { id: this.$route.query.id }

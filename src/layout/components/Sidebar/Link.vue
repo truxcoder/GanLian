@@ -1,3 +1,10 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-03-08 18:53:46
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
   <component :is="type" v-bind="linkProps(to)">
     <slot />

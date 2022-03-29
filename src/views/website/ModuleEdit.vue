@@ -1,13 +1,23 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 20:30:39
+ * @LastEditTime: 2022-03-29 17:16:17
  * @LastEditors: truxcoder
  * @Description: 模块信息添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '模块信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="名称" prop="title">
         <el-input v-model="form.title" :style="formItemWidth" placeholder="请输入名称" />
       </el-form-item>
@@ -32,15 +42,16 @@
         <el-input v-model="form.redirect" :style="formItemWidth" placeholder="请输入重定向路径" />
       </el-form-item>
       <el-form-item label="图标" prop="icon">
-        <el-autocomplete v-model="form.icon" :style="formItemWidth" popper-class="iconList" :fetch-suggestions="querySearch" placeholder="请选择图标" @select="handleSelect">
+        <IconPicker v-model="form.icon" :width="formItemWidth.width" />
+        <!-- <el-autocomplete v-model="form.icon" :style="formItemWidth" popper-class="iconList" :fetch-suggestions="querySearch" placeholder="请选择图标" @select="handleSelect">
           <i slot="suffix" class="el-icon-edit" />
           <template slot-scope="{ item }">
             <i class="iconItem" :class="item.value" />
           </template>
-        </el-autocomplete>
+        </el-autocomplete> -->
       </el-form-item>
       <el-form-item label="父模块" prop="parent">
-        <el-select v-model.number="form.parent" :style="formItemWidth" placeholder="请选择父模块">
+        <el-select v-model="form.parent" :style="formItemWidth" placeholder="请选择父模块">
           <el-option v-for="i in newModuleList" :key="i.id" :label="i.title" :value="i.id" />
         </el-select>
       </el-form-item>
@@ -60,8 +71,10 @@ import { curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import rules from '@/common/rules/module'
 import { iconList } from '@/utils/icon'
+import IconPicker from '@/components/SvgIcon/IconPicker.vue'
 export default {
   name: 'ModuleEdit',
+  components: { IconPicker },
   mixins: [edit_mixin],
   props: {
     visible: {
@@ -80,6 +93,8 @@ export default {
       resource: 'module',
       form: { title: '', name: '', rank: '', path: '', param: '', component: '', redirect: '', icon: '', parent: '', order: '' },
       rules,
+      dialogWidth: '1200px',
+      formItemWidth: { width: '400px' },
       rankList: [
         { label: '一级', value: 1 },
         { label: '二级', value: 2 }

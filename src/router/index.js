@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import { GetQueryValue, setTicket, getTicket } from '@/utils/auth'
+import { GetQueryValue, setTicket } from '@/utils/auth'
 const defaultSettings = require('@/settings.js')
 const ticket = GetQueryValue('ticket')
 if (ticket) {
@@ -12,9 +12,11 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import TalentLayout from '@/layout/talent'
 const Module = () => import('@/views/website/Module')
 const Personnel = () => import('@/views/personnel/Personnel')
-// const Organ = () => import('@/views/organ/Organ')
+const Headcount = () => import('@/views/organ/Headcount')
+const DepartmentPosition = () => import('@/views/organ/DepartmentPosition')
 const Level = () => import('@/views/personnel/Level')
 const Position = () => import('@/views/personnel/Position')
 const Post = () => import('@/views/personnel/Post')
@@ -28,6 +30,7 @@ const Role = () => import('@/views/system/Role')
 const RoleDict = () => import('@/views/system/RoleDict')
 const Permission = () => import('@/views/system/Permission')
 const Data = () => import('@/views/system/Data')
+const DepartmentSync = () => import('@/views/system/DepartmentSync')
 const EduDict = () => import('@/views/personnel/EduDict')
 const Training = () => import('@/views/train/Training')
 const EntryExit = () => import('@/views/incorruption/EntryExit')
@@ -36,7 +39,8 @@ const Affair = () => import('@/views/incorruption/Affair')
 export const componentList = {
   Personnel,
   Module,
-  // Organ,
+  Headcount,
+  DepartmentPosition,
   Level,
   Position,
   Post,
@@ -50,6 +54,7 @@ export const componentList = {
   Discipline,
   Report,
   Data,
+  DepartmentSync,
   EduDict,
   Training,
   EntryExit,
@@ -114,6 +119,11 @@ export const constantRoutes = [
     component: () => import('@/views/website/NoLogin'),
     hidden: true
   },
+  {
+    path: '/upload',
+    component: () => import('@/views/other/Upload'),
+    hidden: true
+  },
 
   {
     path: '/',
@@ -133,6 +143,59 @@ export const constantRoutes = [
     path: '/perdetail',
     component: () => import('@/views/personnel/PerDetail'),
     hidden: true
+  },
+  {
+    path: '/talent',
+    component: TalentLayout,
+    hidden: true,
+    redirect: '/talent/dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        name: 'TalentDashboard',
+        component: () => import('@/views/talent/Dashboard'),
+        meta: { title: '人才库', icon: 'dashboard' }
+      }
+    ]
+  },
+  {
+    path: '/talent',
+    component: TalentLayout,
+    hidden: true,
+    children: [
+      {
+        path: 'politics',
+        name: 'TalentPolitics',
+        component: () => import('@/views/talent/Talent'),
+        meta: { title: '政工人才库', icon: 'dashboard' }
+      }
+    ]
+  },
+  {
+    path: '/talent',
+    component: TalentLayout,
+    hidden: true,
+    children: [
+      {
+        path: 'finance',
+        name: 'TalentFinance',
+        component: () => import('@/views/talent/Talent'),
+        meta: { title: '财务人才库', icon: 'dashboard' }
+      }
+    ]
+  },
+  {
+    path: '/talent',
+    component: TalentLayout,
+    hidden: true,
+    children: [
+      {
+        path: 'information',
+        name: 'TalentInformation',
+        component: () => import('@/views/talent/Talent'),
+        meta: { title: '信息化人才库', icon: 'dashboard' }
+      }
+    ]
   },
 
   // 404 page must be placed at the end !!!

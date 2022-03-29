@@ -1,15 +1,14 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-02-28 20:49:48
+ * @LastEditTime: 2022-03-09 09:51:23
  * @LastEditors: truxcoder
- * @Description: 在resolvePath里增加了一个动态路由参数的判断
 -->
 <template>
   <div v-if="!item.hidden" class="fix-svg">
     <template v-if="hasOneShowingChild(item.children, item) && (!onlyOneChild.children || onlyOneChild.noShowingChildren) && !item.alwaysShow">
-      <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path, onlyOneChild.meta.param)">
-        <el-menu-item :index="resolvePath(onlyOneChild.path, onlyOneChild.meta.param)" :class="{ 'submenu-title-noDropdown': !isNest }">
+      <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
+        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{ 'submenu-title-noDropdown': !isNest }">
           <item :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)" :title="onlyOneChild.meta.title" />
         </el-menu-item>
       </app-link>
@@ -85,19 +84,9 @@ export default {
 
       return false
     },
-    resolvePath(routePath, param) {
+    resolvePath(routePath) {
       if (isExternal(routePath)) {
         return routePath
-      }
-      if (isExternal(this.basePath)) {
-        return this.basePath
-      }
-      if (param && param.includes(':')) {
-        let baseURL = this.basePath
-        if (this.basePath && this.basePath.includes(':')) {
-          baseURL = this.basePath.split('/:')[0]
-        }
-        return path.resolve(baseURL, param.split(':')[1])
       }
       return path.resolve(this.basePath, routePath)
     }

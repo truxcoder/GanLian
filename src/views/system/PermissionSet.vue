@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-03-04 11:39:00
+ * @LastEditTime: 2022-03-17 18:27:14
  * @LastEditors: truxcoder
  * @Description: 重构分配权限
 -->
@@ -30,6 +30,7 @@
 import { request } from '@/api'
 import { permissionDict } from '@/utils/dict'
 import { detailObj } from '@/utils/detail'
+import { talentObj } from '@/utils/talent'
 export default {
   name: 'PermissionSet',
   props: {
@@ -60,7 +61,7 @@ export default {
       return Object.keys(permissionDict)
     },
     objList() {
-      return this.moduleData.concat(detailObj)
+      return this.moduleData.concat(detailObj, talentObj)
     }
   },
   watch: {

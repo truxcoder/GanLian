@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:24:30
- * @LastEditTime: 2022-03-02 09:31:59
+ * @LastEditTime: 2022-03-22 17:21:20
  * @LastEditors: truxcoder
  * @Description: 添加修改各类事项信息
  * wangEditor使用说明:
@@ -12,13 +12,28 @@
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="dialogTitle" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
-      <el-form-item label="举报标题" prop="title">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      class="add-form"
+      :inline="true"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
+      <el-form-item label="标题" prop="title">
         <el-input v-model="form.title" :style="formLineWidth" placeholder="请输入标题" />
       </el-form-item>
       <el-form-item label="姓名" prop="personnelId">
-        <el-input v-if="isSingle" :style="formLineWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formLineWidth" @personnelChange="onPersonnelChange" />
+        <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
+        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+      </el-form-item>
+      <el-form-item label="分类" prop="category">
+        <el-select v-model="form.category" :style="formItemWidth" :disabled="category > 0" placeholder="请选择分类">
+          <el-option v-for="i in categoryOption" :key="i.value" :label="i.label" :value="i.value" />
+        </el-select>
       </el-form-item>
       <el-form-item label="事件简介" prop="intro" />
     </el-form>
@@ -35,7 +50,7 @@ import { curd, request } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import rules from '@/common/rules/affair'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
-
+import { affairCategoryDict } from '@/utils/dict'
 import E from 'wangeditor'
 export default {
   name: 'AffairEdit',
@@ -52,24 +67,22 @@ export default {
       resource: 'affair',
       editor: null,
       form: { title: '', personnelId: '', category: '', intro: '' },
+      formItemWidth: { width: '280px' },
+      formLineWidth: { width: '710px' },
       rules
     }
   },
   computed: {
+    categoryName() {
+      return this.category ? affairCategoryDict[this.category] : '监督事项'
+    },
     dialogTitle() {
-      let cpn = ''
-      switch (this.category) {
-        case 1:
-          cpn = '经济责任审计情况'
-          break
-        case 2:
-          cpn = '个人事项核查情况'
-          break
-        default:
-          cpn = '未定义'
-          break
-      }
-      return this.actName + cpn
+      return this.actName + this.categoryName
+    },
+    categoryOption() {
+      const dict = [...affairCategoryDict]
+      dict.shift()
+      return dict.map((v, i) => ({ label: v, value: i + 1 }))
     }
   },
   watch: {
@@ -83,7 +96,13 @@ export default {
           this.form.id = this.row.id
           this.fetchData()
         } else {
-          this.editor ? this.setIntro() : this.initEditor()
+          if (this.editor) {
+            this.setIntro()
+          } else {
+            // 需要等页面DOM渲染完毕之后才能初始化编辑器，所以这里用了nextTick
+            this.$nextTick(() => this.initEditor())
+          }
+          this.form.category = this.category || ''
         }
       } else {
         this.form = { title: '', personnelId: '', category: '', intro: '' }
@@ -107,7 +126,9 @@ export default {
     },
     onSubmit() {
       this.form.intro = this.editor.txt.html()
-      this.form.category = this.category
+      // if (this.category) {
+      //   this.form.category = this.category
+      // }
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
@@ -130,38 +151,36 @@ export default {
     },
     initEditor() {
       // 创建编辑器
-      setTimeout(() => {
-        this.editor = new E(`#editor`)
-        // 默认情况下，显示所有菜单
-        this.editor.config.menus = [
-          'head',
-          'bold',
-          'fontSize',
-          // 'fontName',
-          'italic',
-          'underline',
-          // 'strikeThrough',
-          'indent',
-          'lineHeight',
-          'foreColor',
-          // 'backColor',
-          // 'link',
-          'list',
-          // 'todo',
-          'justify',
-          'quote',
-          // 'emoticon',
-          // 'image',
-          // 'video',
-          // 'table',
-          // 'code',
-          // 'splitLine',
-          'undo',
-          'redo'
-        ]
-        this.editor.create()
-        this.setIntro()
-      }, 500)
+      this.editor = new E(`#editor`)
+      // 默认情况下，显示所有菜单
+      this.editor.config.menus = [
+        'head',
+        'bold',
+        'fontSize',
+        // 'fontName',
+        'italic',
+        'underline',
+        // 'strikeThrough',
+        'indent',
+        'lineHeight',
+        'foreColor',
+        // 'backColor',
+        // 'link',
+        'list',
+        // 'todo',
+        'justify',
+        'quote',
+        // 'emoticon',
+        // 'image',
+        // 'video',
+        // 'table',
+        // 'code',
+        // 'splitLine',
+        'undo',
+        'redo'
+      ]
+      this.editor.create()
+      this.setIntro()
     },
     disposeEditor() {
       // 销毁编辑器

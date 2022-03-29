@@ -45,7 +45,7 @@
       <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="姓名" width="120">
         <template slot-scope="scope">
-          {{ scope.row.personnelName }}
+          <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
       <el-table-column align="center" label="警号/工号" width="100">

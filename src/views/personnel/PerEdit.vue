@@ -1,13 +1,23 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-07 18:21:21
+ * @LastEditTime: 2022-03-08 16:58:13
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '人员信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item v-for="item in formItemData" :key="item" :label="models[item].label" :prop="item">
         <el-select
           v-if="models[item].type == 'SELECT'"
@@ -21,6 +31,17 @@
           <el-option v-for="i in models[item].options" :key="i" :label="i" :value="i" />
         </el-select>
 
+        <el-select
+          v-else-if="item === 'passport'"
+          v-model.trim="form[item]"
+          :style="models[item].style"
+          :multiple="models[item].multiple === true"
+          :filterable="models[item].multiple === true"
+          :allow-create="models[item].multiple === true"
+          :placeholder="'请选择' + models[item].label"
+        >
+          <el-option v-for="(i, k) in models[item].options" :key="k" :disabled="!isPassportOptionValid(i.value)" :label="i.label" :value="i.value" />
+        </el-select>
         <el-select
           v-else-if="models[item].type == 'SELECT2'"
           v-model.trim="form[item]"
@@ -179,6 +200,19 @@ export default {
           return false
         }
       })
+    },
+    isPassportOptionValid(v) {
+      const values = this.form.passport ?? []
+      if (v === 0 && values.length > 0 && values.includes(0)) {
+        return true
+      }
+      if (v === 0 && values.length > 0 && !values.includes(0)) {
+        return false
+      }
+      if (v !== 0 && values.includes(0)) {
+        return false
+      }
+      return true
     }
   }
 }

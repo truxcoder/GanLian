@@ -1,13 +1,13 @@
-import { login, logout, getInfo } from '@/api/user'
+import { logout } from '@/api/user'
 import { request } from '@/api/'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
-import router from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     id: '',
+    idCode: '',
     name: '',
     avatar: '',
     organ: '',
@@ -26,6 +26,9 @@ const mutations = {
   },
   SET_ID: (state, id) => {
     state.id = id
+  },
+  SET_IDCODE: (state, idCode) => {
+    state.idCode = idCode
   },
   SET_NAME: (state, name) => {
     state.name = name
@@ -74,22 +77,24 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      request('user', 'info', {}, { id: state.token })
+      const token = state.token
+      request('user', 'info', { id: token })
         .then(response => {
           const { data } = response
           if (!data) {
             return reject('验证失败，请重新登录。')
           }
-          const { id, roles, name, organ } = data
+          const { id, roles, name, organ, idCode } = data
           // roles must be a non-empty array
           if (!roles || roles.length <= 0) {
             reject('getInfo: roles 须为非空数组!')
           }
           commit('SET_ROLES', roles)
           commit('SET_ID', id)
+          commit('SET_IDCODE', idCode)
           commit('SET_NAME', name)
           commit('SET_ORGAN', organ)
-          commit('SET_AVATAR', id + '_mini.jpeg')
+          commit('SET_AVATAR', idCode + '_mini.jpeg')
           resolve(data)
         })
         .catch(error => {

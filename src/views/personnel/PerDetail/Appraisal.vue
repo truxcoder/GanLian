@@ -1,15 +1,15 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 11:23:18
- * @LastEditTime: 2022-03-03 14:01:53
+ * @LastEditTime: 2022-03-08 10:21:45
  * @LastEditors: truxcoder
  * @Description:
 -->
 <template>
   <div>
     <div class=" flex items-center text-left">
-      <el-button type="primary" size="mini" @click="handleEdit('add')">添加信息</el-button>
-      <el-button v-if="currentData.length" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="can.add" type="primary" size="mini" @click="handleEdit('add')">添加信息</el-button>
+      <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div v-if="currentData.length" class="mt-4">
       <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
@@ -26,10 +26,10 @@
         <el-table-column align="center" label="考核单位">
           <template slot-scope="scope">{{ scope.row.organName }}</template>
         </el-table-column>
-        <el-table-column align="center" label="操作" width="240" fixed="right">
+        <el-table-column v-if="canOperate" align="center" label="操作" width="240" fixed="right">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+            <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

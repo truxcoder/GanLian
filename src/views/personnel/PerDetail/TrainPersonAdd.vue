@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 10:59:14
- * @LastEditTime: 2022-03-03 19:42:51
+ * @LastEditTime: 2022-03-28 15:40:41
  * @LastEditors: truxcoder
  * @Description: 人员详情页个人培训模块编辑参与培训信息，本页列出培训列表供用户选择或取消参与
 -->
@@ -20,6 +20,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
+          <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="text" @click="onClean">清空</el-button>

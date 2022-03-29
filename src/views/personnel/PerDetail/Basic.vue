@@ -2,12 +2,20 @@
   <div v-loading="loading">
     <div class="flex mt-2">
       <div class="flex-none">
-        <div class="photoZone border border-gray-300 mr-4 p-4">
-          <img :src="photoURL" alt class="photo" />
+        <div v-loading="photoLoading" class="photoZone ">
+          <!-- <img :src="photoURL" alt class="photo" /> -->
+          <el-image fit="fit" :src="photoURL" class="photo">
+            <div slot="error" class="image-slot">
+              <img src="photo.jpg" alt class="photo" />
+            </div>
+          </el-image>
         </div>
-        <div class=" mt-1 mr-4">
-          <el-button size="mini" type="primary" plain style="width:100%" @click="handleEdit('update', baseData)">修改人员信息</el-button>
+        <div class=" mt-2 mr-4">
+          <el-button v-if="can.update" size="mini" type="primary" plain style="width:100%" @click="handleEdit('update', baseData)">修改人员信息</el-button>
           <!-- <button class="text-base font-medium rounded-lg w-full py-1 bg-blue-500 text-white" @click="handleUpdate">修改人员信息</button> -->
+        </div>
+        <div class=" mt-2 mr-4">
+          <el-button v-if="can.update" class="w-full" type="primary" size="mini" plain @click="onPhotoSync">从大数据中心同步照片</el-button>
         </div>
       </div>
       <div class="flex-auto w-full">
@@ -46,19 +54,10 @@
         <span>{{ baseData.proCert }}</span>
       </div>
     </div>
-    <!-- <div class="mt-4 text-left border border-gray-300 rounded-sm">
-      <div class="h-12 flex items-center px-4 bg-blue-50">
-        <span>参加培训情况</span>
-      </div>
-      <hr class="border-gray-300" />
-      <div class="p-4 min-h-0">
-        <span>{{ baseData.training }}</span>
-      </div>
-    </div> -->
     <div class="mt-4 text-left border border-gray-300 rounded-sm">
       <div class="h-12 flex items-center px-4 bg-blue-50 justify-between">
         <span>个人简历</span>
-        <el-button type="text" @click="resumeVisible = true">编辑</el-button>
+        <el-button v-if="can.update" type="text" @click="resumeVisible = true">编辑</el-button>
       </div>
       <hr class="border-gray-300" />
       <div class="p-4">
@@ -83,6 +82,10 @@ import ResumeEdit from '@/views/personnel/ResumeEdit.vue'
 
 import { getPhoto } from '@/utils/personnel'
 import { passportDict } from '@/utils/dict'
+
+import { truxGet } from '@/api/common'
+
+const defaultSettings = require('@/settings.js')
 
 export default {
   name: 'Basic',
@@ -136,8 +139,11 @@ export default {
       obj: 'DetailBasic',
       resource: 'personnel',
       action: '',
+      now: '',
+      // photoURL: '',
       editVisible: false,
       resumeVisible: false,
+      photoLoading: false,
       models: [
         { label: '姓名', field: 'name' },
         { label: '编号', field: 'policeCode' },
@@ -151,6 +157,9 @@ export default {
         { label: '岗位是否涉密', field: 'isSecret' },
         { label: '年龄', field: 'age' },
         { label: '出生日期', field: 'birthday', type: 'date' },
+        { label: '籍贯', field: 'hometown' },
+        { label: '出生地', field: 'birthplace' },
+        { label: '健康状况', field: 'health' },
         { label: '入党日期', field: 'joinPartyDay', type: 'date' },
         { label: '参加工作日期', field: 'startJobDay', type: 'date' },
         { label: '录警日期', field: 'bePoliceDay', type: 'date' },
@@ -161,19 +170,16 @@ export default {
         { label: '非全日制教育专业', field: 'partTimeMajor' },
         { label: '非全日制毕业院校', field: 'partTimeSchool' },
         { label: '通过县处级考试时间', field: 'passExamDay', type: 'date' },
-        { label: '持有护照情况', field: 'passport' }
+        { label: '持有护照情况', field: 'passport' },
+        { label: '专业技术职务', field: 'technicalTitle' },
+        { label: '专长', field: 'specialty' }
       ]
     }
   },
   computed: {
     photoURL() {
-      // return this.$store.getters.staticURL+"/static/lxb2.jpg"
-      // return '/image/lxb2.jpg'
-      return this.baseData.id ? getPhoto(this.baseData.id, 'small') : ''
+      return this.baseData?.idCode ? getPhoto(this.baseData?.idCode, 'small') + '?now=' + this.now : ''
     },
-    // baseData() {
-    //   return this.baseData
-    // },
     resumeList() {
       const resume = this.baseData.resume ?? ''
       let result = []
@@ -186,7 +192,9 @@ export default {
     }
   },
   created() {
-    this.check(this.obj).then(() => {})
+    this.check(this.obj).then(() => {
+
+    })
   },
   methods: {
     visibleChange(cpn) {
@@ -212,6 +220,27 @@ export default {
     editSuccess() {
       this.resumeVisible = false
       this.$emit('updateSuccess')
+    },
+    onPhotoSync() {
+      this.$confirm('同步照片后新照片将会覆盖已有照片, 是否确定?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.photoLoading = true
+          const data = { id: this.baseData.id, userId: this.baseData.userId, idCode: this.baseData.idCode }
+          truxGet(defaultSettings.uploadURL, 'sync', '', data).then(res => {
+            this.now = Date.now()
+            this.$message.success(res.message)
+            this.photoLoading = false
+          }).catch(() => {
+            this.photoLoading = false
+          })
+        })
+        .catch(() => {
+          this.$message.info('已取消同步')
+        })
     },
     isShow(v) {
       if ('cum' in v) {
@@ -263,9 +292,30 @@ export default {
   margin: 0 auto;
   text-align: center;
 }
+.photoZone {
+  @apply flex border border-gray-300 mr-4 p-4 justify-center items-center
+}
 
+/* .photoZone {
+  position: relative;
+  width: 220px;
+  height: 300px;
+  @apply border border-gray-300 mr-4
+}
+.photo_button {
+  position: absolute;
+  width: 200px;
+  height: 28px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  overflow: hidden;
+} */
 .photo {
   width: 200px;
+  margin: auto;
 }
 .mainTable {
   border-spacing: 1px;

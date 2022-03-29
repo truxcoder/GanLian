@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-03 09:08:45
+ * @LastEditTime: 2022-03-22 17:49:42
  * @LastEditors: truxcoder
  * @Description:处分，前端分页
 -->
@@ -25,7 +25,7 @@
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="text" @click="onClean">清空</el-button>
+        <el-link icon="el-icon-delete" :underline="false" @click="onClean">清空</el-link>
       </el-form-item>
     </el-form>
     <div class="tool-bar">
@@ -59,7 +59,7 @@
       </el-table-column>
       <el-table-column align="center" label="姓名">
         <template slot-scope="scope">
-          {{ scope.row.personnelName }}
+          <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
       <el-table-column align="center" label="警号/工号">

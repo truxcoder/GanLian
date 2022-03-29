@@ -1,13 +1,23 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 14:22:56
+ * @LastEditTime: 2022-03-16 18:44:44
  * @LastEditors: truxcoder
  * @Description: 职务级别添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '级别信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="名称" prop="name">
         <el-input v-model="form.name" :style="formItemWidth" />
       </el-form-item>

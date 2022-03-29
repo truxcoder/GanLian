@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-03-02 14:08:39
+ * @LastEditTime: 2022-03-16 15:24:00
  * @LastEditors: truxcoder
  * @Description: 各类事项管理
 -->
@@ -35,7 +35,7 @@
       </el-table-column>
       <el-table-column align="center" label="姓名" width="120">
         <template slot-scope="scope">
-          {{ scope.row.personnelName }}
+          <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
       <el-table-column align="center" label="警号/工号" width="100">
@@ -85,18 +85,6 @@ import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import AffairEdit from './AffairEdit.vue'
 import AffairDetail from './AffairDetail.vue'
 
-function getCategoryName(category) {
-  switch (category) {
-    case '1':
-      return 'Audit'
-    case '2':
-      return 'PersonCheck'
-
-    default:
-      return ''
-  }
-}
-
 export default {
   name: 'Affair',
   components: { PersonnelOption, AffairEdit, AffairDetail },
@@ -104,7 +92,6 @@ export default {
   data() {
     return {
       resource: 'affair',
-      name: getCategoryName(this.$route.params.category),
       queryMeans: 'backend',
       originData: [],
       currentData: [],
@@ -116,22 +103,30 @@ export default {
       return this.$route.params
     },
     category() {
-      return this.$route.params.category * 1
+      switch (this.$route.name) {
+        case 'Audit':
+          return 1
+        case 'PersonCheck':
+          return 2
+        case 'Inspection':
+          return 3
+        default:
+          return 0
+      }
     }
   },
-  watch: {
-    params: function(val, oldval) {
-      this.name = getCategoryName(val)
-      this.check(this.name).then(() => {
-        const data = { category: this.$route.params.category * 1 }
-        this.fetchData(data)
-      })
-    }
-  },
+  // watch: {
+  //   params: function(val, oldval) {
+  //     this.name = getCategoryName(val)
+  //     this.check(this.name).then(() => {
+  //       const data = { category: this.$route.params.category * 1 }
+  //       this.fetchData(data)
+  //     })
+  //   }
+  // },
   created() {
-    this.check(this.name).then(() => {
-      const data = { category: this.$route.params.category * 1 }
-      this.fetchData(data)
+    this.check(this.$route.name).then(() => {
+      this.fetchData()
     })
     // this.$watch(
     //   () => this.$route.params,
@@ -140,14 +135,11 @@ export default {
     //   }
     // )
   },
-  mounted() {
-    console.log('category:', this.$route.params.category)
-  },
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
       params = this.buildParams(this.queryMeans)
-      request(this.resource, 'list', data, params).then(response => {
+      request(this.resource, 'list/' + this.category, data, params).then(response => {
         if (response.count) {
           this.originData = response.data
           this.currentData = [...this.originData]
@@ -159,9 +151,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    getPassport(value) {
-      return value ? this.passportMap.get(value) : '未定义'
     },
     handleDetail(row) {
       this.rowData = row

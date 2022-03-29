@@ -20,7 +20,7 @@
           {{ scope.row.policeCode }}
         </template>
       </el-table-column>
-      <el-table-column align="center" width="100" label="角色" :show-overflow-tooltip="true">
+      <el-table-column align="center" width="200" label="角色" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ roleMap[scope.row.role] }}
         </template>

@@ -1,3 +1,10 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2021-10-12 17:02:21
+ * @LastEditTime: 2022-03-08 20:27:42
+ * @LastEditors: truxcoder
+ * @Description:
+-->
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
