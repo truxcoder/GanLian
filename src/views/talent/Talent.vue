@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-21 10:51:23
+ * @LastEditTime: 2022-04-11 14:30:18
  * @LastEditors: truxcoder
  * @Description: 人才库，后端分页
 -->
@@ -129,6 +129,9 @@ export default {
       request(this.resource, 'list/' + this.category, data, params).then(response => {
         this.originData = response.data ?? []
         this.currentData = this.originData.length ? [...this.originData] : []
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 10:24:13
- * @LastEditTime: 2022-03-03 19:20:49
+ * @LastEditTime: 2022-04-19 21:34:14
  * @LastEditors: truxcoder
  * @Description: 培训选择人员页面
 -->
@@ -122,7 +122,7 @@ export default {
   },
   methods: {
     fetchData() {
-      const data = { personnelId: this.$store.getters.id, organId: this.$store.getters.organ }
+      const data = { accountId: this.$store.getters.id, organId: this.$store.getters.organ }
       this.dialogLoading = true
       request('personnel', 'name_list', data).then(response => {
         this.originData = response.data ?? []

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-29 10:29:36
- * @LastEditTime: 2022-03-29 17:35:14
+ * @LastEditTime: 2022-04-01 16:32:43
  * @LastEditors: truxcoder
  * @Description: 图标选择
 -->
@@ -18,7 +18,6 @@
       </dl>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -44,7 +43,7 @@ export default {
   },
   methods: {
     onOpen(e) {
-      this.mt = document.getElementById('iconOpen').getBoundingClientRect().top > 400 ? '-340px' : '40px'
+      this.mt = document.getElementById('iconOpen').getBoundingClientRect().top > 350 ? '-305px' : '40px'
       this.visible = !this.visible
       // const h = window.window.innerHeight - document.getElementById('iconOpen').getBoundingClientRect().bottom
     },
@@ -79,7 +78,10 @@ export default {
   width: 500px;
   height: 300px;
   background-color: #fff;
-  border: 1px solid #ddd
+  border-radius: 4px;
+  border: 1px solid #e4e7ed;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  // box-shadow: 0 0 10px 1px #dedede;
 }
 .icon-item {
   cursor: pointer;

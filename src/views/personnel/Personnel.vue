@@ -5,15 +5,15 @@
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item v-if="can.global" label="单位" prop="organId">
-        <el-select v-model="searchForm.organId" :style="formItemWidth" size="small" placeholder="请选择单位">
+        <el-select v-model="searchForm.organId" :style="formItemWidth" size="small" multiple placeholder="请选择单位">
           <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="警号/工号" prop="policeCode">
-        <el-input v-model="searchForm.policeCode" :style="formItemWidth" size="small" placeholder="警号/工号" />
-      </el-form-item>
       <el-form-item label="姓名" prop="name">
         <el-input v-model="searchForm.name" :style="formItemWidth" size="small" placeholder="姓名" />
+      </el-form-item>
+      <el-form-item label="警号/工号" prop="policeCode">
+        <el-input v-model="searchForm.policeCode" :style="formItemWidth" size="small" placeholder="警号/工号" />
       </el-form-item>
       <el-form-item label="级别" prop="level">
         <el-select v-model="searchForm.level" :style="formItemWidth" size="small" placeholder="请选择级别" multiple>
@@ -33,6 +33,7 @@
     </el-form>
     <div class="tool-bar">
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button v-if="can.manage" type="primary" icon="el-icon-scjd-circle-forbidden iconfont" size="mini" @click="fetchDisabledData">查看禁用人员</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -76,10 +77,11 @@
       </el-table-column>
       <el-table-column label="民族" prop="nation" width="90" align="center" />
       <el-table-column label="政治面貌" prop="political" align="center" width="120" />
-      <el-table-column align="center" label="操作" width="180">
+      <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button> -->
+          <el-button v-if="can.manage" size="mini" :type="scope.row.status?'danger':'success'" @click="handleDisable(scope.row)">{{ scope.row.status?'禁用':'启用' }}</el-button>
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
         </template>
       </el-table-column>
@@ -99,14 +101,14 @@
     <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
 
     <!-- <personnel-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
-    <personnel-search :visible="searchVisible" :can="can" @advanceSearch="advanceSearch" @visibleChange="visibleChange" />
+    <PersonnelSearch :visible="searchVisible" :can="can" :levels="levelList" @advanceSearch="advanceSearch" @visibleChange="visibleChange" />
   </div>
 </template>
 
 <script>
 import dayjs from 'dayjs'
 // import remoteDepartmentData from '@/api/departmentData.json'
-import { request } from '@/api'
+import { request, curd } from '@/api'
 import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
@@ -129,11 +131,11 @@ export default {
       currentData: [],
       searchVisible: false,
       levelList: [],
-      formItemWidth: { width: '180px' },
+      formItemWidth: { width: '170px' },
       searchForm: {
         name: '',
         policeCode: '',
-        organId: '',
+        organId: [],
         level: ''
       }
     }
@@ -147,6 +149,9 @@ export default {
     if (this.$store.state.department.departments.length === 0) {
       this.$store.dispatch('department/setDepartments')
     }
+    if (this.$store.getters.custom.length === 0) {
+      this.$store.dispatch('account/changeCustom', { category: 1, accountId: this.$store.getters.id })
+    }
     this.check().then(() => {
       this.fetchData()
       this.fetchOtherData()
@@ -158,13 +163,22 @@ export default {
       params.currentPage = this.currentPage
       params.pageSize = this.pageSize
       params.queryMeans = this.queryMeans
+      // if (!Object.keys(data).includes('organId')) {
+      //   data = { ...data, ...this.defaultSearchData }
+      // } else if (data.organId === '') {
+      //   data.organId = this.defaultSearchData.organId ?? ''
+      // }
+      const organId = this.can.global ? [] : [this.$store.getters.organ]
       if (!Object.keys(data).includes('organId')) {
-        data = { ...data, ...this.defaultSearchData }
-      } else if (data.organId === '') {
-        data.organId = this.defaultSearchData.organId ?? ''
+        data = { ...data, organId }
+      } else if (data.organId.length === 0) {
+        data.organId = organId
+      }
+      if (!('status' in data)) {
+        data = { ...data, status: true }
       }
       request('personnel', 'list', data, params).then(response => {
-        if (response.count) {
+        if (response?.count) {
           this.originData = response.data
           this.currentData = [...this.originData]
           this.count = response.count
@@ -175,12 +189,22 @@ export default {
           this.count = 0
           this.listLoading = false
         }
+      }).catch(err => {
+        console.log(err)
+        this.listLoading = false
       })
     },
     fetchOtherData() {
       request('level', 'list').then(res => {
         this.levelList = res.data ?? []
       })
+    },
+    // 获取禁用人员数据
+    fetchDisabledData() {
+      this.searchData = { status: false }
+      this.currentPage = 1
+      this.searchVisible = false
+      this.fetchData(this.searchData)
     },
     handleDetail(index, row) {
       const url = this.$router.resolve({
@@ -226,6 +250,27 @@ export default {
           })
         })
     },
+    handleDisable(row) {
+      this.$confirm('将禁用该人员, 是否确定?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          curd('update', { id: row.id, status: !row.status }, { resource: 'personnel' })
+            .then(response => {
+              this.$message.success(response.message)
+              this.$set(row, 'status', !row.status)
+              // this.fetchData()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        })
+        .catch(() => {
+          this.$message.info('已取消删除')
+        })
+    },
     onClean() {
       this.$refs.searchForm.resetFields()
       this.$set(this.searchForm, 'level', '')
@@ -236,11 +281,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tool-bar {
   margin-bottom: 10px;
 }
 .pagination {
   margin-top: 15px;
 }
+// .myfont {
+//   @extend .iconfont;
+// }
 </style>

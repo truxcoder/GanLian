@@ -31,10 +31,14 @@ const RoleDict = () => import('@/views/system/RoleDict')
 const Permission = () => import('@/views/system/Permission')
 const Data = () => import('@/views/system/Data')
 const DepartmentSync = () => import('@/views/system/DepartmentSync')
+const AccountSync = () => import('@/views/system/AccountSync')
 const EduDict = () => import('@/views/personnel/EduDict')
 const Training = () => import('@/views/train/Training')
 const EntryExit = () => import('@/views/incorruption/EntryExit')
 const Affair = () => import('@/views/incorruption/Affair')
+const Account = () => import('@/views/system/Account')
+
+const PersonnelDisabled = () => import('@/views/system/PersonnelDisabled')
 
 export const componentList = {
   Personnel,
@@ -55,10 +59,13 @@ export const componentList = {
   Report,
   Data,
   DepartmentSync,
+  AccountSync,
   EduDict,
   Training,
   EntryExit,
-  Affair
+  Affair,
+  Account,
+  PersonnelDisabled
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1

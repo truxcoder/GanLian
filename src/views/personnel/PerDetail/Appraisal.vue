@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 11:23:18
- * @LastEditTime: 2022-03-08 10:21:45
+ * @LastEditTime: 2022-04-20 10:36:37
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -18,7 +18,7 @@
           <template slot-scope="scope">{{ scope.row.years }}年</template>
         </el-table-column>
         <el-table-column align="center" label="考核季度">
-          <template slot-scope="scope">{{ scope.row.season | seasonFilter }}</template>
+          <template slot-scope="scope">{{ itemMap.get(scope.row.season) }}</template>
         </el-table-column>
         <el-table-column align="center" label="考核结果">
           <template slot-scope="scope">{{ scope.row.conclusion }}</template>
@@ -58,18 +58,6 @@ import { conclusionDict, seasonDict } from '@/utils/dict'
 export default {
   name: 'Appraisal',
   components: { AppraisalEdit },
-  filters: {
-    seasonFilter(season) {
-      let result = '未知'
-      seasonDict.forEach(item => {
-        if (season === item.value) {
-          result = item.label
-          return
-        }
-      })
-      return result
-    }
-  },
   mixins: [mixin, permission_mixin],
   data() {
     return {
@@ -90,6 +78,13 @@ export default {
         conclusion,
         season: seasonDict
       }
+    },
+    itemMap() {
+      const _map = new Map()
+      seasonDict.forEach(item => {
+        _map.set(item.value, item.label)
+      })
+      return _map
     }
   },
   created() {

@@ -1,16 +1,26 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 11:25:20
+ * @LastEditTime: 2022-04-20 11:04:06
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '考核信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+        <PersonnelOption v-if="!isSingle" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" />
       </el-form-item>
       <el-form-item label="考核单位" prop="organId">
         <el-select v-model="form.organId" :style="formItemWidth" placeholder="请选择单位">
@@ -32,7 +42,7 @@
 
       <el-form-item label="考核结果" prop="conclusion">
         <el-select v-model="form.conclusion" :style="formItemWidth" placeholder="请选择考核结果">
-          <el-option v-for="i in options.conclusion" :key="i" :label="i" :value="i" />
+          <el-option v-for="i in conclusionList" :key="i.value" :label="i.value" :value="i.value" />
         </el-select>
       </el-form-item>
     </el-form>
@@ -48,6 +58,7 @@ import { curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import rules from '@/common/rules/appraisal'
+import { conclusionDict } from '@/utils/dict'
 export default {
   name: 'AppraisalEdit',
   components: { PersonnelOption },
@@ -57,6 +68,20 @@ export default {
       resource: 'appraisal',
       form: { personnelId: '', organId: '', years: '', season: '', conclusion: '' },
       rules
+    }
+  },
+  computed: {
+    conclusionList() {
+      return conclusionDict.filter(item => {
+        switch (this.form.season) {
+          case 100:
+            return item.category === 1
+          case '':
+            return true
+          default:
+            return item.category === 2
+        }
+      })
     }
   },
   watch: {

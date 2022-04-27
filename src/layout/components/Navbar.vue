@@ -17,7 +17,7 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <router-link target="_blank" :to="{ path: '/perdetail', query: { id: id } }">
+          <router-link target="_blank" :to="{ path: '/perdetail', query: { id: personnelId } }">
             <el-dropdown-item>
               个人详情
             </el-dropdown-item>
@@ -54,7 +54,7 @@ export default {
     Hamburger
   },
   computed: {
-    ...mapGetters(['sidebar', 'avatar', 'name', 'id']),
+    ...mapGetters(['sidebar', 'avatar', 'name', 'personnelId']),
     photo() {
       return defaultSettings.staticURL + 'photo/mini/' + this.avatar
     }

@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-14 11:15:43
- * @LastEditTime: 2022-03-10 08:47:32
+ * @LastEditTime: 2022-04-19 20:46:44
  * @LastEditors: truxcoder
  * @Description: 权限检查相关
  */
@@ -54,13 +54,6 @@ export const permission_mixin = {
           })
       })
     }
-    // async check(object = null) {
-    //   const sub = this.$store.getters.id
-    //   const obj = object ?? this.$options.name
-    //   const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
-    //   const res = await request('permission', 'check', { sub, obj, act })
-    //   Object.assign(this.permission, res.data)
-    // }
   }
 }
 

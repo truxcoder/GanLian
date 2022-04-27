@@ -163,6 +163,9 @@ export default {
         this.originData = response.data ?? []
         this.currentData = this.originData.length ? [...this.originData] : []
         this.listLoading = false
+      }).catch(err => {
+        console.log(err)
+        this.listLoading = false
       })
     },
     handleDetail(row) {

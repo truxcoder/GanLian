@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 15:09:42
- * @LastEditTime: 2022-03-16 18:47:18
+ * @LastEditTime: 2022-04-11 11:38:08
  * @LastEditors: truxcoder
  * @Description: 职务等级
 -->
@@ -69,6 +69,9 @@ export default {
     fetchData() {
       request('level', 'list').then(response => {
         this.currentData = response.data
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     }

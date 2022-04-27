@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 15:39:29
- * @LastEditTime: 2022-03-28 14:45:28
+ * @LastEditTime: 2022-04-11 10:54:29
  * @LastEditors: truxcoder
  * @Description: 人员详情页任职列表
 -->
@@ -24,7 +24,7 @@
         <el-table-column align="center" label="任职结束时间" width="150">
           <template slot-scope="scope">{{ scope.row.endDay | dateEndFilter }}</template>
         </el-table-column>
-        <el-table-column v-if="canOperate" align="center" label="操作" width="240" fixed="right">
+        <el-table-column v-if="canOperate" align="center" label="操作" width="240">
           <template slot-scope="scope">
             <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
             <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>

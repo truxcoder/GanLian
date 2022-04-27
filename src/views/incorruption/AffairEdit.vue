@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:24:30
- * @LastEditTime: 2022-03-22 17:21:20
+ * @LastEditTime: 2022-04-01 14:50:01
  * @LastEditors: truxcoder
  * @Description: 添加修改各类事项信息
  * wangEditor使用说明:
@@ -28,7 +28,7 @@
       </el-form-item>
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+        <PersonnelOption v-if="!isSingle" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" />
       </el-form-item>
       <el-form-item label="分类" prop="category">
         <el-select v-model="form.category" :style="formItemWidth" :disabled="category > 0" placeholder="请选择分类">

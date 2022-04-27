@@ -26,7 +26,7 @@
         </el-table-column>
         <el-table-column align="center" label="奖励项/等级">
           <template slot-scope="scope">
-            {{ awardOptions.grade[scope.row.grade - 1] && awardOptions.grade[scope.row.grade - 1].label }}
+            {{ awardMap.get(scope.row.grade) }}
           </template>
         </el-table-column>
         <el-table-column align="center" label="奖励时间">
@@ -71,7 +71,7 @@
         </el-table-column>
         <el-table-column align="center" label="处理项">
           <template slot-scope="scope">
-            {{ punishOptions.grade[scope.row.grade - 1] && punishOptions.grade[scope.row.grade - 1].label }}
+            {{ punishMap.get(scope.row.grade) }}
           </template>
         </el-table-column>
         <el-table-column align="center" label="处理时间">
@@ -180,6 +180,20 @@ export default {
         category: categoryOptions,
         grade: gradeOptions
       }
+    },
+    awardMap() {
+      const _map = new Map()
+      awardGrade.forEach(item => {
+        _map.set(item.value, item.label)
+      })
+      return _map
+    },
+    punishMap() {
+      const _map = new Map()
+      punishGrade.forEach(item => {
+        _map.set(item.value, item.label)
+      })
+      return _map
     }
   },
   created() {

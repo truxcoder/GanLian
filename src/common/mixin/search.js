@@ -1,7 +1,9 @@
+import { isEmpty } from '@/utils/validate'
+
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-03-02 14:21:36
+ * @LastEditTime: 2022-04-13 18:46:43
  * @LastEditors: truxcoder
  * @Description: 列表页搜索mixin
  */
@@ -9,8 +11,7 @@ export const search_mixin = {
   data() {
     return {
       searchData: {},
-      queryParam: {},
-      isClean: false
+      queryParam: {}
     }
   },
   methods: {
@@ -22,11 +23,9 @@ export const search_mixin = {
       const searchData = {}
       let searchParamNumber = 0
       for (const key in this.searchForm) {
-        if (this.searchForm[key] !== '') {
-          if (
-            Object.prototype.toString.call(this.searchForm[key]) === '[object String]' &&
-            (this.searchForm[key].includes("'") || this.searchForm[key].includes('or') || this.searchForm[key].includes('and') || this.searchForm[key].includes('--'))
-          ) {
+        // if (this.searchForm[key] !== '') {
+        if (!isEmpty(this.searchForm[key])) {
+          if (Object.prototype.toString.call(this.searchForm[key]) === '[object String]' && (this.searchForm[key].includes("'") || this.searchForm[key].includes('or') || this.searchForm[key].includes('and') || this.searchForm[key].includes('--'))) {
             this.$message.error('查询参数包含非法字符!')
             return false
           }
@@ -56,8 +55,10 @@ export const search_mixin = {
     // 清空搜索框
     onClean() {
       this.$refs.searchForm.resetFields()
+      if (this.$refs.personnelOption) {
+        this.$refs.personnelOption.clean()
+      }
       // this.queryParam = {}
-      this.isClean = true
     }
   }
 }

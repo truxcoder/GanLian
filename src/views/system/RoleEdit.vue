@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-10 15:51:29
+ * @LastEditTime: 2022-04-19 19:35:10
  * @LastEditors: truxcoder
  * @Description: 人员角色信息添加编辑
 -->
@@ -18,9 +18,10 @@
       :label-width="formLabelWidth"
       label-position="right"
     >
-      <el-form-item label="姓名" prop="personnelId">
-        <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option :rowdata="personnelOption" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+      <el-form-item label="姓名" prop="accountId">
+        <el-input v-if="isSingle" :style="formItemWidth" :value="singleAccountData.name" disabled />
+        <!-- <PersonnelOption v-model="form.accountId" :rowdata="accountOption" :is-update="action === 'update'" :form-item-width="formItemWidth" /> -->
+        <AccountOption v-model="form.accountId" :row="accountOption" :is-update="action === 'update'" :width="formItemWidth" />
       </el-form-item>
       <el-form-item label="角色" prop="role">
         <el-select v-model="form.role" :style="formItemWidth" placeholder="请选择角色">
@@ -38,33 +39,33 @@
 <script>
 import { request } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
-import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
+import AccountOption from '@/components/Account/AccountOption.vue'
 import rules from '@/common/rules/role'
 export default {
   name: 'RoleEdit',
-  components: { PersonnelOption },
+  components: { AccountOption },
   mixins: [edit_mixin],
   data() {
     return {
       resource: 'role',
-      form: { personnelId: '', role: '' },
+      form: { accountId: '', role: '' },
       rules
     }
   },
   computed: {
-    personnelOption() {
-      return { personnelId: this.row.id, personnelName: this.row.name, role: this.row.role, policeCode: this.row.policeCode }
+    accountOption() {
+      return { id: this.row.id, name: this.row.name, role: this.row.role, username: this.row.username }
     }
   },
   watch: {
     visible: function(val, oldval) {
       if (val === true) {
         if (this.action === 'update') {
-          this.form.personnelId = this.row.id
+          this.form.accountId = this.row.id
           this.form.role = this.row.role
         }
       } else {
-        this.form = { personnelId: '', role: '' }
+        this.form = { accountId: '', role: '' }
         this.$refs.editForm.resetFields()
       }
     }
@@ -76,7 +77,7 @@ export default {
           this.dialogLoading = true
           let data = this.form
           if (this.action === 'update') {
-            data = { old: [this.row.id, this.row.role], new: [this.form.personnelId, this.form.role] }
+            data = { old: [this.row.id, this.row.role], new: [this.form.accountId, this.form.role] }
           }
           request(this.resource, this.action, data)
             .then(response => {

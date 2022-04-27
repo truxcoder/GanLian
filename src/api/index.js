@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-07 15:13:48
- * @LastEditTime: 2022-01-25 09:22:45
+ * @LastEditTime: 2022-04-06 14:50:42
  * @LastEditors: truxcoder
  * @Description: 通用请求接口
  */
@@ -26,5 +26,13 @@ export function curd(act, data, params) {
     method: 'post',
     data,
     params
+  })
+}
+
+export function del(obj, id) {
+  const url = '/' + obj + '/' + id
+  return service({
+    url,
+    method: 'delete'
   })
 }

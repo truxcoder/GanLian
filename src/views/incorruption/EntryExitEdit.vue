@@ -1,16 +1,26 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:24:30
- * @LastEditTime: 2022-02-28 15:47:01
+ * @LastEditTime: 2022-04-01 14:51:57
  * @LastEditors: truxcoder
  * @Description: 添加修改出入境信息
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '出入境信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+        <PersonnelOption v-if="!isSingle" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" />
       </el-form-item>
 
       <el-form-item label="所用证件" prop="passport">

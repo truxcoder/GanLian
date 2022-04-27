@@ -2,10 +2,10 @@
   <div class="app-container">
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" :form-item-width="searchItemWidth" />
       </el-form-item>
-      <el-form-item label="单位" prop="organId">
-        <OrganSelect v-model="searchForm.organId" />
+      <el-form-item label="单位" prop="organParam">
+        <OrganSelect v-model="searchForm.organParam" :width="searchItemWidth" />
       </el-form-item>
 
       <el-form-item label="年份" prop="years">
@@ -20,7 +20,7 @@
       </el-form-item>
       <el-form-item label="结果" prop="conclusion">
         <el-select v-model="searchForm.conclusion" size="small" :style="searchItemWidth" placeholder="请选择结果">
-          <el-option v-for="i in options.conclusion" :key="i" :label="i" :value="i" />
+          <el-option v-for="i in conclusionList" :key="i.value" :label="i.value" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -32,6 +32,7 @@
     </el-form>
     <div class="tool-bar">
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
+      <el-button v-if="can.manage" type="success" icon="el-icon-folder-add" size="mini" @click="batchVisible = true">批量录入</el-button>
       <el-button v-if="total && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
       <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
@@ -57,7 +58,7 @@
         <el-table-column align="center" label="考核年份" prop="years" />
         <el-table-column align="center" label="考核季度">
           <template slot-scope="scope">
-            {{ scope.row.season | seasonFilter }}
+            {{ itemMap.get(scope.row.season) }}
           </template>
         </el-table-column>
         <el-table-column align="center" label="考核结果" prop="conclusion" />
@@ -83,6 +84,7 @@
       @current-change="handleCurrentChange"
     />
     <AppraisalEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <AppraisalBatchEdit :visible="batchVisible" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -97,35 +99,25 @@ import { permission_mixin } from '@/common/mixin/permission'
 import { conclusionDict, seasonDict } from '@/utils/dict'
 
 import AppraisalEdit from './AppraisalEdit.vue'
+import AppraisalBatchEdit from './AppraisalBatchEdit.vue'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
 import OrganSelect from '@/components/department/OrganSelect.vue'
 
 export default {
   name: 'Appraisal',
-  components: { AppraisalEdit, PersonnelOption, OrganSelect },
-  filters: {
-    seasonFilter(season) {
-      let result = '未知'
-      seasonDict.forEach(item => {
-        if (season === item.value) {
-          result = item.label
-          return
-        }
-      })
-      return result
-    }
-  },
+  components: { AppraisalEdit, AppraisalBatchEdit, PersonnelOption, OrganSelect },
   mixins: [common_mixin, delete_mixin, list_mixin, permission_mixin, search_mixin],
   data() {
     return {
       resource: 'appraisal',
       queryMeans: 'backend',
+      batchVisible: false,
       originData: [],
       currentData: [],
       organMap: {},
-      searchForm: { personnelId: '', organId: '', years: '', season: '', conclusion: '' },
-      searchItemWidth: { width: '130px' }
+      searchForm: { personnelId: '', organParam: '', years: '', season: '', conclusion: '' },
+      searchItemWidth: { width: '160px' }
     }
   },
   computed: {
@@ -137,11 +129,9 @@ export default {
       for (let index = 2010; index < 2030; index++) {
         years.push({ label: index + '年', value: index + '' })
       }
-      const conclusion = conclusionDict
       return {
         organ: this.$store.getters.organs,
         years,
-        conclusion,
         season: seasonDict
       }
     },
@@ -153,6 +143,25 @@ export default {
         { key: 'season', label: '季度', type: 'select', placeholder: '请选择季度', option: this.options.season },
         { key: 'conclusion', label: '结果', type: 'select', placeholder: '请选择结果', option: this.options.conclusion }
       ]
+    },
+    conclusionList() {
+      return conclusionDict.filter(item => {
+        switch (this.searchForm.season) {
+          case 100:
+            return item.category === 1
+          case '':
+            return true
+          default:
+            return item.category === 2
+        }
+      })
+    },
+    itemMap() {
+      const _map = new Map()
+      seasonDict.forEach(item => {
+        _map.set(item.value, item.label)
+      })
+      return _map
     }
   },
   created() {
@@ -166,7 +175,7 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
       request('appraisal', 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
@@ -177,6 +186,9 @@ export default {
           this.currentData = []
           this.count = 0
         }
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     }

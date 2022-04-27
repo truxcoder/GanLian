@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-11 17:03:21
- * @LastEditTime: 2022-03-24 11:36:10
+ * @LastEditTime: 2022-04-01 15:29:51
  * @LastEditors: truxcoder
  * @Description: 机构编制数管理
 -->
@@ -14,9 +14,9 @@
         element-loading-text="Loading"
         stripe
         :fit="true"
+        :height="height"
         highlight-current-row
       >
-        <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="全称" prop="name" width="250" />
         <el-table-column align="center" label="简称" prop="shortName" />
         <el-table-column align="center" label="编制数">
@@ -36,7 +36,7 @@
             <span v-else>{{ scope.row.headcount - getUse(scope.row) }}</span>
           </template>
         </el-table-column>
-        <el-table-column v-if="can.manage && can.global" align="center" label="操作">
+        <el-table-column v-if="can.manage" align="center" label="操作">
           <template slot-scope="scope">
             <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" @click="onUpdateSubmit(scope.$index, scope.row)">确定</el-button>
             <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
@@ -44,19 +44,6 @@
         </el-table-column>
       </el-table>
     </div>
-
-    <el-pagination
-      v-if="total"
-      class="pagination"
-      background
-      :current-page="currentPage"
-      :page-sizes="[10, 20, 40]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
   </div>
 </template>
 
@@ -85,6 +72,16 @@ export default {
     }
   },
   computed: {
+    currentPageData() {
+      if (this.can.global) {
+        // return this.currentData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+        return this.currentData
+      }
+      return this.currentData.filter(item => item.id === this.$store.getters.organ)
+    },
+    height() {
+      return window.window.innerHeight - 100
+    }
   },
   created() {
     this.check().then(() => {
@@ -117,11 +114,13 @@ export default {
       this.dialogLoading = true
       request('department', 'update', data).then(response => {
         this.$message.success(response.message)
-
-        // this.$set(this.currentData, index + (this.currentPage - 1) * this.pageSize, this.headcount)
-        const current = this.currentData[index + (this.currentPage - 1) * this.pageSize]
-        this.$set(current, 'headcount', this.headcount)
-        // this.$set(this.currentData, index + (this.currentPage - 1) * this.pageSize, current)
+        if (this.can.global) {
+          // const current = this.currentData[index + (this.currentPage - 1) * this.pageSize]
+          // this.$set(current, 'headcount', this.headcount)
+          this.$set(row, 'headcount', this.headcount)
+        } else {
+          this.fetchData()
+        }
         this.resetUpdateForm()
         this.dialogLoading = false
       })
@@ -149,6 +148,12 @@ export default {
         return this.totalCount
       }
       return row.use
+    },
+    hasThisRowPermission(id) {
+      if (this.can.global) {
+        return true
+      }
+      return id === this.$store.getters.organ
     }
   }
 }

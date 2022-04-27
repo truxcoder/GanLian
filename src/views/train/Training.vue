@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-22 17:46:09
+ * @LastEditTime: 2022-04-11 14:30:34
  * @LastEditors: truxcoder
  * @Description:培训，后端分页
 -->
@@ -171,6 +171,9 @@ export default {
         this.originData = response.data ?? []
         this.currentData = this.originData.length ? [...this.originData] : []
         this.count = response.count
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

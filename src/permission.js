@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-03-09 22:38:15
+ * @LastEditTime: 2022-04-19 20:57:38
  * @LastEditors: truxcoder
  * @Description: 导航守卫，动态获取路由
  */
@@ -10,7 +10,7 @@ import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken, getTicket } from '@/utils/auth' // get token from cookie
+import { getToken, getTicket, getUserID } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 import { request } from '@/api'
 const defaultSettings = require('@/settings.js')
@@ -32,6 +32,7 @@ router.beforeEach(async (to, from, next) => {
   document.title = getPageTitle(to.meta.title)
   // determine whether the user has logged in
   const hasToken = getToken()
+  // const userId = getUserID
   // const hasToken = 'admin-token'
   if (hasToken) {
     if (to.path === '/403' || to.path === '/auth') {
@@ -46,10 +47,12 @@ router.beforeEach(async (to, from, next) => {
       } else {
         try {
           // note: roles 必须为数组! 如: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
+          const { roles, personnelId } = await store.dispatch('user/getInfo')
           // 如果用户仅为普通用户，则强制跳转到其个人页面
+          // FIXME: jwt认证后需要重新获取id
           if (roles[0] === 'normal') {
-            next(`/perdetail?id=${hasToken}`)
+            // next(`/perdetail?id=${hasToken}`)
+            next(`/perdetail?id=${personnelId}`)
           } else {
             const accessRoutes = await store.dispatch('permission/getOriginRoutes', roles)
             router.addRoutes(accessRoutes)
@@ -82,7 +85,8 @@ router.beforeEach(async (to, from, next) => {
         if (!response.isValid) {
           next('/403')
         } else {
-          store.dispatch('user/login', response.token).then(() => {
+          // 用户单点登录认证
+          store.dispatch('user/login', response.data).then(() => {
             next(to.path ?? '/dashboard')
             // window.location.href = defaultSettings.URL + '/#/dashboard'
           })

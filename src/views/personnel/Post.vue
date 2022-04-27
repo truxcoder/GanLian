@@ -1,28 +1,40 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 09:48:14
- * @LastEditTime: 2022-03-23 16:11:59
+ * @LastEditTime: 2022-04-24 14:50:42
  * @LastEditors: truxcoder
  * @Description: 任职管理
 -->
 <template>
   <div class="app-container">
-    <!-- <el-row v-if="!total">
-      <el-col :span="24"><h2>暂无数据</h2></el-col>
-    </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" :form-item-width="searchNameWidth" />
       </el-form-item>
-      <el-form-item v-if="can.global" label="人员所属单位" prop="organParam">
-        <el-select v-model="searchForm.organParam" size="small" placeholder="请选择单位">
+      <el-form-item v-if="can.global" label="所属单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" :style="searchItemWidth" multiple placeholder="请选择单位">
           <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
         </el-select>
+        <!-- <OrganSelect v-model="searchForm.organParam" :multiple="true" :width="searchItemWidth" /> -->
       </el-form-item>
       <el-form-item label="任职级别" prop="levelId">
-        <el-select v-model="searchForm.levelId" size="small" placeholder="请选择级别">
+        <el-select v-model="searchForm.levelId" size="small" :style="searchItemWidth" multiple placeholder="请选择级别">
           <el-option v-for="i in levelList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
+      </el-form-item>
+      <el-form-item label="是否实职" prop="isLeader">
+        <el-select v-model="searchForm.isLeader" size="small" :style="searchItemWidth" placeholder="请选择">
+          <el-option label="是" :value="2" />
+          <el-option label="否" :value="1" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="所任职务" prop="positionId">
+        <el-select v-model="searchForm.positionId" size="small" :style="searchItemWidth" filterable multiple placeholder="请选择职务">
+          <el-option v-for="i in positionList" :key="i.value" :label="i.label" :value="i.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="现任" prop="current">
+        <el-switch v-model="searchForm.current" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
@@ -61,8 +73,8 @@
 
       <el-table-column align="center" label="操作" width="160">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -83,6 +95,7 @@
 </template>
 
 <script>
+var _ = require('lodash/array')
 import { request } from '@/api/index'
 import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
@@ -104,12 +117,20 @@ export default {
       originData: [],
       currentData: [],
       levelList: [],
-      searchForm: { personnelId: '', organParam: '', levelId: '' }
+      positionData: [],
+      searchItemWidth: { width: '170px' },
+      searchNameWidth: { width: '160px' },
+      searchForm: { personnelId: '', organParam: '', levelId: '', positionId: '', isLeader: '', current: false }
     }
   },
   computed: {
     organList() {
       return this.$store.getters.organs
+    },
+    positionList() {
+      return this.positionData.map(item => {
+        return { label: item.name + ' 〔' + item.levelName + '〕', value: item.id }
+      })
     }
   },
   created() {
@@ -122,6 +143,8 @@ export default {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
       params = this.buildParams(this.queryMeans, params)
+      this.interceptor(data, params)
+      console.log('data:', data)
       request(this.resource, 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
@@ -133,12 +156,31 @@ export default {
           this.count = 0
         }
         this.listLoading = false
+      }).catch(err => {
+        console.log(err)
+        this.listLoading = false
       })
     },
     fetchOtherData() {
-      request('level', 'list').then(res => {
-        this.levelList = res.data ?? []
+      // request('level', 'list').then(res => {
+      //   this.levelList = res.data ?? []
+      // })
+      Promise.all([request('level', 'list'), request('position', 'list')]).then(responses => {
+        this.levelList = responses[0].data ?? []
+        this.positionData = responses[1].data ?? []
       })
+    },
+    interceptor(data, params) {
+      if ('current' in data) {
+        if (data.current) {
+          params.zero = 'end_day$time'
+        }
+        // delete data.current
+      }
+      if ('isLeader' in data) {
+        const temp = this.positionData.filter(i => i.isLeader === data.isLeader).map(i => i.id)
+        data.positionId = ('positionId' in data) ? _.intersection(data.positionId, temp) : temp
+      }
     }
   }
 }

@@ -1,6 +1,13 @@
+<!--
+ * @Author: truxcoder
+ * @Date: 2022-04-01 11:30:14
+ * @LastEditTime: 2022-04-18 10:27:16
+ * @LastEditors: truxcoder
+ * @Description: 人员选择组件
+-->
 <template>
   <el-select
-    v-model="personnelId"
+    :value="value"
     :disabled="disabled"
     :size="size"
     :style="formItemWidth"
@@ -19,11 +26,9 @@
 import _ from 'lodash'
 export default {
   props: {
-    options: {
-      type: Array,
-      default() {
-        return []
-      }
+    value: {
+      type: String,
+      default: ''
     },
     rowdata: {
       type: Object,
@@ -48,20 +53,13 @@ export default {
       default() {
         return 'medium'
       }
-    },
-    isClean: {
-      type: Boolean,
-      default() {
-        return false
-      }
     }
   },
   data() {
     return {
       loading: false,
       disabled: false,
-      personnelOpitons: [],
-      personnelId: this.rowdata?.personnelId
+      personnelOpitons: []
     }
   },
   computed: {
@@ -81,14 +79,6 @@ export default {
       }
     }
   },
-  watch: {
-    isClean: function(val, oldval) {
-      if (val) {
-        this.personnelId = ''
-        this.personnelOpitons = []
-      }
-    }
-  },
   created() {
     if (this.$store.state.personnel.personnelOptions.length === 0) {
       this.disabled = true
@@ -98,19 +88,6 @@ export default {
     }
   },
   methods: {
-    // remoteMethod: _.debounce(function(query) {
-    //   query = query.trim()
-    //   if (query !== '') {
-    //     this.loading = true
-    //     console.log("query:",query)
-    //     personnelSearchName({ name: query }).then( res => {
-    //       this.remotePersonnelData = res.data
-    //       this.loading = false
-    //     })
-    //   } else {
-    //     this.remotePersonnelData = []
-    //   }
-    // }, 1000),
     filterMethod: _.debounce(function(query) {
       query = query.trim()
       if (query !== '') {
@@ -121,9 +98,12 @@ export default {
       } else {
         this.personnelOpitons = []
       }
-    }, 600),
+    }, 300),
     onChange(value) {
-      this.$emit('personnelChange', value)
+      this.$emit('input', value)
+    },
+    clean() {
+      this.personnelOpitons = []
     }
   }
 }

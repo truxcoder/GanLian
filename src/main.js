@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2021-12-24 11:34:23
+ * @LastEditTime: 2022-03-30 16:20:35
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -18,6 +18,8 @@ import '@/styles/custom/theme/index.css' // 自定义element主题色
 import '@/styles/common.css' // global css
 
 import 'tailwindcss/tailwind.css' // tailwind
+
+import '@/assets/icon/iconfont.css'
 
 import App from './App'
 import store from './store'

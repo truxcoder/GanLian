@@ -1,11 +1,10 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-01 16:25:23
- * @LastEditTime: 2022-03-04 14:38:39
+ * @LastEditTime: 2022-04-19 21:47:55
  * @LastEditors: truxcoder
  * @Description:
  */
-import { getPersonnelName } from '@/api/personnel'
 import { request } from '@/api'
 const state = {
   personnelOptions: [],
@@ -24,8 +23,8 @@ const mutations = {
 const actions = {
   changePerOptions({ commit, rootGetters }) {
     return new Promise((resolve, reject) => {
-      const data = { personnelId: rootGetters.id, organId: rootGetters.organ }
-      getPersonnelName(data)
+      const data = { accountId: rootGetters.id, organId: rootGetters.organ }
+      request('personnel', 'base_list', data)
         .then(response => {
           const personnelOptions = response.data.map(item => {
             return {
@@ -42,7 +41,7 @@ const actions = {
     })
   },
   changePerDptMap({ commit }) {
-    request('user', 'organs').then(res => {
+    request('personnel', 'organs').then(res => {
       commit('CHANGE_PER_DPT_MAP', res.data)
     })
   }

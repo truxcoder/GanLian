@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-03-02 14:08:11
+ * @LastEditTime: 2022-04-11 11:40:16
  * @LastEditors: truxcoder
  * @Description: 出入境管理
 -->
@@ -12,20 +12,20 @@
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" :form-item-width="formItemWidth" />
       </el-form-item>
       <el-form-item label="所用证件" prop="passport">
-        <el-select v-model="searchForm.passport" size="small" filterable allow-create placeholder="请选择证件">
+        <el-select v-model="searchForm.passport" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择证件">
           <el-option v-for="i in options.passport" :key="i.vaule" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="出境事由" prop="aim">
-        <el-select v-model="searchForm.aim" size="small" filterable allow-create placeholder="请选择或输入出境事由">
+        <el-select v-model="searchForm.aim" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择或输入事由">
           <el-option v-for="(v, i) in options.aim" :key="i" :label="v" :value="v" />
         </el-select>
       </el-form-item>
       <el-form-item label="是否报备" prop="isReport">
-        <el-select v-model="searchForm.isReport" size="small">
+        <el-select v-model="searchForm.isReport" :style="formItemWidth" size="small">
           <el-option v-for="i in options.isReport" :key="i.vaule" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
@@ -86,8 +86,8 @@
 
       <el-table-column align="center" label="操作" width="160">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -130,6 +130,7 @@ export default {
       queryMeans: 'backend',
       originData: [],
       currentData: [],
+      formItemWidth: { width: '170px' },
       searchForm: { personnelId: '', passport: '', aim: '', isReport: '' }
     }
   },
@@ -171,6 +172,9 @@ export default {
           this.currentData = []
           this.count = 0
         }
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

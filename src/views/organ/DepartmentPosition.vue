@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-11 17:03:21
- * @LastEditTime: 2022-03-28 11:40:56
+ * @LastEditTime: 2022-04-01 15:30:49
  * @LastEditors: truxcoder
  * @Description: 机构职数管理
 -->
@@ -13,10 +13,10 @@
         :data="queryMeans === 'backend' ? currentData : currentPageData"
         element-loading-text="Loading"
         stripe
+        :height="height"
         :fit="true"
         highlight-current-row
       >
-        <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="名称" prop="shortName" />
         <el-table-column align="center" label="正处(占用数/编制数)">
           <template slot-scope="scope">
@@ -55,7 +55,7 @@
             <el-input v-else v-model.number="form.fk" size="mini" class=" w-14" />
           </template>
         </el-table-column>
-        <el-table-column v-if="can.manage && can.global" align="center" label="操作">
+        <el-table-column v-if="can.manage" align="center" label="操作">
           <template slot-scope="scope">
             <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" @click="onUpdateSubmit(scope.$index, scope.row)">确定</el-button>
             <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
@@ -63,19 +63,6 @@
         </el-table-column>
       </el-table>
     </div>
-
-    <el-pagination
-      v-if="total"
-      class="pagination"
-      background
-      :current-page="currentPage"
-      :page-sizes="[10, 20, 40]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
   </div>
 </template>
 
@@ -110,6 +97,16 @@ export default {
         map[i.organId] = i
       })
       return map
+    },
+    currentPageData() {
+      if (this.can.global) {
+        // return this.currentData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+        return this.currentData
+      }
+      return this.currentData.filter(item => item.id === this.$store.getters.organ)
+    },
+    height() {
+      return window.window.innerHeight - 100
     }
   },
   created() {
@@ -147,9 +144,12 @@ export default {
       this.dialogLoading = true
       request('department', 'update', data, params).then(response => {
         this.$message.success(response.message)
+        if (this.can.global) {
+          this.$set(row, 'position', position)
+        } else {
+          this.fetchData()
+        }
 
-        const current = this.currentData[index + (this.currentPage - 1) * this.pageSize]
-        this.$set(current, 'position', position)
         this.resetUpdateForm()
         this.dialogLoading = false
       })

@@ -81,6 +81,10 @@ export default {
     onSubmit() {
       this.$refs.addForm.validate(valid => {
         if (valid) {
+          if (this.currentData.map(i => i.name).includes(this.form.name)) {
+            this.$message.error('有重复的角色名')
+            return false
+          }
           this.dialogLoading = true
           roleDictAdd(this.form)
             .then(response => {
@@ -105,6 +109,10 @@ export default {
     onUpdateSubmit(row) {
       if (this.updateForm.name === '' || this.updateForm.title === '') {
         this.$message.error('所有字段都不能为空')
+        return false
+      }
+      if (this.currentData.map(i => i.name).includes(this.updateForm.name) && this.updateForm.name !== row.name) {
+        this.$message.error('有重复的角色名')
         return false
       }
       if (this.updateForm.name === row.name && this.updateForm.title === row.title) {

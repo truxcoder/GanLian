@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-09 12:43:53
- * @LastEditTime: 2022-03-16 21:27:29
+ * @LastEditTime: 2022-04-19 21:08:15
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -82,11 +82,11 @@ export default {
     this.actCheck()
       .then(() => this.check('DetailBasic'))
       .then(() => {
-        if (this.id === this.$store.getters.id || this.can.global) {
+        if (this.id === this.$store.getters.personnelId || this.can.global) {
           this.fetchData()
           return
         } else {
-          request('user', 'organ', { id: this.id }).then(res => {
+          request('personnel', 'organ', { id: this.id }).then(res => {
             if (!res.data || res.data !== this.$store.getters.organ) {
               this.$message.error('你无权查看此人信息!')
               this.$router.push('/401')
@@ -99,22 +99,6 @@ export default {
       .catch(err => {
         this.$message.error(err)
       })
-
-    // this.check('DetailBasic').then(() => {
-    //   if (this.$route.query.id === this.$store.getters.id || this.can.global) {
-    //     this.fetchData()
-    //     return
-    //   } else {
-    //     request('user', 'organ', { id: this.$route.query.id }).then(res => {
-    //       if (!res.data || res.data !== this.$store.getters.organ) {
-    //         this.$message.error('你无权查看此人信息!')
-    //         this.$router.push('/401')
-    //         return
-    //       }
-    //       this.fetchData()
-    //     })
-    //   }
-    // })
   },
   methods: {
     fetchData() {

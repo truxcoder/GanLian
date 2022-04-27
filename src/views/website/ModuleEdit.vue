@@ -1,12 +1,13 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-29 17:16:17
+ * @LastEditTime: 2022-04-01 16:59:22
  * @LastEditors: truxcoder
  * @Description: 模块信息添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '模块信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+
     <el-form
       v-if="visible"
       ref="editForm"
@@ -43,12 +44,6 @@
       </el-form-item>
       <el-form-item label="图标" prop="icon">
         <IconPicker v-model="form.icon" :width="formItemWidth.width" />
-        <!-- <el-autocomplete v-model="form.icon" :style="formItemWidth" popper-class="iconList" :fetch-suggestions="querySearch" placeholder="请选择图标" @select="handleSelect">
-          <i slot="suffix" class="el-icon-edit" />
-          <template slot-scope="{ item }">
-            <i class="iconItem" :class="item.value" />
-          </template>
-        </el-autocomplete> -->
       </el-form-item>
       <el-form-item label="父模块" prop="parent">
         <el-select v-model="form.parent" :style="formItemWidth" placeholder="请选择父模块">

@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-03-16 21:30:05
+ * @LastEditTime: 2022-04-20 10:46:18
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
@@ -197,15 +197,37 @@ export { fullTimeEduDict, partTimeEduDict }
 //   '中央党校大学'
 // ]
 
-export const conclusionDict = ['优秀', '称职', '基本称职', '不称职', '不确定等次']
+// export const conclusionDict = ['优秀', '称职', '基本称职', '不称职', '不确定等次']
+export const conclusionDict = [
+  { value: '优秀', category: 1 },
+  { value: '称职', category: 1 },
+  { value: '基本称职', category: 1 },
+  { value: '不确定等次', category: 1 },
+  { value: '好', category: 2 },
+  { value: '较好', category: 2 },
+  { value: '一般', category: 2 },
+  { value: '较差', category: 2 }
+]
 export const aimDict = ['出差', '旅行', '学习']
 export const relationDict = ['妻子', '丈夫', '父亲', '母亲', '儿子', '女儿', '养父', '养母', '养子', '养女']
 export const seasonDict = [
-  { label: '年终', value: 5 },
-  { label: '一季度', value: 1 },
-  { label: '二季度', value: 2 },
-  { label: '三季度', value: 3 },
-  { label: '四季度', value: 4 }
+  { label: '年终', value: 100 },
+  { label: '一季度', value: 101 },
+  { label: '二季度', value: 102 },
+  { label: '三季度', value: 103 },
+  { label: '四季度', value: 104 },
+  { label: '一月', value: 1 },
+  { label: '二月', value: 2 },
+  { label: '三月', value: 3 },
+  { label: '四月', value: 4 },
+  { label: '五月', value: 5 },
+  { label: '六月', value: 6 },
+  { label: '七月', value: 7 },
+  { label: '八月', value: 8 },
+  { label: '九月', value: 9 },
+  { label: '十月', value: 10 },
+  { label: '十一月', value: 11 },
+  { label: '十二月', value: 12 }
 ]
 export const awardCategory = [
   { label: '年度奖励', value: 1 },
@@ -217,11 +239,11 @@ export const awardGrade = [
   { label: '二等功', value: 3, category: 1 },
   { label: '三等功', value: 4, category: 1 },
   { label: '嘉奖', value: 5, category: 1 },
-  { label: '国家级', value: 6, category: 2 },
-  { label: '省部级', value: 7, category: 2 },
-  { label: '市厅级', value: 8, category: 2 },
-  { label: '局级', value: 9, category: 2 },
-  { label: '所级', value: 10, category: 2 }
+  { label: '国家级', value: 20, category: 2 },
+  { label: '省部级', value: 21, category: 2 },
+  { label: '市厅级', value: 22, category: 2 },
+  { label: '局级', value: 23, category: 2 },
+  { label: '所级', value: 24, category: 2 }
 ]
 export const punishCategory = [
   { label: '组织处理', value: 1 },
@@ -233,9 +255,10 @@ export const punishGrade = [
   { label: '责令辞职', value: 3, category: 1 },
   { label: '降职', value: 4, category: 1 },
   { label: '免职', value: 5, category: 1 },
-  { label: '责令检查', value: 6, category: 2 },
-  { label: '批评教育', value: 7, category: 2 },
-  { label: '诫勉', value: 8, category: 2 }
+  { label: '责令检查', value: 20, category: 2 },
+  { label: '批评教育', value: 21, category: 2 },
+  { label: '诫勉', value: 22, category: 2 },
+  { label: '提醒', value: 23, category: 2 }
 ]
 export const eduCategory = [
   { label: '全日制', value: 1 },

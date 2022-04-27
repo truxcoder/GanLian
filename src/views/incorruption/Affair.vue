@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-03-16 15:24:00
+ * @LastEditTime: 2022-04-11 11:39:34
  * @LastEditors: truxcoder
  * @Description: 各类事项管理
 -->
@@ -12,7 +12,7 @@
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
@@ -50,9 +50,9 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleDetail(scope.row)">详情</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -149,6 +149,9 @@ export default {
           this.currentData = []
           this.count = 0
         }
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

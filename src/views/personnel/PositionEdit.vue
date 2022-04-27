@@ -1,13 +1,23 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-03 16:30:04
+ * @LastEditTime: 2022-04-12 12:14:47
  * @LastEditors: truxcoder
  * @Description: 职务添加编辑
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '职务信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="editForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="editForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="名称" prop="name">
         <el-input v-model="form.name" :style="formItemWidth" />
       </el-form-item>
@@ -35,7 +45,7 @@
 </template>
 
 <script>
-import { curd } from '@/api/index'
+import { request, curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import rules from '@/common/rules/position'
 export default {
@@ -89,7 +99,9 @@ export default {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          curd(this.action, this.form, { resource: this.resource })
+          request('position', 'check', this.form).then(res => {
+            return curd(this.action, this.form, { resource: this.resource })
+          })
             .then(response => {
               this.$message.success(response.message)
               this.dialogLoading = false

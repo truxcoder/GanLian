@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-29 15:23:07
+ * @LastEditTime: 2022-04-01 14:47:56
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -20,7 +20,7 @@
     >
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+        <PersonnelOption v-if="!isSingle" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" />
       </el-form-item>
       <el-form-item label="任职部门" prop="department">
         <el-select v-model="form.department" :style="formItemWidth" filterable allow-create placeholder="请选择或输入部门">

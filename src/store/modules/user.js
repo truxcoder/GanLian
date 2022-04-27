@@ -1,12 +1,13 @@
 import { logout } from '@/api/user'
 import { request } from '@/api/'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setUserID, getUserID } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     id: '',
+    personnelId: '',
     idCode: '',
     name: '',
     avatar: '',
@@ -26,6 +27,9 @@ const mutations = {
   },
   SET_ID: (state, id) => {
     state.id = id
+  },
+  SET_PERSONNEL_ID: (state, personnelId) => {
+    state.personnelId = personnelId
   },
   SET_IDCODE: (state, idCode) => {
     state.idCode = idCode
@@ -49,27 +53,30 @@ const actions = {
     console.log('---avatar:', avatar)
     commit('SET_AVATAR', avatar)
   },
-  // 测试单点认证
-  auth({ commit }, userInfo) {
-    const { id, name, roles } = userInfo
-    console.log('userInfo:', userInfo)
-    console.log('----roles:', roles)
-    commit('SET_TOKEN', id)
-    commit('SET_ID', id)
-    commit('SET_NAME', name)
-    commit('SET_AVATAR', id + '_mini.jpeg')
-    // commit('SET_ROLES', roles)
-    commit('SET_TEMP_ROLES', roles)
-    setToken(id)
-    return new Promise((resolve, reject) => {
-      resolve('admin-token')
-    })
-  },
+  // // 测试单点认证
+  // auth({ commit }, userInfo) {
+  //   const { id, name, roles } = userInfo
+  //   console.log('userInfo:', userInfo)
+  //   console.log('----roles:', roles)
+  //   commit('SET_TOKEN', id)
+  //   commit('SET_ID', id)
+  //   commit('SET_ID', id)
+  //   commit('SET_NAME', name)
+  //   commit('SET_AVATAR', id + '_mini.jpeg')
+  //   // commit('SET_ROLES', roles)
+  //   commit('SET_TEMP_ROLES', roles)
+  //   setToken(id)
+  //   return new Promise((resolve, reject) => {
+  //     resolve('admin-token')
+  //   })
+  // },
   // user login
-  login({ commit }, token) {
+  login({ commit }, data) {
     return new Promise((resolve, reject) => {
-      commit('SET_TOKEN', token)
-      setToken(token)
+      commit('SET_TOKEN', data.token)
+      commit('SET_ID', data.id)
+      setToken(data.token)
+      setUserID(data.id)
       resolve()
     })
   },
@@ -77,20 +84,22 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      const token = state.token
-      request('user', 'info', { id: token })
+      // const token = state.token
+      const userId = getUserID()
+      request('user', 'info', { id: userId })
         .then(response => {
           const { data } = response
           if (!data) {
             return reject('验证失败，请重新登录。')
           }
-          const { id, roles, name, organ, idCode } = data
+          const { id, personnelId, roles, name, organ, idCode } = data
           // roles must be a non-empty array
           if (!roles || roles.length <= 0) {
             reject('getInfo: roles 须为非空数组!')
           }
           commit('SET_ROLES', roles)
           commit('SET_ID', id)
+          commit('SET_PERSONNEL_ID', personnelId)
           commit('SET_IDCODE', idCode)
           commit('SET_NAME', name)
           commit('SET_ORGAN', organ)

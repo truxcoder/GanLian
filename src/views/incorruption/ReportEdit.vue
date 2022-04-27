@@ -1,18 +1,28 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-15 10:13:03
- * @LastEditTime: 2022-03-03 11:09:39
+ * @LastEditTime: 2022-04-20 14:53:43
  * @LastEditors: truxcoder
  * @Description: 添加和修改举报信息
 -->
 <template>
   <el-dialog v-loading="dialogLoading" :title="actName + '信访举报信息'" :width="dialogWidth" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form v-if="visible" ref="addForm" :inline="true" class="add-form" :model="form" :rules="rules" size="medium" :label-width="formLabelWidth" label-position="right">
+    <el-form
+      v-if="visible"
+      ref="addForm"
+      :inline="true"
+      class="add-form"
+      :model="form"
+      :rules="rules"
+      size="medium"
+      :label-width="formLabelWidth"
+      label-position="right"
+    >
       <el-form-item label="举报标题" prop="title">
         <el-input v-model="form.title" :style="formLineWidth" placeholder="请输入标题" />
       </el-form-item>
       <el-form-item label="涉及人员">
-        <person-multi-select :form-item-width="formLineWidth" :is-update="action === 'update'" :persons="persons" @personnelChange="onPersonnelChange" />
+        <PersonMultiSelect :form-item-width="formLineWidth" :is-update="action === 'update'" :persons="persons" @personnelChange="onPersonnelChange" />
       </el-form-item>
       <el-form-item label="受理时间" prop="reportTime">
         <el-date-picker v-model="form.reportTime" :style="formItemWidth" type="date" placeholder="选择日期" />

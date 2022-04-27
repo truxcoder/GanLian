@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-22 17:49:03
+ * @LastEditTime: 2022-04-20 10:12:33
  * @LastEditors: truxcoder
  * @Description:奖励信息，后端分页
 -->
@@ -12,7 +12,7 @@
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
       </el-form-item>
       <el-form-item label="类别" prop="category">
         <el-select v-model="searchForm.category" size="small" placeholder="类别">
@@ -67,7 +67,7 @@
       </el-table-column>
       <el-table-column label="奖励项/等级" align="center" width="120">
         <template slot-scope="scope">
-          {{ options.grade[scope.row.grade - 1] && options.grade[scope.row.grade - 1].label }}
+          {{ itemMap.get(scope.row.grade) }}
         </template>
       </el-table-column>
       <el-table-column label="奖励时间" align="center" width="150">
@@ -103,7 +103,7 @@
       @current-change="handleCurrentChange"
     />
     <AwardEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
-    <AwardDetail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
+    <AwardDetail :visible="detailVisible" :options="options" :row="rowData" :item-map="itemMap" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -145,6 +145,13 @@ export default {
     },
     gradeList() {
       return this.options.grade.filter(item => item.category === this.searchForm.category)
+    },
+    itemMap() {
+      const _map = new Map()
+      awardGrade.forEach(item => {
+        _map.set(item.value, item.label)
+      })
+      return _map
     }
   },
   created() {
@@ -166,6 +173,9 @@ export default {
           this.currentData = []
           this.count = 0
         }
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

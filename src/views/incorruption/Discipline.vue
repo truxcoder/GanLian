@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-03-22 17:49:42
+ * @LastEditTime: 2022-04-18 10:49:13
  * @LastEditors: truxcoder
  * @Description:处分，前端分页
 -->
@@ -9,7 +9,7 @@
   <div class="app-container">
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
       </el-form-item>
       <el-form-item label="类别" prop="category">
         <el-select v-model="searchForm.category" size="small" placeholder="类别">
@@ -153,7 +153,8 @@ export default {
     options() {
       const categoryOptions = [
         { label: '党纪处分', value: 1 },
-        { label: '政务处分', value: 2 }
+        { label: '政务处分', value: 2 },
+        { label: '处分', value: 3 }
       ]
       return {
         category: categoryOptions
@@ -178,6 +179,9 @@ export default {
         this.currentData = this.originData.length ? [...this.originData] : []
 
         this.disDict = responses[1].data
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

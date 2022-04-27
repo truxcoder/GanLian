@@ -80,19 +80,7 @@ const values = {
     { value: '珞巴族' },
     { value: '基诺族' }
   ],
-  fullTimeEdu: [
-    { value: '博士研究生' },
-    { value: '硕士研究生' },
-    { value: '博士' },
-    { value: '硕士' },
-    { value: '大学本科学士' },
-    { value: '大学本科' },
-    { value: '大学专科' },
-    { value: '中专' },
-    { value: '中技' },
-    { value: '高中' },
-    { value: '初中' }
-  ],
+  fullTimeEdu: [{ value: '博士研究生' }, { value: '硕士研究生' }, { value: '博士' }, { value: '硕士' }, { value: '大学本科学士' }, { value: '大学本科' }, { value: '大学专科' }, { value: '中专' }, { value: '中技' }, { value: '高中' }, { value: '初中' }],
   partTimeEdu: [
     { value: '在职博士研究生' },
     { value: '在职硕士研究生' },
@@ -107,17 +95,7 @@ const values = {
     { value: '中央党校硕士研究生' },
     { value: '中央党校大学' }
   ],
-  ranks: [
-    { value: '三级警司' },
-    { value: '二级警司' },
-    { value: '一级警司' },
-    { value: '三级警督' },
-    { value: '二级警督' },
-    { value: '一级警督' },
-    { value: '三级警监' },
-    { value: '二级警监' },
-    { value: '一级警监' }
-  ],
+  ranks: [{ value: '三级警司' }, { value: '二级警司' }, { value: '一级警司' }, { value: '三级警督' }, { value: '二级警督' }, { value: '一级警督' }, { value: '三级警监' }, { value: '二级警监' }, { value: '一级警监' }],
   grades: [
     { value: '一级警务专员' },
     { value: '二级警务专员' },
@@ -143,31 +121,8 @@ const values = {
     { value: '一级科员' },
     { value: '二级科员' }
   ],
-  levels: [
-    { value: '正厅级' },
-    { value: '副厅级' },
-    { value: '正局级' },
-    { value: '副局级' },
-    { value: '正处级' },
-    { value: '副处级' },
-    { value: '正科级' },
-    { value: '副科级' },
-    { value: '科员级' },
-    { value: '办事员级' },
-    { value: '未确定' }
-  ],
-  subject: [
-    { value: '法学' },
-    { value: '新闻学' },
-    { value: '监狱学' },
-    { value: '汉语言文学' },
-    { value: '经济学' },
-    { value: '化学' },
-    { value: '数学' },
-    { value: '心理学' },
-    { value: '物理' },
-    { value: '医学' }
-  ],
+  levels: [{ value: '正厅级' }, { value: '副厅级' }, { value: '正局级' }, { value: '副局级' }, { value: '正处级' }, { value: '副处级' }, { value: '正科级' }, { value: '副科级' }, { value: '科员级' }, { value: '办事员级' }, { value: '未确定' }],
+  subject: [{ value: '法学' }, { value: '新闻学' }, { value: '监狱学' }, { value: '汉语言文学' }, { value: '经济学' }, { value: '化学' }, { value: '数学' }, { value: '心理学' }, { value: '物理' }, { value: '医学' }],
   proCert: [{ value: '律师资格证' }, { value: '三级心理咨询师' }, { value: '二级心理咨询师' }, { value: '一级建造师' }, { value: '软件架构师' }, { value: '教师资格证' }]
 }
 

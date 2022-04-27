@@ -1,13 +1,14 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-01-17 13:18:23
+ * @LastEditTime: 2022-04-06 17:47:19
  * @LastEditors: truxcoder
  * @Description:
  */
 import Cookies from 'js-cookie'
 
 const TokenKey = 'role_token'
+const IDkey = 'user_id'
 
 export function getToken() {
   return Cookies.get(TokenKey)
@@ -31,6 +32,18 @@ export function setTicket(ticket) {
 
 export function removeTicket() {
   return Cookies.remove('ticket')
+}
+
+export function getUserID() {
+  return Cookies.get(IDkey)
+}
+
+export function setUserID(id) {
+  return Cookies.set(IDkey, id)
+}
+
+export function removeUserID() {
+  return Cookies.remove(IDkey)
 }
 
 /**

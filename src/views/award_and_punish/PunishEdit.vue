@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-15 19:41:34
+ * @LastEditTime: 2022-04-18 10:39:37
  * @LastEditors: truxcoder
  * @Description: 处理信息添加编辑
 -->
@@ -20,7 +20,7 @@
     >
       <el-form-item label="姓名" prop="personnelId">
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" @personnelChange="onPersonnelChange" />
+        <PersonnelOption v-if="!isSingle" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" />
       </el-form-item>
       <el-form-item label="分类" prop="category">
         <el-select v-model="form.category" :style="formItemWidth" placeholder="请选择分类" @change="onCategoryChange">
@@ -41,8 +41,12 @@
         <el-input v-model="form.docNumber" :style="formItemWidth" placeholder="输入文号" />
       </el-form-item>
 
+      <el-form-item label="决定机关" prop="organ">
+        <el-input v-model="form.organ" :style="formItemWidth" placeholder="输入决定机关" />
+      </el-form-item>
+
       <el-form-item label="处理内容" prop="content">
-        <el-input v-model="form.content" :style="formItemWidth" placeholder="输入处理内容" />
+        <el-input v-model="form.content" :style="formTextAreaWidth" placeholder="输入处理内容" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -64,7 +68,7 @@ export default {
   data() {
     return {
       resource: 'punish',
-      form: { personnelId: '', category: '', getTime: '', grade: '', content: '', docNumber: '' },
+      form: { personnelId: '', category: '', getTime: '', grade: '', content: '', docNumber: '', organ: '' },
       rules
     }
   },
@@ -84,7 +88,7 @@ export default {
           this.form.id = this.row.id
         }
       } else {
-        this.form = { personnelId: '', category: '', getTime: '', grade: '', content: '', docNumber: '' }
+        this.form = { personnelId: '', category: '', getTime: '', grade: '', content: '', docNumber: '', organ: '' }
         this.$refs.editForm.resetFields()
       }
     }

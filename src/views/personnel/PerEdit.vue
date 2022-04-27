@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-08 16:58:13
+ * @LastEditTime: 2022-04-15 14:37:47
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -184,7 +184,7 @@ export default {
           // this.modelDateKeys.forEach(item => {
           //   this.form[item] = this.form[item] ?? firstDay
           // })
-          setDateFieldZero(this.form, this.modelDateKeys)
+          // setDateFieldZero(this.form, this.modelDateKeys)
           curd(this.action, this.form, { resource: this.resource })
             .then(response => {
               this.$message.success(response.message)
