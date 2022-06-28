@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-01-10 18:32:41
+ * @LastEditTime: 2022-04-28 16:27:04
  * @LastEditors: truxcoder
  * @Description: 删除数据mixin
  */
@@ -30,7 +30,8 @@ export const delete_mixin = {
                 message: response.message,
                 type: 'success'
               })
-              this.fetchData()
+              // this.fetchData()
+              this.fetchData(this.searchData, this.queryParam)
             })
             .catch(err => {
               // this.$message.error(err.message)
@@ -57,7 +58,8 @@ export const delete_mixin = {
                 message: response.message,
                 type: 'success'
               })
-              this.fetchData()
+              // this.fetchData()
+              this.fetchData(this.searchData, this.queryParam)
             })
             .catch(err => {
               // this.$message.error(err.message)

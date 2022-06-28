@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 10:24:13
- * @LastEditTime: 2022-04-19 21:34:14
+ * @LastEditTime: 2022-06-23 14:16:39
  * @LastEditors: truxcoder
  * @Description: 培训选择人员页面
 -->
@@ -92,7 +92,7 @@ export default {
       return map
     },
     finalData() {
-      return this.selectData.length > 0 ? this.selectData.map(item => this.personnelMap[item].name).join(', ') : '无数据'
+      return this.selectData.length > 0 ? this.selectData.filter(item => item in this.personnelMap).map(item => this.personnelMap[item].name).join(', ') : '无数据'
     }
   },
   watch: {
@@ -131,7 +131,6 @@ export default {
       })
     },
     nodeClick(id) {
-      console.log('---id:', id)
       const levelCode = this.departmentMap[id]?.levelCode ?? ''
       const dep = this.$store.getters.departments.filter(item => item.levelCode.indexOf(levelCode) > -1).map(item => item.id)
       this.currentData = this.originData.filter(item => dep.includes(item.departmentId))

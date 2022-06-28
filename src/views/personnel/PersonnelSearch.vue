@@ -1,6 +1,6 @@
 <template>
   <el-drawer title="人员信息高级检索" :visible.sync="visible" :size="1250" :wrapper-closable="false" :show-close="false">
-    <div class="px-8 mb-4">
+    <div class="search-container px-8 mb-4">
       <el-form
         v-if="visible"
         ref="searchForm"
@@ -37,16 +37,14 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="民族" prop="nation">
-              <el-select v-model="form.nation" :style="leftColumn" multiple>
-                <el-option v-for="i in nationOption" :key="i" :label="i" :value="i" />
+            <el-form-item label="所属单位" prop="organId">
+              <el-select v-model="form.organId" :disabled="!can.global" :style="leftColumn" multiple placeholder="请选择单位">
+                <el-option v-for="i in organOption" :key="i.id" :label="i.shortName" :value="i.id" />
               </el-select>
             </el-form-item>
-            <el-form-item label="岗位是否涉密" prop="isSecret">
-              <!-- <el-radio v-model="form.isSecret" label="是">是</el-radio>
-              <el-radio v-model="form.isSecret" label="否">否</el-radio> -->
-              <el-select v-model="form.isSecret" :style="threeColumn">
-                <el-option v-for="i in YesOrNo" :key="i.value" :label="i.label" :value="i.value" />
+            <el-form-item label="民族" prop="nation">
+              <el-select v-model="form.nation" :style="threeColumn" multiple>
+                <el-option v-for="i in nationOption" :key="i" :label="i" :value="i" />
               </el-select>
             </el-form-item>
             <el-form-item label="是否持有护照" prop="hasPassport">
@@ -55,24 +53,6 @@
               <el-select v-model="form.hasPassport" :style="threeColumn">
                 <el-option v-for="i in YesOrNo" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
-            </el-form-item>
-
-            <el-form-item label="所属单位" prop="organId">
-              <el-select v-model="form.organId" :disabled="!can.global" :style="leftColumn" multiple placeholder="请选择单位">
-                <el-option v-for="i in organOption" :key="i.id" :label="i.shortName" :value="i.id" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="全日制教育学历" prop="fullTimeEdu">
-              <el-select v-model="form.fullTimeEdu" :style="threeColumn" multiple>
-                <el-option v-for="i in fullTimeEduOption" :key="i" :label="i" :value="i" />
-              </el-select>
-            <!-- <el-autocomplete v-model="form.fullTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryFullTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
-            </el-form-item>
-            <el-form-item label="全日制教育专业" prop="fullTimeMajor">
-              <el-select v-model="form.fullTimeMajor" :style="threeColumn" filterable allow-create multiple :filter-method="subjectFilter" placeholder="请输入关键字">
-                <el-option v-for="i in subjectOption" :key="i" :label="i" :value="i" />
-              </el-select>
-            <!-- <el-autocomplete v-model="form.fullTimeMajor" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.querySubject" placeholder="请输入内容" @select="handleSelect" /> -->
             </el-form-item>
 
             <el-form-item label="工龄">
@@ -84,16 +64,43 @@
                 <template slot="append">年</template>
               </el-input>
             </el-form-item>
-            <el-form-item label="非全日制教育学历" prop="partTimeEdu">
-              <el-select v-model="form.partTimeEdu" :style="threeColumn" multiple>
-                <el-option v-for="i in partTimeEduOption" :key="i" :label="i" :value="i" />
+            <el-form-item label="岗位是否涉密" prop="isSecret">
+              <!-- <el-radio v-model="form.isSecret" label="是">是</el-radio>
+              <el-radio v-model="form.isSecret" label="否">否</el-radio> -->
+              <el-select v-model="form.isSecret" :style="threeColumn">
+                <el-option v-for="i in YesOrNo" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
-            <!-- <el-autocomplete v-model="form.partTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryPartTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
             </el-form-item>
-            <el-form-item label="非全日制教育专业" prop="partTimeMajor">
-              <el-select v-model="form.partTimeMajor" :style="threeColumn" filterable allow-create multiple :filter-method="subjectFilter" placeholder="请输入关键字">
+            <el-form-item label="健康状况" prop="health">
+              <el-input v-model="form.health" :style="threeColumn" placeholder="请输入健康状况" />
+            </el-form-item>
+
+            <el-form-item label="全日制教育学历" prop="fullTimeEdu">
+              <el-cascader v-model="form.fullTimeEdu" :style="leftColumn" :options="eduOptions" :show-all-levels="false" :props="cascaderProps" />
+            <!-- <el-autocomplete v-model="form.fullTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryFullTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
+            </el-form-item>
+            <el-form-item label="全日制教育学位" prop="fullTimeDegree">
+              <el-cascader v-model="form.fullTimeDegree" :style="threeColumn" :options="degreeOptions" filterable :show-all-levels="false" :props="cascaderProps" />
+            </el-form-item>
+            <el-form-item label="全日制教育专业" prop="fullTimeMajor">
+              <el-select v-model="form.fullTimeMajor" :style="threeColumn" filterable allow-create multiple :filter-method="subjectFilter" placeholder="请输入关键字">
                 <el-option v-for="i in subjectOption" :key="i" :label="i" :value="i" />
               </el-select>
+            <!-- <el-autocomplete v-model="form.fullTimeMajor" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.querySubject" placeholder="请输入内容" @select="handleSelect" /> -->
+            </el-form-item>
+
+            <el-form-item label="最高教育学历" prop="finalEdu">
+              <el-cascader v-model="form.finalEdu" :style="leftColumn" :options="eduOptions" :show-all-levels="false" :props="cascaderProps" />
+            <!-- <el-autocomplete v-model="form.fullTimeEdu" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.queryFullTimeEdu" placeholder="请输入内容" @select="handleSelect" /> -->
+            </el-form-item>
+            <el-form-item label="最高教育学位" prop="finalDegree">
+              <el-cascader v-model="form.finalDegree" :style="threeColumn" :options="degreeOptions" filterable :show-all-levels="false" :props="cascaderProps" />
+            </el-form-item>
+            <el-form-item label="最高教育专业" prop="finalMajor">
+              <el-select v-model="form.finalMajor" :style="threeColumn" filterable allow-create multiple :filter-method="subjectFilter" placeholder="请输入关键字">
+                <el-option v-for="i in subjectOption" :key="i" :label="i" :value="i" />
+              </el-select>
+            <!-- <el-autocomplete v-model="form.fullTimeMajor" :style="formItemWidth" class="inline-input" :fetch-suggestions="suggestions.querySubject" placeholder="请输入内容" @select="handleSelect" /> -->
             </el-form-item>
 
             <el-form-item label="考核有称职以下等次" prop="hasAppraisalIncompetent">
@@ -105,12 +112,12 @@
             </el-form-item>
             <el-form-item label="组织奖励" prop="award">
               <el-select v-model="form.award" :style="threeColumn" multiple>
-                <el-option v-for="i in awardOption" :key="i.vaule" :label="i.label" :value="i.value" />
+                <el-option v-for="i in awardOption" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
             </el-form-item>
             <el-form-item label="组织处理" prop="punish">
               <el-select v-model="form.punish" :style="threeColumn" multiple>
-                <el-option v-for="i in punishOption" :key="i.vaule" :label="i.label" :value="i.value" />
+                <el-option v-for="i in punishOption" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
             </el-form-item>
 
@@ -121,11 +128,9 @@
                 <el-option v-for="i in YesOrNo" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
             </el-form-item>
-            <el-form-item label="健康状况" prop="health">
-              <el-input v-model="form.health" :style="threeColumn" placeholder="请输入健康状况" />
-            </el-form-item>
+
             <el-form-item label="取得专业证书情况" prop="proCert">
-              <el-select v-model="form.proCert" :style="threeColumn" multiple filterable allow-create>
+              <el-select v-model="form.proCert" :style="twoColumn" multiple filterable allow-create>
                 <el-option v-for="i in proCertOption" :key="i" :label="i" :value="i" />
               </el-select>
             </el-form-item>
@@ -159,9 +164,11 @@
               </el-select>
             </el-form-item>
             <el-form-item label="两个以上任职经历" prop="twoPost">
-              <el-select v-model="form.twoPost" :style="threeColumn">
+              <!-- <el-select v-model="form.twoPost" :style="threeColumn">
                 <el-option v-for="i in YesOrNo" :key="i.value" :label="i.label" :value="i.value" />
-              </el-select>
+              </el-select> -->
+              <el-cascader v-model="form.twoPost" :style="threeColumn" :options="twoPostOption" filterable :show-all-levels="false" :props="cascaderProps" />
+
             </el-form-item>
           </el-collapse-item>
 
@@ -229,6 +236,7 @@ import { isEmpty } from '@/utils/validate'
 import { suggestions } from '@/common/model/suggestions'
 import { nationDict, politicalDict, proCertDict, fullTimeEduDict, partTimeEduDict, awardGrade, punishGrade } from '@/utils/dict'
 import { subjectDict } from '@/utils/subject_dict'
+import { eduOptions, degreeOptions } from '@/utils/dict_edu'
 
 import { request, curd } from '@/api/index'
 export default {
@@ -268,9 +276,11 @@ export default {
         nation: [],
         political: [],
         fullTimeEdu: [],
+        fullTimeDegree: [],
         fullTimeMajor: [],
-        partTimeEdu: [],
-        partTimeMajor: [],
+        finalEdu: [],
+        finalDegree: [],
+        finalMajor: [],
         organId: [],
         positionId: [],
         level: [],
@@ -311,9 +321,13 @@ export default {
       proCertOption: proCertDict,
       fullTimeEduOption: fullTimeEduDict,
       partTimeEduOption: partTimeEduDict,
+      eduOptions: eduOptions,
+      degreeOptions: degreeOptions,
       fullTimeMajorOption: subjectDict,
       awardOption: awardGrade,
       punishOption: punishGrade,
+      cascaderProps: { expandTrigger: 'hover', emitPath: false, multiple: true },
+      twoPostOption: [],
       pickerOptions: {
         shortcuts: [
           {
@@ -358,6 +372,24 @@ export default {
       return this.positionData.map(item => {
         return { label: item.name + ' 〔' + item.levelName + '〕', value: item.id }
       })
+    }
+  },
+  watch: {
+    visible: function(val, oldval) {
+      if (val === true && this.twoPostOption.length === 0) {
+        this.twoPostOption = this.getTwoPostOption()
+      }
+    },
+    'form.twoPost'(val, oldval) {
+      if (val.includes('不限')) {
+        this.twoPostOption[1].disabled = true
+      } else if (Array.isArray(val) && val.length > 0 && !val.includes('不限')) {
+        this.twoPostOption[0].disabled = true
+      } else if (Array.isArray(val) && val.length === 0) {
+        this.twoPostOption.forEach(i => {
+          i.disabled = false
+        })
+      }
     }
   },
   created() {
@@ -561,9 +593,26 @@ export default {
         }
       }
       return temp
+    },
+    getTwoPostOption() {
+      return [
+        { label: '不限', value: '不限', disabled: false },
+        {
+          label: '职务',
+          value: '职务',
+          disabled: false,
+          children: this.levels.map(i => ({ label: i.name, value: i.id }))
+        }
+      ]
     }
   }
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.search-container ::v-deep .el-cascader__tags {
+  flex-wrap: nowrap!important;
+  overflow: hidden;
+}
+
+</style>

@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-03-07 17:30:09
- * @LastEditTime: 2022-03-29 15:22:18
+ * @LastEditTime: 2022-05-26 11:39:45
  * @LastEditors: truxcoder
  * @Description: 日期相关函数
  */
@@ -20,6 +20,9 @@ export function setDateFieldNull(form, fields) {
     return
   }
   fields.forEach(item => {
+    if (form[item] === '') {
+      form[item] = null
+    }
     form[item] = dayjs(form[item]).year() !== 1 ? form[item] : null
   })
 }

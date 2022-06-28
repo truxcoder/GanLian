@@ -4,17 +4,22 @@
       <el-form-item label="姓名" prop="personnelId">
         <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" :form-item-width="searchItemWidth" />
       </el-form-item>
-      <el-form-item label="单位" prop="organParam">
+      <!-- <el-form-item v-if="can.global" label="单位" prop="organParam">
         <OrganSelect v-model="searchForm.organParam" :width="searchItemWidth" />
+      </el-form-item> -->
+      <el-form-item v-if="can.global" label="单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" :style="searchItemWidth" multiple placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="年份" prop="years">
-        <el-select v-model="searchForm.years" size="small" :style="searchItemWidth" placeholder="请选择年份">
+        <el-select v-model="searchForm.years" size="small" :style="searchItemWidth" multiple placeholder="请选择年份">
           <el-option v-for="i in options.years" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="季度" prop="season">
-        <el-select v-model="searchForm.season" size="small" :style="searchItemWidth" placeholder="请选择季度">
+        <el-select v-model="searchForm.season" size="small" :style="searchItemWidth" multiple placeholder="请选择季度">
           <el-option v-for="i in options.season" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
@@ -48,13 +53,14 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column align="center" type="selection" width="55" />
+        <el-table-column align="center" label="单位" prop="organShortName" width="100" />
         <el-table-column align="center" label="人员">
           <template slot-scope="scope">
             <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
           </template>
         </el-table-column>
         <el-table-column align="center" label="警号/工号" prop="policeCode" />
-        <el-table-column align="center" label="考核单位" prop="organShortName" />
+        <el-table-column align="center" label="考核单位" width="240" show-overflow-tooltip prop="organ" />
         <el-table-column align="center" label="考核年份" prop="years" />
         <el-table-column align="center" label="考核季度">
           <template slot-scope="scope">
@@ -101,12 +107,11 @@ import { conclusionDict, seasonDict } from '@/utils/dict'
 import AppraisalEdit from './AppraisalEdit.vue'
 import AppraisalBatchEdit from './AppraisalBatchEdit.vue'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
-
-import OrganSelect from '@/components/department/OrganSelect.vue'
+import isEmpty from 'lodash/isEmpty'
 
 export default {
   name: 'Appraisal',
-  components: { AppraisalEdit, AppraisalBatchEdit, PersonnelOption, OrganSelect },
+  components: { AppraisalEdit, AppraisalBatchEdit, PersonnelOption },
   mixins: [common_mixin, delete_mixin, list_mixin, permission_mixin, search_mixin],
   data() {
     return {
@@ -146,14 +151,23 @@ export default {
     },
     conclusionList() {
       return conclusionDict.filter(item => {
-        switch (this.searchForm.season) {
-          case 100:
-            return item.category === 1
-          case '':
-            return true
-          default:
-            return item.category === 2
+        if (isEmpty(this.searchForm.season)) {
+          return false
+        } else if (this.searchForm.season.length === 1 && this.searchForm.season[0] === 100) {
+          return item.category === 1
+        } else if (!this.searchForm.season.includes(100)) {
+          return item.category === 2
+        } else {
+          return true
         }
+        // switch (this.searchForm.season) {
+        //   case 100:
+        //     return item.category === 1
+        //   case '':
+        //     return false
+        //   default:
+        //     return item.category === 2
+        // }
       })
     },
     itemMap() {

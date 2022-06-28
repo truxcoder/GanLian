@@ -10,7 +10,7 @@
         <el-input v-model="searchForm.name" :style="formItemWidth" size="small" placeholder="姓名" />
       </el-form-item>
       <el-form-item label="登录名" prop="username">
-        <el-input v-model="searchForm.username" :style="formItemWidth" size="small" placeholder="姓名" />
+        <el-input v-model="searchForm.username" :style="formItemWidth" size="small" placeholder="登录名" />
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="searchForm.userType" :style="formItemWidth" size="small" placeholder="请选择用户类型">

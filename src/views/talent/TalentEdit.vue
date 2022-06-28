@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-03-29 16:54:45
+ * @LastEditTime: 2022-05-26 11:45:28
  * @LastEditors: truxcoder
  * @Description: 人才信息添加编辑
 -->
@@ -18,14 +18,17 @@
       label-position="right"
     >
       <el-form-item label="姓名" prop="personnelId">
-        <el-input v-if="isSingle" :style="formLineWidth" :value="singlePersonnelData.name" disabled />
-        <personnel-option v-if="!isSingle" :rowdata="row" :is-update="action === 'update'" :form-item-width="formLineWidth" @personnelChange="onPersonnelChange" />
+        <el-input v-if="action === 'update'" :style="formLineWidth" :value="row.personnelName" disabled />
+        <PersonnelOption v-if="action === 'add'" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formLineWidth" />
       </el-form-item>
-      <el-form-item label="技能" prop="skill">
-        <el-input v-model="form.skill" :style="formLineWidth" />
+      <el-form-item label="获得考官证时间" prop="beExaminerDay">
+        <el-date-picker v-model="form.beExaminerDay" :style="formLineWidth" type="date" placeholder="请选择日期" />
       </el-form-item>
-      <el-form-item label="测试">
-        <IconPicker v-model="kkkkk" :width="formItemWidth.width" />
+      <el-form-item label="岗位标签" prop="skill">
+        <!-- <el-input v-model="form.skill" :style="formLineWidth" /> -->
+        <el-select v-model="form.skill" :style="formLineWidth" filterable allow-create multiple placeholder="请选择或输入岗位标签">
+          <el-option v-for="i in talentSkillOption" :key="i.value" :label="i.label" :value="i.value" />
+        </el-select>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -40,12 +43,12 @@ import { request, curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import rules from '@/common/rules/post'
-
-import IconPicker from '@/components/SvgIcon/IconPicker.vue'
+import { talentSkillOption } from '@/utils/talent'
+import { setDateFieldNull } from '@/utils/date'
 
 export default {
   name: 'TalentEdit',
-  components: { PersonnelOption, IconPicker },
+  components: { PersonnelOption },
   mixins: [edit_mixin],
   props: {
     category: {
@@ -56,28 +59,31 @@ export default {
   data() {
     return {
       resource: 'talent',
-      form: { personnelId: '', skill: '', category: 0 },
-      rules,
-      kkkkk: ''
+      form: { personnelId: '', skill: '', category: 0, beExaminerDay: '' },
+      rules
     }
   },
   computed: {
+    talentSkillOption() {
+      return talentSkillOption.filter(i => i.category === this.category)
+    }
   },
   watch: {
     visible: function(val, oldval) {
       if (val === true) {
         this.form.personnelId = this.singlePersonnelData?.id ?? ''
-        this.kkkkk = ''
         if (this.action === 'update') {
           for (const key in this.form) {
             this.form[key] = this.row[key]
           }
           this.form.id = this.row.id
+          this.form.skill = JSON.parse(this.row.skill)
         } else {
           this.form.category = this.category
         }
+        setDateFieldNull(this.form, ['beExaminerDay'])
       } else {
-        this.form = { personnelId: '', skill: '', category: 0 }
+        this.form = { personnelId: '', skill: '', category: 0, beExaminerDay: '' }
         this.$refs.editForm.resetFields()
       }
     }
@@ -87,6 +93,7 @@ export default {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
+          this.form.skill = JSON.stringify(this.form.skill)
           const promise = this.action === 'add' ? request(this.resource, this.action, this.form) : curd(this.action, this.form, { resource: this.resource })
           promise.then(response => {
             this.$message.success(response.message)

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-01 14:47:56
+ * @LastEditTime: 2022-05-26 10:26:22
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item label="任职部门" prop="department">
         <el-select v-model="form.department" :style="formItemWidth" filterable allow-create placeholder="请选择或输入部门">
-          <el-option v-for="i in op.department" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in op.department" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
@@ -36,13 +36,13 @@
 
       <el-form-item label="所任职务" prop="positionId">
         <el-select v-model="form.positionId" :style="formItemWidth" filterable placeholder="请选择职务">
-          <el-option v-for="i in op.position" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in op.position" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="所任级别" prop="levelId">
         <el-select v-model="form.levelId" :style="formItemWidth" filterable disabled placeholder="请选择级别">
-          <el-option v-for="i in op.level" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in op.level" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 

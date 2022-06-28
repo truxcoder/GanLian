@@ -23,17 +23,13 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="标题" min-width="300" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="涉及人员" min-width="100">
+      <el-table-column align="left" label="标题" min-width="300" show-overflow-tooltip prop="title" />
+      <el-table-column align="center" label="涉及人员" min-width="100" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.personnels | personList }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="当前阶段" width="120">
+      <el-table-column align="center" label="当前阶段" width="150">
         <template slot-scope="scope">
           {{ scope.row.step | stepFilter }}
         </template>

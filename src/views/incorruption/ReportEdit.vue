@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-15 10:13:03
- * @LastEditTime: 2022-04-20 14:53:43
+ * @LastEditTime: 2022-04-28 15:15:44
  * @LastEditors: truxcoder
  * @Description: 添加和修改举报信息
 -->
@@ -33,7 +33,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="举报内容简介" prop="intro">
+      <el-form-item label="举报处置情况" prop="intro">
         <el-input v-model="form.intro" :style="formTextAreaWidth" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="输入处理内容" />
       </el-form-item>
     </el-form>

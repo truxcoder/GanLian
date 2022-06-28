@@ -39,6 +39,10 @@ const Affair = () => import('@/views/incorruption/Affair')
 const Account = () => import('@/views/system/Account')
 
 const PersonnelDisabled = () => import('@/views/system/PersonnelDisabled')
+const Review = () => import('@/views/review/Review')
+const Feedback = () => import('@/views/review/Feedback')
+
+const Appointment = () => import('@/views/personnel/Appointment')
 
 export const componentList = {
   Personnel,
@@ -65,7 +69,10 @@ export const componentList = {
   EntryExit,
   Affair,
   Account,
-  PersonnelDisabled
+  PersonnelDisabled,
+  Review,
+  Feedback,
+  Appointment
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -201,6 +208,19 @@ export const constantRoutes = [
         name: 'TalentInformation',
         component: () => import('@/views/talent/Talent'),
         meta: { title: '信息化人才库', icon: 'dashboard' }
+      }
+    ]
+  },
+  {
+    path: '/talent',
+    component: TalentLayout,
+    hidden: true,
+    children: [
+      {
+        path: 'pick',
+        name: 'TalentPick',
+        component: () => import('@/views/talent/TalentPick'),
+        meta: { title: '人才抽取', icon: 'dashboard' }
       }
     ]
   },

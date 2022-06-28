@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-03-16 21:35:07
+ * @LastEditTime: 2022-05-19 11:37:43
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -17,6 +17,15 @@ export const common_mixin = {
         return '今'
       }
       return dayjs(date).format('YYYY年MM月DD日')
+    },
+    dateMonthFilter(date) {
+      if (date === '') {
+        return '未录入'
+      }
+      if (dayjs(date).year() === 1) {
+        return '未录入'
+      }
+      return dayjs(date).format('YYYY年MM月')
     },
     deadlineFilter(date) {
       const now = dayjs()

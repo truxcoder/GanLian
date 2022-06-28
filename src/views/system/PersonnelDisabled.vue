@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-04-06 14:10:33
- * @LastEditTime: 2022-04-06 15:08:37
+ * @LastEditTime: 2022-06-16 15:18:37
  * @LastEditors: truxcoder
  * @Description: 禁用人员管理
 -->
@@ -58,8 +58,9 @@
       </el-table-column>
       <el-table-column align="center" label="姓名" prop="name" />
       <el-table-column align="center" label="身份" width="70">
-        <template slot-scope="scope">
-          {{ scope.row.userType === 1 ? '民警' : '辅警' }}
+        <template>
+          民警
+          <!-- {{ scope.row.userType === 1 ? '民警' : '辅警' }} -->
         </template>
       </el-table-column>
       <el-table-column align="center" width="100" label="警号/工号" prop="policeCode" :show-overflow-tooltip="true" />
@@ -96,7 +97,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import { request, curd, del } from '@/api'
+import { request, del } from '@/api'
 import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
@@ -111,7 +112,7 @@ export default {
   data() {
     return {
       resource: 'personnel',
-      queryMeans: 'backend',
+      queryMeans: 'frontend',
       originData: [],
       currentData: [],
       searchVisible: false,
@@ -143,24 +144,41 @@ export default {
       params.currentPage = this.currentPage
       params.pageSize = this.pageSize
       params.queryMeans = this.queryMeans
+      // if (!Object.keys(data).includes('organId')) {
+      //   data = { ...data, ...this.defaultSearchData }
+      // } else if (data.organId === '') {
+      //   data.organId = this.defaultSearchData.organId ?? ''
+      // }
+      const organId = this.can.global ? [] : [this.$store.getters.organ]
       if (!Object.keys(data).includes('organId')) {
-        data = { ...data, ...this.defaultSearchData }
-      } else if (data.organId === '') {
-        data.organId = this.defaultSearchData.organId ?? ''
+        data = { ...data, organId }
+      } else if (data.organId.length === 0) {
+        data.organId = organId
       }
       data = { ...data, status: false }
       request('personnel', 'list', data, params).then(response => {
-        if (response.count) {
+        if (response.data.length) {
           this.originData = response.data
           this.currentData = [...this.originData]
-          this.count = response.count
+          // this.count = response.count
           this.listLoading = false
         } else {
           this.originData = []
           this.currentData = []
-          this.count = 0
+          // this.count = 0
           this.listLoading = false
         }
+        // if (response.count) {
+        //   this.originData = response.data
+        //   this.currentData = [...this.originData]
+        //   this.count = response.count
+        //   this.listLoading = false
+        // } else {
+        //   this.originData = []
+        //   this.currentData = []
+        //   this.count = 0
+        //   this.listLoading = false
+        // }
       })
     },
     handleDetail(index, row) {
@@ -195,13 +213,14 @@ export default {
         })
     },
     handleDisable(row) {
-      this.$confirm('将禁用该人员, 是否确定?', '提示', {
+      const message = row.status ? '将禁用该人员, 是否确定?' : '将启用该人员, 是否确定?'
+      this.$confirm(message, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          curd('update', { id: row.id, status: !row.status }, { resource: 'personnel' })
+          request('personnel', 'update_status', { id: row.id, status: !row.status })
             .then(response => {
               this.$message.success(response.message)
               this.$set(row, 'status', !row.status)

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-04-20 10:04:26
+ * @LastEditTime: 2022-05-26 10:44:11
  * @LastEditors: truxcoder
  * @Description:组织处理，后端分页
 -->
@@ -11,17 +11,27 @@
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form-item v-if="can.global" label="单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" :style="searchItemWidth" multiple placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="姓名" prop="personnelId">
-        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" :form-item-width="searchNameWidth" size="small" />
       </el-form-item>
       <el-form-item label="类别" prop="category">
-        <el-select v-model="searchForm.category" size="small" placeholder="类别">
+        <el-select v-model="searchForm.category" size="small" :style="searchItemWidth" placeholder="类别">
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="处理项" prop="grade">
-        <el-select v-model="searchForm.grade" size="small" placeholder="请选择处理项">
+        <el-select v-model="searchForm.grade" size="small" :style="searchItemWidth" placeholder="请选择处理项">
           <el-option v-for="i in gradeList" :key="i.value" :label="i.label" :value="i.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="年份" prop="year">
+        <el-select v-model="searchForm.year" size="small" :style="searchItemWidth" placeholder="请选择年份">
+          <el-option v-for="i in options.years" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -50,11 +60,7 @@
           <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="警号/工号" width="100">
-        <template slot-scope="scope">
-          {{ scope.row.policeCode }}
-        </template>
-      </el-table-column>
+      <el-table-column align="center" label="警号/工号" width="100" prop="policeCode" />
       <el-table-column label="处理类型" align="center" width="120">
         <template slot-scope="scope">
           {{ options.category[scope.row.category - 1] && options.category[scope.row.category - 1].label }}
@@ -70,11 +76,7 @@
           {{ scope.row.getTime | dateFilter }}
         </template>
       </el-table-column>
-      <el-table-column label="处理文号" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.docNumber }}
-        </template>
-      </el-table-column>
+      <el-table-column label="处理文号" align="center" :show-overflow-tooltip="true" prop="docNumber" />
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
           <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
@@ -131,15 +133,25 @@ export default {
       originData: [],
       currentData: [],
       detailVisible: false,
-      searchForm: { personnelId: '', category: '', grade: '' }
+      searchItemWidth: { width: '155px' },
+      searchNameWidth: { width: '150px' },
+      searchForm: { personnelId: '', organParam: '', category: '', grade: '', year: '' }
     }
   },
   computed: {
+    organList() {
+      return this.$store.getters.organs
+    },
     options() {
       const categoryOptions = punishCategory
       const gradeOptions = punishGrade
+      const years = []
+      for (let index = 2010; index < 2030; index++) {
+        years.push({ label: index + '年', value: index })
+      }
       return {
         category: categoryOptions,
+        years,
         grade: gradeOptions
       }
     },
@@ -162,7 +174,8 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
+      this.interceptor(data)
       request(this.resource, 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
@@ -182,6 +195,11 @@ export default {
     handleDetail(row) {
       this.rowData = row
       this.detailVisible = true
+    },
+    interceptor(data) {
+      if ('year' in data) {
+        data.intercept = 'YEAR(punishes.get_time) = ' + data.year
+      }
     }
   }
 }

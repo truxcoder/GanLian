@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 11:23:18
- * @LastEditTime: 2022-04-20 10:36:37
+ * @LastEditTime: 2022-06-14 16:52:16
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -12,7 +12,7 @@
       <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
     <div v-if="currentData.length" class="mt-4">
-      <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
         <el-table-column align="center" label="考核年份">
           <template slot-scope="scope">{{ scope.row.years }}年</template>
@@ -24,7 +24,7 @@
           <template slot-scope="scope">{{ scope.row.conclusion }}</template>
         </el-table-column>
         <el-table-column align="center" label="考核单位">
-          <template slot-scope="scope">{{ scope.row.organName }}</template>
+          <template slot-scope="scope">{{ scope.row.organ }}</template>
         </el-table-column>
         <el-table-column v-if="canOperate" align="center" label="操作" width="240" fixed="right">
           <template slot-scope="scope">
@@ -33,6 +33,19 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        v-if="currentData.length"
+        class="pagination"
+        background
+        hide-on-single-page
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 40]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
     <AppraisalEdit
@@ -62,7 +75,9 @@ export default {
   data() {
     return {
       obj: 'DetailAppraisal',
-      resource: 'appraisal'
+      resource: 'appraisal',
+      currentPage: 1,
+      pageSize: 10
     }
   },
   computed: {
@@ -85,6 +100,12 @@ export default {
         _map.set(item.value, item.label)
       })
       return _map
+    },
+    total() {
+      return this.currentData.length
+    },
+    currentPageData() {
+      return this.currentData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
     }
   },
   created() {
@@ -92,8 +113,19 @@ export default {
       this.fetchData()
     })
   },
-  methods: {}
+  methods: {
+    handleSizeChange(size) {
+      this.pageSize = size
+    },
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage
+    }
+  }
 }
 </script>
 
-<style></style>
+<style scoped>
+.pagination {
+  margin-top: 10px;
+}
+</style>

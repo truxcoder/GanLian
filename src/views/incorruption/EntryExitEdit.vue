@@ -25,7 +25,7 @@
 
       <el-form-item label="所用证件" prop="passport">
         <el-select v-model="form.passport" :style="formItemWidth" filterable allow-create placeholder="请选择证件">
-          <el-option v-for="i in options.passport" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.passport" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
@@ -49,7 +49,7 @@
 
       <el-form-item label="是否报备" prop="isReport">
         <el-select v-model="form.isReport" :style="formItemWidth">
-          <el-option v-for="i in options.isReport" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.isReport" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
     </el-form>

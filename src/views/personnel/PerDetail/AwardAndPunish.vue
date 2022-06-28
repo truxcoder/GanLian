@@ -39,6 +39,7 @@
           <template slot-scope="scope">
             <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('award', 'update', scope.row)">编辑</el-button>
             <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row.id, 'award')">删除</el-button>
+            <el-button size="mini" type="primary" @click="handleDetail(scope.row, 'award')">详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -84,6 +85,7 @@
           <template slot-scope="scope">
             <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('punish', 'update', scope.row)">编辑</el-button>
             <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row.id, 'punish')">删除</el-button>
+            <el-button size="mini" type="primary" @click="handleDetail(scope.row, 'punish')">详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -110,6 +112,9 @@
       @editSuccess="editSuccess"
       @visibleChange="visibleChange"
     />
+    <AwardDetail :visible="awardDetailVisible" :options="awardOptions" :row="rowData" :item-map="awardMap" @visibleChange="visibleChange" />
+    <PunishDetail :visible="punishDetailVisible" :options="punishOptions" :row="rowData" :item-map="punishMap" @visibleChange="visibleChange" />
+
   </div>
 </template>
 
@@ -117,6 +122,8 @@
 import { awardCategory, awardGrade, punishCategory, punishGrade } from '@/utils/dict'
 import PunishEdit from '@/views/award_and_punish/PunishEdit.vue'
 import AwardEdit from '@/views/award_and_punish/AwardEdit.vue'
+import AwardDetail from '@/views/award_and_punish/AwardDetail.vue'
+import PunishDetail from '@/views/award_and_punish/PunishDetail.vue'
 import { permission_mixin } from '@/common/mixin/permission'
 
 import { request, curd } from '@/api/index'
@@ -125,7 +132,7 @@ import dayjs from 'dayjs'
 
 export default {
   name: 'AwardAndPunish',
-  components: { AwardEdit, PunishEdit },
+  components: { AwardEdit, PunishEdit, AwardDetail, PunishDetail },
   filters: {
     dateFilter(date) {
       if (dayjs(date).year() === 2100) {
@@ -154,6 +161,8 @@ export default {
       awardMultipleSelection: [],
       punishVisible: false,
       punishMultipleSelection: [],
+      awardDetailVisible: false,
+      punishDetailVisible: false,
       rowData: {},
       action: '',
       currentEditIndex: 0,
@@ -305,6 +314,17 @@ export default {
         this.awardVisible = true
       } else if (resource === 'punish') {
         this.punishVisible = true
+      }
+    },
+    handleDetail(row, resource) {
+      this.currentOperateCpn = resource + 'Detail'
+      const temp = { personnelName: this.baseData.name, policeCode: this.baseData.policeCode, organShortName: this.baseData.organShortName, ...row }
+      this.rowData = temp
+      if (resource === 'award') {
+        this.awardDetailVisible = true
+      }
+      if (resource === 'punish') {
+        this.punishDetailVisible = true
       }
     }
   }

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-04-26 09:08:56
- * @LastEditTime: 2022-04-27 10:10:59
+ * @LastEditTime: 2022-06-14 15:57:19
  * @LastEditors: truxcoder
  * @Description: 考核信息批量录入
 -->
@@ -34,21 +34,21 @@
             :label-width="formLabelWidth"
             label-position="right"
           >
-            <el-form-item label="考核单位" prop="organId">
-              <el-select v-model="form.organId" :style="formItemWidth" placeholder="请选择单位">
-                <el-option v-for="i in options.organ" :key="i.id" :label="i.shortName" :value="i.id" />
+            <el-form-item label="考核单位" prop="organ">
+              <el-select v-model="form.organ" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位全称">
+                <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.name" />
               </el-select>
             </el-form-item>
 
             <el-form-item label="考核年份" prop="years">
               <el-select v-model="form.years" :style="formItemWidth" placeholder="请选择考核年份">
-                <el-option v-for="i in options.years" :key="i.vaule" :label="i.label" :value="i.value" />
+                <el-option v-for="i in options.years" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
             </el-form-item>
 
             <el-form-item label="考核季度" prop="season">
               <el-select v-model="form.season" :style="formItemWidth" placeholder="请选择考核季度">
-                <el-option v-for="i in options.season" :key="i.vaule" :label="i.label" :value="i.value" />
+                <el-option v-for="i in options.season" :key="i.value" :label="i.label" :value="i.value" />
               </el-select>
             </el-form-item>
 
@@ -114,7 +114,7 @@ export default {
       formLineWidth: { width: '940px' },
       formItemWidth: { width: '280px' },
       formTextAreaWidth: { width: '940px' },
-      form: { organId: '', years: '', season: '', conclusion: '' },
+      form: { organ: '', years: '', season: '', conclusion: '' },
       rules,
       dialogLoading: false,
       expand: false
@@ -127,7 +127,7 @@ export default {
           case 100:
             return item.category === 1
           case '':
-            return true
+            return false
           default:
             return item.category === 2
         }
@@ -159,7 +159,7 @@ export default {
         this.currentData = []
         this.selectData = []
         this.existData = []
-        this.form = { organId: '', years: '', season: '', conclusion: '' }
+        this.form = { organ: '', years: '', season: '', conclusion: '' }
         this.expand = true
         this.dialogLoading = false
       }
@@ -178,7 +178,6 @@ export default {
       })
     },
     nodeClick(id) {
-      console.log('---id:', id)
       const levelCode = this.departmentMap[id]?.levelCode ?? ''
       const dep = this.$store.getters.departments.filter(item => item.levelCode.indexOf(levelCode) > -1).map(item => item.id)
       this.currentData = this.originData.filter(item => dep.includes(item.departmentId))
@@ -203,7 +202,6 @@ export default {
                 this.existData = response.data.map(i => i.id)
                 const personnels = response.data.map(i => i.personnelId)
                 const diff = _.difference(this.selectData, personnels)
-                // this.$message.success(this.getNameList(response.data))
                 let message = '检测到以下人员已录入指定时间的考核信息。跳过这些人员的信息录入请点击<strong><i>跳过</i></strong>，覆盖这些人员已录入的信息请点击<strong><i>覆盖</i></strong>，取消本次操作请点击右上角<strong><i>关闭</i></strong>按钮。<br />'
                 message = message + this.getNameList(personnels)
                 this.$confirm(message, '确认信息', {
@@ -219,7 +217,12 @@ export default {
                   const _data = { added: diff, ...this.form }
                   request('appraisal', 'batch', _data).then(res => {
                     this.$message.success(res.message)
-                  }).catch(error => { console.log(error) })
+                    this.dialogLoading = false
+                    this.$emit('visibleChange', 'batch')
+                  }).catch(error => {
+                    console.log(error)
+                    this.dialogLoading = false
+                  })
                 }).catch(action => {
                   // 这里按elmentUI的官方说明用distinguishCancelAndClose: true区分了取消和关闭
                   // 如果是取消，则执行覆盖操作，提交新增信息和修改信息
@@ -227,9 +230,15 @@ export default {
                     const _data = { added: diff, updated: this.existData, ...this.form }
                     request('appraisal', 'batch', _data).then(res => {
                       this.$message.success(res.message)
-                    }).catch(error => { console.log(error) })
+                      this.dialogLoading = false
+                      this.$emit('visibleChange', 'batch')
+                    }).catch(error => {
+                      console.log(error)
+                      this.dialogLoading = false
+                    })
                   } else {
                     this.$message.info('取消操作')
+                    this.dialogLoading = false
                   }
                 })
               } else {
@@ -238,11 +247,17 @@ export default {
                   const _data = { added: this.selectData, ...this.form }
                   request('appraisal', 'batch', _data).then(res => {
                     this.$message.success(res.message)
-                  }).catch(error => { console.log(error) })
-                }).catch(() => { this.$message.info('已取消操作') })
+                    this.dialogLoading = false
+                    this.$emit('visibleChange', 'batch')
+                  }).catch(error => {
+                    console.log(error)
+                    this.dialogLoading = false
+                  })
+                }).catch(() => {
+                  this.$message.info('已取消操作')
+                  this.dialogLoading = false
+                })
               }
-              this.dialogLoading = false
-              this.$emit('visibleChange', 'personnel')
             })
             .catch(err => {
               console.log(err)

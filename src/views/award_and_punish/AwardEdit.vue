@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-18 10:31:40
+ * @LastEditTime: 2022-05-16 14:51:49
  * @LastEditors: truxcoder
  * @Description: 奖励信息添加编辑
 -->
@@ -29,7 +29,7 @@
       </el-form-item>
       <el-form-item label="等级/奖励项" prop="grade">
         <el-select v-model="form.grade" :style="formItemWidth" placeholder="请选择等级/奖励项">
-          <el-option v-for="i in gradeList" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in gradeList" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
@@ -46,7 +46,7 @@
       </el-form-item>
 
       <el-form-item label="奖励内容" prop="content">
-        <el-input v-model="form.content" :style="formTextAreaWidth" placeholder="输入奖励内容" />
+        <el-input v-model="form.content" type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" :style="formTextAreaWidth" placeholder="输入奖励内容" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">

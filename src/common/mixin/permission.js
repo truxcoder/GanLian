@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-14 11:15:43
- * @LastEditTime: 2022-04-19 20:46:44
+ * @LastEditTime: 2022-05-16 10:30:21
  * @LastEditors: truxcoder
  * @Description: 权限检查相关
  */
@@ -41,7 +41,7 @@ export const permission_mixin = {
   methods: {
     check(object = null) {
       return new Promise((resolve, reject) => {
-        const sub = this.$store.getters.id
+        const sub = this.$store.getters.roles.length === 1 && this.$store.getters.roles[0] === 'normal' ? 'normal' : this.$store.getters.id
         const obj = object ?? this.$options.name
         const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
         request('permission', 'check', { sub, obj, act })

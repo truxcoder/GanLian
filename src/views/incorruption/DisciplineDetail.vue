@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-22 10:10:06
- * @LastEditTime: 2022-04-24 10:12:02
+ * @LastEditTime: 2022-06-28 15:07:27
  * @LastEditors: truxcoder
  * @Description:处理详情页
 -->
@@ -10,7 +10,7 @@
     <div id="dis-container">
       <el-descriptions title="" :column="2" label-class-name="dis-desc-label" border>
         <el-descriptions-item label="姓名">{{ isSingle ? singlePersonnelData.name : row.personnelName }}</el-descriptions-item>
-        <el-descriptions-item v-if="!isSingle" label="单位">{{ row.organShortName }}</el-descriptions-item>
+        <el-descriptions-item label="单位">{{ isSingle ? singlePersonnelData.organShortName:row.organShortName }}</el-descriptions-item>
         <el-descriptions-item label="处分文号">{{ row.docNumber }}</el-descriptions-item>
         <el-descriptions-item label="类别">{{ options.category[row.category - 1] && options.category[row.category - 1].label }}</el-descriptions-item>
         <el-descriptions-item label="处分项">{{ row.dictName }}</el-descriptions-item>

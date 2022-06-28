@@ -34,7 +34,80 @@
     <div class="tool-bar">
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
       <el-button v-if="can.manage" type="primary" icon="el-icon-scjd-circle-forbidden iconfont" size="mini" @click="fetchDisabledData">查看禁用人员</el-button>
+      <el-button v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click=" onQuickSearchBoxShow">展开快捷查询</el-button>
+      <el-button v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click=" onQuickSearchBoxShow">收缩快捷查询</el-button>
     </div>
+    <CollapseTransition>
+      <div v-show="quickSearchBoxShow" ref="quickSearchBox">
+        <div class="border py-4 mb-4">
+          <div class="quick-buttons">
+            <el-button size="small" type="success" plain @click="onQuickSearch('fc')">符合副处级领导干部选拔条件人员</el-button>
+            <el-popover
+              placement="bottom-start"
+              title="条件说明"
+              width="500"
+              trigger="hover"
+              content="工龄≥5年。下一级两个及以上职位任职经历。下一职级（正科级）任职时间≥3年。学历:大专及以上。通过县处级领导干部考试且在三年有效期内。前三年年度考核称职及以上。政治面貌为中共党员。三年以上党龄。"
+            >
+              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            </el-popover>
+          </div>
+
+          <div class="quick-buttons">
+            <el-button size="small" type="success" plain @click="onQuickSearch('zc')">符合副处级晋升正处级条件人员</el-button>
+            <el-popover
+              placement="bottom-start"
+              title="条件说明"
+              width="500"
+              trigger="hover"
+              content="工龄≥5年。下一级两个及以上职位任职经历。下一职级（副处级）任职时间≥2年。学历:大专及以上。通过县处级领导干部考试且在三年有效期内。前三年年度考核称职及以上。政治面貌为中共党员。三年以上党龄。"
+            >
+              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            </el-popover>
+          </div>
+          <div class="quick-buttons">
+            <el-button size="small" type="success" plain @click="onQuickSearch('willUpInSixMonth')">半年内将晋升职级的人员</el-button>
+            <el-popover
+              placement="bottom-start"
+              title="条件说明"
+              width="500"
+              trigger="hover"
+              content="现任职级(非领导职务)为一级警长以下。现职级任职时间已满18个月。"
+            >
+              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            </el-popover>
+          </div>
+          <div class="quick-buttons">
+            <el-button size="small" type="success" plain @click="onQuickSearch('willUpInThreeMonth')">三个月内将晋升职级的人员</el-button>
+            <el-popover
+              placement="bottom-start"
+              title="条件说明"
+              width="500"
+              trigger="hover"
+              content="现任职级(非领导职务)为一级警长以下。现职级任职时间已满21个月。"
+            >
+              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            </el-popover>
+          </div>
+          <div class="quick-buttons">
+            <el-button size="small" type="success" plain @click="onQuickSearch('willRetireInTwoYear')">两年内将退休的人员</el-button>
+            <el-popover
+              placement="bottom-start"
+              title="条件说明"
+              width="500"
+              trigger="hover"
+              content="男民警已满58岁，女民警已满53岁。"
+            >
+              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            </el-popover>
+          </div>
+        </div>
+      </div>
+    </CollapseTransition>
+    <!-- <transition name="fade">
+
+    </transition> -->
+
     <el-table
       v-loading="listLoading"
       :data="queryMeans === 'backend' ? currentData : currentPageData"
@@ -64,8 +137,9 @@
       </el-table-column>
       <el-table-column align="center" label="姓名" prop="name" />
       <el-table-column align="center" label="身份" width="70">
-        <template slot-scope="scope">
-          {{ scope.row.userType === 1 ? '民警' : '辅警' }}
+        <template>
+          <!-- {{ scope.row.userType === 1 ? '民警' : '辅警' }} -->
+          民警
         </template>
       </el-table-column>
       <el-table-column align="center" width="100" label="警号/工号" prop="policeCode" :show-overflow-tooltip="true" />
@@ -98,7 +172,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" :is-parent-list="true" @editSuccess="editSuccess" @visibleChange="visibleChange" />
 
     <!-- <personnel-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
     <PersonnelSearch :visible="searchVisible" :can="can" :levels="levelList" @advanceSearch="advanceSearch" @visibleChange="visibleChange" />
@@ -108,7 +182,7 @@
 <script>
 import dayjs from 'dayjs'
 // import remoteDepartmentData from '@/api/departmentData.json'
-import { request, curd } from '@/api'
+import { request } from '@/api'
 import { common_mixin } from '@/common/mixin/mixin'
 import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
@@ -118,18 +192,21 @@ import { permission_mixin } from '@/common/mixin/permission'
 import PersonnelSearch from './PersonnelSearch'
 // import PersonnelUpdate from './PerUpdate'
 import PersonnelEdit from './PerEdit.vue'
+import CollapseTransition from '@/utils/collapse-transition.js'
 
 export default {
   name: 'Personnel',
-  components: { PersonnelEdit, PersonnelSearch },
+  components: { PersonnelEdit, PersonnelSearch, CollapseTransition },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
       resource: 'personnel',
-      queryMeans: 'backend',
+      // queryMeans: 'backend',
+      queryMeans: 'frontend',
       originData: [],
       currentData: [],
       searchVisible: false,
+      quickSearchBoxShow: false,
       levelList: [],
       formItemWidth: { width: '170px' },
       searchForm: {
@@ -160,14 +237,9 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params.currentPage = this.currentPage
-      params.pageSize = this.pageSize
-      params.queryMeans = this.queryMeans
-      // if (!Object.keys(data).includes('organId')) {
-      //   data = { ...data, ...this.defaultSearchData }
-      // } else if (data.organId === '') {
-      //   data.organId = this.defaultSearchData.organId ?? ''
-      // }
+      // params.currentPage = this.currentPage
+      // params.pageSize = this.pageSize
+      // params.queryMeans = this.queryMeans
       const organId = this.can.global ? [] : [this.$store.getters.organ]
       if (!Object.keys(data).includes('organId')) {
         data = { ...data, organId }
@@ -178,15 +250,16 @@ export default {
         data = { ...data, status: true }
       }
       request('personnel', 'list', data, params).then(response => {
-        if (response?.count) {
+        // if (response?.count) {
+        if (response.data.length) {
           this.originData = response.data
           this.currentData = [...this.originData]
-          this.count = response.count
+          // this.count = response.count
           this.listLoading = false
         } else {
           this.originData = []
           this.currentData = []
-          this.count = 0
+          // this.count = 0
           this.listLoading = false
         }
       }).catch(err => {
@@ -220,56 +293,33 @@ export default {
       this.searchVisible = false
       this.fetchData(data)
     },
+    onQuickSearchBoxShow() {
+      this.quickSearchBoxShow = !this.quickSearchBoxShow
+    },
+    onQuickSearch(key) {
+      const data = { extra: key }
+      this.advanceSearch(data)
+    },
     isBirthdayZero(birthday) {
       return dayjs(birthday).year() === 1
     },
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          request('personnel', 'delete', { id: [id] })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.fetchData()
-            })
-            .catch(err => {
-              // this.$message.error(err.message)
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
     handleDisable(row) {
-      this.$confirm('将禁用该人员, 是否确定?', '提示', {
+      const message = row.status ? '将禁用该人员, 是否确定?' : '将启用该人员, 是否确定?'
+      this.$confirm(message, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          curd('update', { id: row.id, status: !row.status }, { resource: 'personnel' })
+          request('personnel', 'update_status', { id: row.id, status: !row.status })
             .then(response => {
               this.$message.success(response.message)
               this.$set(row, 'status', !row.status)
               // this.fetchData()
             })
-            .catch(err => {
-              console.log(err)
-            })
+            .catch(err => { console.log(err) })
         })
-        .catch(() => {
-          this.$message.info('已取消删除')
-        })
+        .catch(() => { this.$message.info('已取消禁用') })
     },
     onClean() {
       this.$refs.searchForm.resetFields()
@@ -291,4 +341,13 @@ export default {
 // .myfont {
 //   @extend .iconfont;
 // }
+#load-more ::v-deep .el-link--inner {
+  text-align: center;
+}
+
+.quick-buttons {
+  display: inline-block;
+  padding-left: 16px;
+}
+
 </style>

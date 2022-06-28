@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-04-20 10:12:33
+ * @LastEditTime: 2022-05-26 10:43:25
  * @LastEditors: truxcoder
  * @Description:奖励信息，后端分页
 -->
@@ -11,17 +11,28 @@
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form-item v-if="can.global" label="单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" :style="searchItemWidth" multiple placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
+        </el-select>
+        <!-- <OrganSelect v-model="searchForm.organParam" :multiple="true" :width="searchItemWidth" /> -->
+      </el-form-item>
       <el-form-item label="姓名" prop="personnelId">
-        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" :form-item-width="searchNameWidth" size="small" />
       </el-form-item>
       <el-form-item label="类别" prop="category">
-        <el-select v-model="searchForm.category" size="small" placeholder="类别">
+        <el-select v-model="searchForm.category" size="small" :style="searchItemWidth" placeholder="类别">
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="等级/奖励项" prop="grade">
-        <el-select v-model="searchForm.grade" size="small" placeholder="请选择等级/奖励项">
+      <el-form-item label="奖励项" prop="grade">
+        <el-select v-model="searchForm.grade" size="small" :style="searchItemWidth" placeholder="请选择等级/奖励项">
           <el-option v-for="i in gradeList" :key="i.value" :label="i.label" :value="i.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="年份" prop="year">
+        <el-select v-model="searchForm.year" size="small" :style="searchItemWidth" placeholder="请选择年份">
+          <el-option v-for="i in options.years" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -32,15 +43,10 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">
-        添加
-      </el-button>
-      <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
-        删除
-      </el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
-        所有数据
-      </el-button>
+      <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
+      <el-button v-if="can.manage" type="success" icon="el-icon-folder-add" size="mini" @click="batchVisible = true">批量录入</el-button>
+      <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -75,7 +81,7 @@
           {{ scope.row.getTime | dateFilter }}
         </template>
       </el-table-column>
-      <el-table-column label="奖励文号" align="center" prop="docNumber" />
+      <el-table-column label="奖励文号" align="center" prop="docNumber" :show-overflow-tooltip="true" />
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
           <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
@@ -104,6 +110,7 @@
     />
     <AwardEdit :visible="editVisible" :action="action" :row="rowData" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
     <AwardDetail :visible="detailVisible" :options="options" :row="rowData" :item-map="itemMap" @visibleChange="visibleChange" />
+    <AwardBatchEdit :visible="batchVisible" :options="options" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -119,10 +126,11 @@ import { awardCategory, awardGrade } from '@/utils/dict'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import AwardDetail from './AwardDetail.vue'
 import AwardEdit from './AwardEdit.vue'
+import AwardBatchEdit from './AwardBatchEdit.vue'
 
 export default {
   name: 'Award',
-  components: { AwardEdit, PersonnelOption, AwardDetail },
+  components: { AwardEdit, AwardBatchEdit, PersonnelOption, AwardDetail },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -131,15 +139,26 @@ export default {
       originData: [],
       currentData: [],
       detailVisible: false,
-      searchForm: { personnelId: '', category: '', grade: '' }
+      batchVisible: false,
+      searchItemWidth: { width: '155px' },
+      searchNameWidth: { width: '150px' },
+      searchForm: { personnelId: '', organParam: '', category: '', grade: '', year: '' }
     }
   },
   computed: {
+    organList() {
+      return this.$store.getters.organs
+    },
     options() {
       const categoryOptions = awardCategory
       const gradeOptions = awardGrade
+      const years = []
+      for (let index = 2010; index < 2030; index++) {
+        years.push({ label: index + '年', value: index })
+      }
       return {
         category: categoryOptions,
+        years,
         grade: gradeOptions
       }
     },
@@ -162,7 +181,8 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
+      this.interceptor(data)
       request(this.resource, 'list', data, params).then(response => {
         if (response.count) {
           this.originData = response.data
@@ -182,6 +202,11 @@ export default {
     handleDetail(row) {
       this.rowData = row
       this.detailVisible = true
+    },
+    interceptor(data) {
+      if ('year' in data) {
+        data.intercept = 'YEAR(awards.get_time) = ' + data.year
+      }
     }
   }
 }

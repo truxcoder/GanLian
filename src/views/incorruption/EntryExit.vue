@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-04-11 11:40:16
+ * @LastEditTime: 2022-05-06 16:24:37
  * @LastEditors: truxcoder
  * @Description: 出入境管理
 -->
@@ -16,7 +16,7 @@
       </el-form-item>
       <el-form-item label="所用证件" prop="passport">
         <el-select v-model="searchForm.passport" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择证件">
-          <el-option v-for="i in options.passport" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.passport" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="出境事由" prop="aim">
@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item label="是否报备" prop="isReport">
         <el-select v-model="searchForm.isReport" :style="formItemWidth" size="small">
-          <el-option v-for="i in options.isReport" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.isReport" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -43,16 +43,13 @@
     </div>
     <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
+      <el-table-column align="center" label="单位" prop="organShortName" />
       <el-table-column align="center" label="姓名" width="120">
         <template slot-scope="scope">
           <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="警号/工号" width="100">
-        <template slot-scope="scope">
-          {{ scope.row.policeCode }}
-        </template>
-      </el-table-column>
+      <el-table-column align="center" label="警号/工号" width="100" prop="policeCode" />
       <el-table-column label="目的地" align="center">
         <template slot-scope="scope">
           {{ scope.row.destination }}

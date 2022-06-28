@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 09:40:38
- * @LastEditTime: 2022-03-08 15:45:41
+ * @LastEditTime: 2022-06-08 16:12:10
  * @LastEditors: truxcoder
  * @Description: 人员个人培训列表
 -->
@@ -14,22 +14,18 @@
     <div v-if="currentData.length" class="mt-4">
       <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55" />
-        <el-table-column label="开始时间" align="center">
+        <el-table-column label="培训标题" align="left" show-overflow-tooltip prop="title" />
+        <el-table-column label="开始时间" align="center" width="140">
           <template slot-scope="scope">
             {{ scope.row.startTime | dateFilter }}
           </template>
         </el-table-column>
-        <el-table-column label="结束时间" align="center">
+        <el-table-column label="结束时间" align="center" width="140">
           <template slot-scope="scope">
             {{ scope.row.endTime | dateFilter }}
           </template>
         </el-table-column>
-        <el-table-column label="培训标题" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.title }}
-          </template>
-        </el-table-column>
-        <el-table-column label="培训学时" align="center">
+        <el-table-column label="培训学时" align="center" width="100">
           <template slot-scope="scope"> {{ scope.row.period }}学时 </template>
         </el-table-column>
         <el-table-column align="center" label="操作" width="240">
@@ -46,7 +42,7 @@
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
     <train-person-add :visible="addVisible" :passed="originData" :personnel-id="personnelId" @addSuccess="addSuccess" @visibleChange="visibleChange" />
-    <training-detail :visible="detailVisible" :row="rowData" @visibleChange="visibleChange" />
+    <training-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -60,6 +56,7 @@ import { permission_mixin } from '@/common/mixin/permission'
 import { common_mixin } from '@/common/mixin/mixin'
 // import { request } from '@/api'
 import { request } from '@/api/index'
+import { trainingMethodOption, trainingCategoryOption, trainingMethodDict, trainingCategoryDict } from '@/utils/dict'
 
 export default {
   name: 'Training',
@@ -87,6 +84,31 @@ export default {
       multipleSelection: [],
       rowData: {},
       currentEditIndex: 0
+    }
+  },
+  computed: {
+    organMap() {
+      const newMap = {}
+      this.$store.getters.organs.forEach(item => (newMap[item.busOrgCode] = item))
+      return newMap
+    },
+    options() {
+      // const departmentOptions = this.$store.getters.departments.map(item => {
+      //   const parent = this.organMap[item.busOrgCode] ? this.organMap[item.busOrgCode].name : ' '
+      //   return { label: item.name + ' 〔' + parent + '〕', value: item.name }
+      // })
+      const yesOrNo = [
+        { label: '是', value: 2 },
+        { label: '否', value: 1 }
+      ]
+      return {
+        organ: this.$store.getters.organs,
+        yesOrNo,
+        method: trainingMethodOption,
+        category: trainingCategoryOption,
+        methodDict: trainingMethodDict,
+        categoryDict: trainingCategoryDict
+      }
     }
   },
   created() {

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-18 10:39:37
+ * @LastEditTime: 2022-05-16 14:50:46
  * @LastEditors: truxcoder
  * @Description: 处理信息添加编辑
 -->
@@ -29,7 +29,7 @@
       </el-form-item>
       <el-form-item label="处理项" prop="grade">
         <el-select v-model="form.grade" :style="formItemWidth" placeholder="请选择处理项">
-          <el-option v-for="i in gradeList" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in gradeList" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
@@ -46,7 +46,7 @@
       </el-form-item>
 
       <el-form-item label="处理内容" prop="content">
-        <el-input v-model="form.content" :style="formTextAreaWidth" placeholder="输入处理内容" />
+        <el-input v-model="form.content" type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" :style="formTextAreaWidth" placeholder="输入处理内容" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">

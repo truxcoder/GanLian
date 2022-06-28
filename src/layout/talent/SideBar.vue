@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-17 10:41:37
- * @LastEditTime: 2022-03-17 20:20:37
+ * @LastEditTime: 2022-05-26 18:08:43
  * @LastEditors: truxcoder
  * @Description: 人才库侧边栏
 -->
@@ -37,6 +37,10 @@
       <el-menu-item index="4" :route="router.information">
         <i class="el-icon-platform-eleme" />
         <span slot="title">信息化人才库</span>
+      </el-menu-item>
+      <el-menu-item index="5" :route="router.pick">
+        <i class="el-icon-platform-eleme" />
+        <span slot="title">人才抽取</span>
       </el-menu-item>
     </el-menu>
   </div>

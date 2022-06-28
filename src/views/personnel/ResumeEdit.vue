@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-03-22 15:19:39
+ * @LastEditTime: 2022-06-24 11:27:05
  * @LastEditors: truxcoder
  * @Description: 个人简历编辑
 -->
@@ -32,17 +32,17 @@
         </el-table-column>
         <el-table-column align="center" label="单位">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.organ" />
+            <el-input v-model.trim="scope.row.organ" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="部门" width="220">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.dept" />
+            <el-input v-model.trim="scope.row.dept" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="职务/身份" width="200">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.post" />
+            <el-input v-model.trim="scope.row.post" />
           </template>
         </el-table-column>
         <el-table-column align="center" label="主任" width="55">
@@ -80,6 +80,8 @@
 <script>
 import { request } from '@/api'
 import dayjs from 'dayjs'
+import isEqual from 'lodash/isEqual'
+import cloneDeep from 'lodash/cloneDeep'
 export default {
   props: {
     visible: {
@@ -97,6 +99,12 @@ export default {
       default() {
         return ''
       }
+    },
+    can: {
+      type: Object,
+      default() {
+        return {}
+      }
     }
   },
   data() {
@@ -109,6 +117,7 @@ export default {
       multipleSelection: [],
       loading: false,
       dialogLoading: false,
+      originData: [],
       currentData: []
     }
   },
@@ -121,8 +130,10 @@ export default {
         }
         this.currentData = JSON.parse(this.resume)
         this.currentData.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
+        this.originData = cloneDeep(this.currentData)
       } else {
         this.currentData = []
+        this.originData = []
       }
     }
   },
@@ -131,19 +142,35 @@ export default {
       this.$emit('addVisibleChange')
     },
     onSubmit() {
+      if (isEqual(this.currentData, this.originData)) {
+        this.$message.info('未修改任何数据')
+        this.$emit('visibleChange', 'resume')
+        return false
+      }
       if (!this.validate()) {
         return false
       }
       const temp = JSON.stringify(this.currentData)
-      console.log('temp:----', temp)
-      request('personnel', 'resume', { personnelId: this.personnelId, content: temp })
-        .then(response => {
-          this.$message({
-            message: response.message,
-            type: 'success'
-          })
-          this.$emit('editSuccess')
+      let result
+      if (!this.can?.manage) {
+        const data = {
+          personnelId: this.personnelId,
+          organId: this.$store.getters.organ,
+          category: 3,
+          content: temp
+        }
+        result = request('pre', null, data)
+      } else {
+        result = request('personnel', 'resume', { personnelId: this.personnelId, content: temp })
+      }
+      // request('personnel', 'resume', { personnelId: this.personnelId, content: temp })
+      result.then(response => {
+        this.$message({
+          message: response.message,
+          type: 'success'
         })
+        this.$emit('editSuccess', 'resume')
+      })
         .catch(err => {
           console.log(err)
         })

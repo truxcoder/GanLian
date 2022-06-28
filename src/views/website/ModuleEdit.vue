@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-01 16:59:22
+ * @LastEditTime: 2022-05-18 11:11:55
  * @LastEditors: truxcoder
  * @Description: 模块信息添加编辑
 -->
@@ -101,7 +101,7 @@ export default {
       return iconList
     },
     newModuleList() {
-      return [{ id: 0, title: '网站根模块' }, ...this.moduleList]
+      return [{ id: '0', title: '网站根模块' }, ...this.moduleList]
     }
   },
   watch: {
@@ -124,9 +124,10 @@ export default {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          if ((this.form.parent === 0 && this.form.rank !== 1) || (this.form.parent !== 0 && this.form.rank === 1)) {
+          if ((this.form.parent === '0' && this.form.rank !== 1) || (this.form.parent !== '0' && this.form.rank === 1)) {
             this.$message.error('模块级别和父组件不匹配！')
-            return
+            this.dialogLoading = false
+            return false
           }
           curd(this.action, this.form, { resource: this.resource })
             .then(response => {

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-04-18 10:49:13
+ * @LastEditTime: 2022-05-26 10:50:03
  * @LastEditors: truxcoder
  * @Description:处分，前端分页
 -->
@@ -52,31 +52,19 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="单位">
-        <template slot-scope="scope">
-          {{ scope.row.organShortName }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="姓名">
+      <el-table-column align="center" label="单位" width="100" prop="organShortName" />
+      <el-table-column align="center" label="姓名" width="120">
         <template slot-scope="scope">
           <el-link :href="getDetailLink(scope.row.personnelId)" target="_blank">{{ scope.row.personnelName }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="警号/工号">
-        <template slot-scope="scope">
-          {{ scope.row.policeCode }}
-        </template>
-      </el-table-column>
-      <el-table-column label="处分类型" align="center">
+      <el-table-column align="center" label="警号/工号" width="120" prop="policeCode" />
+      <el-table-column label="处分类型" align="center" width="120">
         <template slot-scope="scope">
           {{ scope.row.category && options.category[scope.row.category - 1] && options.category[scope.row.category - 1].label }}
         </template>
       </el-table-column>
-      <el-table-column label="处分项" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.dictName }}
-        </template>
-      </el-table-column>
+      <el-table-column label="处分项" align="center" prop="dictName" />
       <el-table-column label="处分时间" align="center">
         <template slot-scope="scope">
           {{ scope.row.getTime | dateFilter }}

@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-03-17 16:44:10
- * @LastEditTime: 2022-03-17 16:51:08
+ * @LastEditTime: 2022-05-26 17:16:10
  * @LastEditors: truxcoder
  * @Description: 人才库路由
  */
@@ -18,5 +18,8 @@ export default {
   },
   information: {
     path: '/talent/information'
+  },
+  pick: {
+    path: '/talent/pick'
   }
 }

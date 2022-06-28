@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-15 14:37:47
+ * @LastEditTime: 2022-06-21 15:10:47
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -47,11 +47,12 @@
           v-model.trim="form[item]"
           :style="models[item].style"
           :multiple="models[item].multiple === true"
-          :filterable="models[item].multiple === true"
-          :allow-create="models[item].multiple === true"
+          :filterable="models[item].filterable === true"
+          :allow-create="models[item].create === true"
+          :clearable="models[item].clearable === true"
           :placeholder="'请选择' + models[item].label"
         >
-          <el-option v-for="(i, k) in models[item].options" :key="k" :label="i.label" :value="i.value" />
+          <el-option v-for="(i, k) in models[item].options ? models[item].options : formOptions[item] " :key="k" :label="i.label" :value="i.value" />
         </el-select>
 
         <el-autocomplete
@@ -63,8 +64,15 @@
           placeholder="请输入内容"
         />
 
-        <el-date-picker v-else-if="models[item].type == 'DATE'" v-model="form[item]" :style="models[item].style" :picker-options="pickerOptions" type="date" placeholder="选择日期" />
+        <el-date-picker v-else-if="models[item].type === 'DATE' || models[item].type === 'MONTH'" v-model="form[item]" :style="models[item].style" :picker-options="pickerOptions" :type="models[item].type === 'MONTH' ? 'month' : 'date'" placeholder="选择日期" />
         <el-input v-else-if="models[item].type == 'NUMBER'" v-model.number="form[item]" :style="models[item].style" autocomplete="off" />
+        <el-input
+          v-else-if="item === 'remark'"
+          v-model="form[item]"
+          :style="models[item].style"
+          :disabled="isNormal"
+          :placeholder="'请输入' + models[item].label"
+        />
         <el-input
           v-else-if="models[item].type == 'TEXT'"
           v-model="form[item]"
@@ -84,11 +92,12 @@
 </template>
 
 <script>
-import { curd } from '@/api/index'
+import { request, curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import rules from '@/common/rules/personnel'
 import models from '@/common/model/personnel'
-import { setDateFieldNull, setDateFieldZero } from '@/utils/date'
+import { setDateFieldNull } from '@/utils/date'
+import { isNormalRole } from '@/utils/permission'
 export default {
   name: 'PersonnelEdit',
   mixins: [edit_mixin],
@@ -98,14 +107,20 @@ export default {
       default() {
         return []
       }
+    },
+    isParentList: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       resource: 'personnel',
+      originForm: {},
       form: {},
       rules,
       models,
+      formOptions: {},
       dialogWidth: '1200px',
       formLabelWidth: '140px',
       formItemWidth: { width: '220px' },
@@ -149,35 +164,82 @@ export default {
     },
     modelDateKeys() {
       return Object.entries(this.models)
-        .filter(item => !item[1]?.disabled && item[1]?.type === 'DATE')
+        .filter(item => !item[1]?.disabled && (item[1]?.type === 'DATE' || item[1]?.type === 'MONTH'))
         .map(item => item[0])
+    },
+    isNormal() {
+      return isNormalRole(this.$store.getters.roles)
     }
   },
   watch: {
     visible: function(val, oldval) {
       if (val === true) {
-        this.form.personnelId = this.singlePersonnelData?.id ?? ''
+        // this.form.personnelId = this.singlePersonnelData?.id ?? ''
         if (this.action === 'update') {
-          this.form = { ...this.row }
-          this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
-          this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
-          // const firstDay = new Date('0001-01-01T00:00:01Z')
-          // this.modelDateKeys.forEach(item => {
-          //   this.form[item] = dayjs(this.form[item]).year() !== 1 ? this.form[item] : null
-          // })
-          setDateFieldNull(this.form, this.modelDateKeys)
+          if (this.isParentList) {
+            this.dialogLoading = true
+            request('personnel', 'detail', { id: this.row.id }).then(response => {
+              // this.form = response.data ?? {}
+              this.formItemData.forEach(item => {
+                this.originForm[item] = response.data[item]
+              })
+              this.originForm.id = this.row.id
+              this.form = { ...this.originForm }
+              this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
+              this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
+              setDateFieldNull(this.form, this.modelDateKeys)
+              setDateFieldNull(this.originForm, this.modelDateKeys)
+              this.dialogLoading = false
+            })
+          } else {
+            // this.form = { ...this.row }
+            this.formItemData.forEach(item => {
+              this.originForm[item] = this.row[item]
+            })
+            this.originForm.id = this.row.id
+            this.form = { ...this.originForm }
+            this.form.proCert = this.form.proCert ? this.form.proCert.split(',') : []
+            this.form.passport = this.form.passport ? JSON.parse(this.form.passport) : []
+            // const firstDay = new Date('0001-01-01T00:00:01Z')
+            // this.modelDateKeys.forEach(item => {
+            //   this.form[item] = dayjs(this.form[item]).year() !== 1 ? this.form[item] : null
+            // })
+            setDateFieldNull(this.form, this.modelDateKeys)
+            setDateFieldNull(this.originForm, this.modelDateKeys)
+          }
         }
       } else {
+        this.originForm = {}
         this.form = {}
         this.$refs.editForm.resetFields()
       }
     }
+  },
+  created() {
+    request('personnel', 'dict').then(res => {
+      this.formOptions.fullTimeEdu = res.data
+        ? res.data.filter(item => item.category === 1).map(item => ({ label: item.name, value: item.name }))
+        : []
+      this.formOptions.partTimeEdu = res.data
+        ? res.data.filter(item => item.category === 2).map(item => ({ label: item.name, value: item.name }))
+        : []
+      this.formOptions.finalEdu = res.data ? Array.from(new Set(res.data.map(i => i.name))).map(item => ({ label: item, value: item })) : []
+    })
   },
   methods: {
     onSubmit() {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
+          // let isNormal = false
+          // try {
+          //   isNormal = isNormalRole(this.$store.getters.roles)
+          // } catch (error) {
+          //   this.$message.error(error)
+          //   this.dialogLoading = false
+          //   return false
+          // }
+
           this.form.proCert = this.form.proCert.toString()
           this.form.passport = this.form.passport.length ? JSON.stringify(this.form.passport) : JSON.stringify([0])
           // const firstDay = new Date('0001-01-01T00:00:01Z')
@@ -185,16 +247,43 @@ export default {
           //   this.form[item] = this.form[item] ?? firstDay
           // })
           // setDateFieldZero(this.form, this.modelDateKeys)
-          curd(this.action, this.form, { resource: this.resource })
-            .then(response => {
-              this.$message.success(response.message)
-              this.dialogLoading = false
-              this.$emit('editSuccess')
-            })
-            .catch(err => {
-              console.log(err)
-              this.dialogLoading = false
-            })
+          const content = this.getDiffData()
+          if (Object.keys(content).length === 0) {
+            this.$message.info('未修改任何数据')
+            this.dialogLoading = false
+            this.$emit('visibleChange', 'edit')
+            return false
+          }
+          if (!this.can?.manage) {
+            const data = {
+              personnelId: this.form.id,
+              organId: this.$store.getters.organ,
+              category: 1,
+              // content: JSON.stringify(this.form)
+              content: JSON.stringify(content)
+            }
+            request('pre', null, data)
+              .then(response => {
+                this.$message.success(response.message)
+                this.dialogLoading = false
+                this.$emit('editSuccess')
+              })
+              .catch(err => {
+                console.log(err)
+                this.dialogLoading = false
+              })
+          } else {
+            curd(this.action, this.form, { resource: this.resource })
+              .then(response => {
+                this.$message.success(response.message)
+                this.dialogLoading = false
+                this.$emit('editSuccess')
+              })
+              .catch(err => {
+                console.log(err)
+                this.dialogLoading = false
+              })
+          }
         } else {
           this.$message.error('请按规则填写表格！')
           return false
@@ -213,6 +302,18 @@ export default {
         return false
       }
       return true
+    },
+    getDiffData() {
+      const temp = {}
+      for (const i in this.form) {
+        if (this.form[i] !== this.originForm[i]) {
+          temp[i] = this.form[i]
+        }
+      }
+      return temp
+    },
+    onCleanSelect(item) {
+      console.log(item)
     }
   }
 }

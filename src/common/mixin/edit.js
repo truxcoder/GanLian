@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2022-01-10 17:39:10
- * @LastEditTime: 2022-03-03 09:12:17
+ * @LastEditTime: 2022-06-21 14:39:57
  * @LastEditors: truxcoder
  * @Description: 编辑页mixin
  */
@@ -34,6 +34,12 @@ export const edit_mixin = {
       }
     },
     row: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+    can: {
       type: Object,
       default() {
         return {}

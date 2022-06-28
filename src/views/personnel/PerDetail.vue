@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-09 12:43:53
- * @LastEditTime: 2022-04-19 21:08:15
+ * @LastEditTime: 2022-05-30 14:57:55
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -12,7 +12,7 @@
         <el-tab-pane name="basic" label="人员基本情况">
           <basic :loading="loading" :base-data="baseData" @updateSuccess="updateSuccess" />
         </el-tab-pane>
-        <el-tab-pane v-if="menu.DetailFamily" name="family" label="家庭成员">
+        <el-tab-pane v-if="menu.DetailFamily" name="family" label="家庭及社会关系">
           <family :base-data="baseData" />
         </el-tab-pane>
         <el-tab-pane v-if="menu.DetailTraining" name="training" label="培训情况">
@@ -56,6 +56,7 @@ import { detailObj } from '@/utils/detail'
 
 import { request } from '@/api/index'
 import { permission_mixin } from '@/common/mixin/permission'
+import { isNormalRole } from '@/utils/permission'
 
 export default {
   name: 'Pdetail',
@@ -114,7 +115,9 @@ export default {
     },
     actCheck(act = 'MENU', obj = null) {
       return new Promise((resolve, reject) => {
-        const sub = this.$store.getters.id
+        // const sub = this.$store.getters.id
+        const sub = isNormalRole(this.$store.getters.roles) ? 'normal' : this.$store.getters.id
+
         obj = obj ?? detailObj.map(i => i.name)
         request('permission', 'act_check', { sub, obj, act })
           .then(res => {

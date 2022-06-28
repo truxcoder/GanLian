@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-04-11 14:30:34
+ * @LastEditTime: 2022-06-08 15:43:06
  * @LastEditors: truxcoder
  * @Description:培训，后端分页
 -->
@@ -11,8 +11,8 @@
       <el-form-item label="培训标题" prop="title">
         <el-input v-model="searchForm.title" size="small" :style="formTitleWidth" placeholder="培训标题" />
       </el-form-item>
-      <el-form-item label="组织单位" prop="organ">
-        <el-select v-model="searchForm.organ" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位名称">
+      <el-form-item label="主办单位" prop="sponsor">
+        <el-select v-model="searchForm.sponsor" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位名称">
           <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.name" />
         </el-select>
       </el-form-item>
@@ -52,35 +52,20 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="标题">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="组织单位" width="300">
-        <template slot-scope="scope">
-          {{ scope.row.organ }}
-        </template>
-      </el-table-column>
-      <el-table-column label="开始时间" align="center" width="160">
+      <el-table-column align="left" label="标题" show-overflow-tooltip prop="title" />
+      <el-table-column align="center" label="主办单位" width="150" show-overflow-tooltip prop="sponsor" />
+      <el-table-column align="center" label="承办单位" width="150" show-overflow-tooltip prop="organizer" />
+      <el-table-column label="开始时间" align="center" width="140">
         <template slot-scope="scope">
           {{ scope.row.startTime | dateFilter }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="300">
+      <el-table-column align="center" label="操作" width="210">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
-            编辑
-          </el-button>
-          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
-            删除
-          </el-button>
-          <el-button size="mini" type="primary" @click="handleDetail(scope.row)">
-            详情
-          </el-button>
-          <el-button size="mini" type="primary" @click="selectPerson(scope.row)">
-            参加人员
-          </el-button>
+          <el-link v-if="can.update" type="success" class="oper-btn" :underline="false" @click="handleEdit('update', scope.row)">编辑</el-link>
+          <el-link v-if="can.delete" type="danger" class="oper-btn" :underline="false" @click="handleDelete(scope.$index, scope.row.id)">删除</el-link>
+          <el-link type="primary" class="oper-btn" :underline="false" @click="handleDetail(scope.row)">详情</el-link>
+          <el-link type="primary" class="oper-btn" :underline="false" @click="selectPerson(scope.row)">参加人员</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -115,6 +100,8 @@ import TrainingEdit from './TrainingEdit.vue'
 import TrainingPersonnel from './TrainingPersonnel.vue'
 import TrainingDetail from './TrainingDetail.vue'
 
+import { trainingMethodOption, trainingCategoryOption, trainingMethodDict, trainingCategoryDict } from '@/utils/dict'
+
 export default {
   name: 'Training',
   components: { TrainingEdit, TrainingDetail, TrainingPersonnel },
@@ -130,7 +117,7 @@ export default {
       personnelVisible: false,
       formTitleWidth: { width: '500px' },
       formItemWidth: { width: '220px' },
-      searchForm: { title: '', organ: '' }
+      searchForm: { title: '', sponsor: '' }
     }
   },
   computed: {
@@ -140,21 +127,21 @@ export default {
       return newMap
     },
     options() {
-      const departmentOptions = this.$store.getters.departmentNames.map(item => {
-        return { label: item, value: item }
-      })
       // const departmentOptions = this.$store.getters.departments.map(item => {
       //   const parent = this.organMap[item.busOrgCode] ? this.organMap[item.busOrgCode].name : ' '
       //   return { label: item.name + ' 〔' + parent + '〕', value: item.name }
       // })
-      const property = [
-        { label: '系统内培训', value: 1 },
-        { label: '系统外培训', value: 2 }
+      const yesOrNo = [
+        { label: '是', value: 2 },
+        { label: '否', value: 1 }
       ]
       return {
         organ: this.$store.getters.organs,
-        department: departmentOptions,
-        property
+        yesOrNo,
+        method: trainingMethodOption,
+        category: trainingCategoryOption,
+        methodDict: trainingMethodDict,
+        categoryDict: trainingCategoryDict
       }
     }
   },
@@ -195,5 +182,9 @@ export default {
 }
 .pagination {
   margin-top: 15px;
+}
+.oper-btn {
+  font-size: 12px;
+  margin: 0 5px;
 }
 </style>

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-11 17:03:21
- * @LastEditTime: 2022-04-01 15:30:49
+ * @LastEditTime: 2022-06-28 09:32:48
  * @LastEditors: truxcoder
  * @Description: 机构职数管理
 -->
@@ -18,6 +18,16 @@
         highlight-current-row
       >
         <el-table-column align="center" label="名称" prop="shortName" />
+        <el-table-column align="center" label="副厅(占用数/编制数)">
+          <template slot-scope="scope">
+            <div v-if="currentEditIndex !== scope.$index" class="flex justify-center items-center content-center">
+              <div :class="getStyle(scope.row, 'ft')">{{ getUse(scope.row.id, 'ft') }}</div>
+              <div class="right-button">{{ getNumber(scope.row.position, 'ft') }}</div>
+            </div>
+            <!-- <span v-if="currentEditIndex !== scope.$index">{{ getUse(scope.row.id, 'zc') }} / {{ getNumber(scope.row.position, 'zc') }}</span> -->
+            <el-input v-else v-model.number="form.ft" size="mini" class=" w-14" />
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="正处(占用数/编制数)">
           <template slot-scope="scope">
             <div v-if="currentEditIndex !== scope.$index" class="flex justify-center items-center content-center">
@@ -55,7 +65,7 @@
             <el-input v-else v-model.number="form.fk" size="mini" class=" w-14" />
           </template>
         </el-table-column>
-        <el-table-column v-if="can.manage" align="center" label="操作">
+        <el-table-column v-if="can.manage" align="center" label="操作" width="90">
           <template slot-scope="scope">
             <el-button v-if="currentEditIndex === scope.$index" size="mini" type="primary" @click="onUpdateSubmit(scope.$index, scope.row)">确定</el-button>
             <el-button v-if="currentEditIndex !== scope.$index" size="mini" type="success" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
@@ -85,7 +95,7 @@ export default {
       positionData: [],
       organMap: {},
       currentEditIndex: -1,
-      form: { zc: 0, fc: 0, zk: 0, fk: 0, g4: 0, g3: 0, g2: 0, g1: 0, z2: 0, z1: 0 },
+      form: { ft: 0, zc: 0, fc: 0, zk: 0, fk: 0, g4: 0, g3: 0, g2: 0, g1: 0, z2: 0, z1: 0 },
       searchForm: { personnelId: '', organId: '', years: '', season: '', conclusion: '' },
       searchItemWidth: { width: '130px' }
     }
@@ -166,10 +176,10 @@ export default {
         return
       }
       this.currentEditIndex = index
-      this.form = row.position ? JSON.parse(row.position) : { zc: 0, fc: 0, zk: 0, fk: 0, g4: 0, g3: 0, g2: 0, g1: 0, z2: 0, z1: 0 }
+      this.form = row.position ? JSON.parse(row.position) : { ft: 0, zc: 0, fc: 0, zk: 0, fk: 0, g4: 0, g3: 0, g2: 0, g1: 0, z2: 0, z1: 0 }
     },
     resetUpdateForm() {
-      this.form = { zc: 0, fc: 0, zk: 0, fk: 0, g4: 0, g3: 0, g2: 0, g1: 0, z2: 0, z1: 0 }
+      this.form = { ft: 0, zc: 0, fc: 0, zk: 0, fk: 0, g4: 0, g3: 0, g2: 0, g1: 0, z2: 0, z1: 0 }
       this.currentEditIndex = -1
     },
     getNumber(p, key) {
@@ -202,12 +212,23 @@ export default {
 .pagination {
   margin-top: 15px;
 }
-.left-button {
+/* .left-button {
   background: #e6f5f0;
   color: #096;
   font-size: 12px;
   padding: 2px 10px;
   border: 1px solid #99d6c2;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-right-color: rgba(255,255,255,.5);
+  margin-right: -1px;
+} */
+.left-button {
+  background: #eee;
+  color: #666;
+  font-size: 12px;
+  padding: 2px 10px;
+  border: 1px solid #ccc;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
   border-right-color: rgba(255,255,255,.5);

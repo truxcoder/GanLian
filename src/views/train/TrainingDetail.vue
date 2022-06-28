@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 19:46:18
- * @LastEditTime: 2022-03-03 19:18:11
+ * @LastEditTime: 2022-06-08 15:32:39
  * @LastEditors: truxcoder
  * @Description: 培训详情
 -->
@@ -15,10 +15,13 @@
           <el-descriptions-item label="开始时间"> {{ row.startTime | dateFilter }} </el-descriptions-item>
           <el-descriptions-item label="结束时间"> {{ row.endTime | dateFilter }} </el-descriptions-item>
           <el-descriptions-item label="培训地点"> {{ row.place }} </el-descriptions-item>
-          <el-descriptions-item label="培训性质"> {{ row.property === 1 ? '系统内培训' : '系统外培训' }} </el-descriptions-item>
-          <el-descriptions-item label="组织单位"> {{ row.organ }} </el-descriptions-item>
-          <el-descriptions-item label="组织部门"> {{ row.department }} </el-descriptions-item>
+          <el-descriptions-item label="培训分类"> {{ getCategory(row.category) }} </el-descriptions-item>
+          <el-descriptions-item label="主办单位"> {{ row.sponsor }} </el-descriptions-item>
+          <el-descriptions-item label="承办单位"> {{ row.organizer }} </el-descriptions-item>
+          <el-descriptions-item label="培训方式"> {{ getMethod(row.method) }} </el-descriptions-item>
           <el-descriptions-item label="培训学时"> {{ row.period }}学时 </el-descriptions-item>
+          <el-descriptions-item label="是否脱产"> {{ getYesOrNo(row.isFullTime) }} </el-descriptions-item>
+          <el-descriptions-item label="仅本单位参加"> {{ getYesOrNo(row.isInner) }} </el-descriptions-item>
         </el-descriptions>
       </div>
       <div class=" flex-1 ml-4">
@@ -39,6 +42,7 @@
 
 <script>
 import { common_mixin } from '@/common/mixin/mixin'
+import { isEmpty } from 'lodash/lang'
 
 export default {
   name: 'TrainingDetail',
@@ -70,6 +74,38 @@ export default {
   methods: {
     onCancel() {
       this.$emit('visibleChange', 'detail')
+    },
+    getCategory(c) {
+      const item = this.options.categoryDict.filter(i => i.value === c)
+      if (isEmpty(item)) {
+        return ''
+      }
+      if (item[0].parent !== 0) {
+        const parent = this.options.categoryDict.filter(i => i.value === item[0].parent)
+        return parent[0].label + '/' + item[0].label
+      }
+      return item[0].label
+    },
+    getMethod(m) {
+      const item = this.options.methodDict.filter(i => i.value === m)
+      if (isEmpty(item)) {
+        return ''
+      }
+      if (item[0].parent !== 0) {
+        const parent = this.options.methodDict.filter(i => i.value === item[0].parent)
+        return parent[0].label + '/' + item[0].label
+      }
+      return item[0].label
+    },
+    getYesOrNo(v) {
+      switch (v) {
+        case 2:
+          return '是'
+        case 1:
+          return '否'
+        default:
+          return ''
+      }
     }
   }
 }

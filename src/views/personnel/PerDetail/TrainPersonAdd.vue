@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 10:59:14
- * @LastEditTime: 2022-03-28 15:40:41
+ * @LastEditTime: 2022-06-08 16:10:14
  * @LastEditors: truxcoder
  * @Description: 人员详情页个人培训模块编辑参与培训信息，本页列出培训列表供用户选择或取消参与
 -->
@@ -13,8 +13,8 @@
         <el-form-item label="培训标题" prop="title">
           <el-input v-model="searchForm.title" size="small" :style="formTitleWidth" placeholder="培训标题" />
         </el-form-item>
-        <el-form-item label="组织单位" prop="organ">
-          <el-select v-model="searchForm.organ" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位名称">
+        <el-form-item label="主办单位" prop="sponsor">
+          <el-select v-model="searchForm.sponsor" size="small" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位名称">
             <el-option v-for="i in organOption" :key="i.id" :label="i.name" :value="i.name" />
           </el-select>
         </el-form-item>
@@ -32,11 +32,7 @@
             {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column label="培训标题" :show-overflow-tooltip="true">
-          <template slot-scope="scope">
-            {{ scope.row.title }}
-          </template>
-        </el-table-column>
+        <el-table-column label="培训标题" :show-overflow-tooltip="true" prop="title" />
         <el-table-column label="开始时间" align="center" width="160">
           <template slot-scope="scope">
             {{ scope.row.startTime | dateFilter }}
@@ -47,9 +43,7 @@
             {{ scope.row.endTime | dateFilter }}
           </template>
         </el-table-column>
-        <el-table-column label="组织单位" align="center" width="240" :show-overflow-tooltip="true">
-          <template slot-scope="scope"> {{ scope.row.organ }} </template>
-        </el-table-column>
+        <el-table-column label="主办单位" align="center" width="240" show-overflow-tooltip prop="sponsor" />
         <el-table-column label="培训学时" align="center" width="80">
           <template slot-scope="scope"> {{ scope.row.period }}学时 </template>
         </el-table-column>

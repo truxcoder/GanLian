@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-04-11 14:30:18
+ * @LastEditTime: 2022-05-26 10:59:24
  * @LastEditors: truxcoder
  * @Description: 人才库，后端分页
 -->
@@ -9,7 +9,7 @@
   <div>
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item label="姓名" prop="personnelId">
-        <personnel-option :is-clean="isClean" size="small" @personnelChange="onPersonnelChange" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
@@ -48,18 +48,21 @@
           {{ scope.row.birthday | ageFilter }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="专长" prop="skill" />
+      <el-table-column label="取得考官证时间" width="150" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.beExaminerDay | dateFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="岗位标签">
+        <template slot-scope="scope">
+          {{ scope.row.skill | skillFilter }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
-            编辑
-          </el-button>
-          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
-            删除
-          </el-button>
-          <el-button size="mini" type="primary" @click="handleDetail(scope.row)">
-            详情
-          </el-button>
+          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+          <el-button size="mini" type="primary" @click="handleDetail(scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -91,10 +94,19 @@ import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
 import TalentEdit from './TalentEdit.vue'
 import { talentObj } from '@/utils/talent'
+import { isEmpty } from 'lodash/lang'
 
 export default {
   name: 'Talent',
   components: { TalentEdit, PersonnelOption },
+  filters: {
+    skillFilter(v) {
+      if (!isEmpty(v)) {
+        return JSON.parse(v).toLocaleString()
+      }
+      return '无'
+    }
+  },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {

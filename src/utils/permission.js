@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-20 16:59:39
- * @LastEditTime: 2021-12-20 17:03:53
+ * @LastEditTime: 2022-06-21 14:38:48
  * @LastEditors: truxcoder
  * @Description: 权限相关计算函数
  */
@@ -41,3 +41,11 @@ export function arrSubtraction(a, b) {
   }
   throw new new TypeError('arguments must be array')()
 }
+
+export function isNormalRole(roles) {
+  if (!Array.isArray(roles)) {
+    throw TypeError('参数必须为数组')
+  }
+  return roles.length === 1 && roles[0] === 'normal'
+}
+

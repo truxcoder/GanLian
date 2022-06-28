@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-20 11:04:06
+ * @LastEditTime: 2022-06-14 15:57:39
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -22,21 +22,21 @@
         <el-input v-if="isSingle" :style="formItemWidth" :value="singlePersonnelData.name" disabled />
         <PersonnelOption v-if="!isSingle" v-model="form.personnelId" :rowdata="row" :is-update="action === 'update'" :form-item-width="formItemWidth" />
       </el-form-item>
-      <el-form-item label="考核单位" prop="organId">
-        <el-select v-model="form.organId" :style="formItemWidth" placeholder="请选择单位">
-          <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.id" />
+      <el-form-item label="考核单位" prop="organ">
+        <el-select v-model="form.organ" :style="formItemWidth" filterable allow-create placeholder="请选择或输入单位全称">
+          <el-option v-for="i in options.organ" :key="i.id" :label="i.name" :value="i.name" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="考核年份" prop="years">
         <el-select v-model="form.years" :style="formItemWidth" placeholder="请选择考核年份">
-          <el-option v-for="i in options.years" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.years" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="考核季度" prop="season">
         <el-select v-model="form.season" :style="formItemWidth" placeholder="请选择考核季度">
-          <el-option v-for="i in options.season" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in options.season" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
 
@@ -66,7 +66,7 @@ export default {
   data() {
     return {
       resource: 'appraisal',
-      form: { personnelId: '', organId: '', years: '', season: '', conclusion: '' },
+      form: { personnelId: '', organ: '', years: '', season: '', conclusion: '' },
       rules
     }
   },
@@ -77,7 +77,7 @@ export default {
           case 100:
             return item.category === 1
           case '':
-            return true
+            return false
           default:
             return item.category === 2
         }
@@ -95,7 +95,7 @@ export default {
           this.form.id = this.row.id
         }
       } else {
-        this.form = { personnelId: '', organId: '', years: '', season: '', conclusion: '' }
+        this.form = { personnelId: '', organ: '', years: '', season: '', conclusion: '' }
         this.$refs.editForm.resetFields()
       }
     }

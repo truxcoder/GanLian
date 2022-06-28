@@ -1,19 +1,19 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-04-20 10:46:18
+ * @LastEditTime: 2022-06-16 17:40:19
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
 
-import { request } from '@/api/index'
-let fullTimeEduDict = []
-let partTimeEduDict = []
+// import { request } from '@/api/index'
+const fullTimeEduDict = []
+const partTimeEduDict = []
 
-request('personnel', 'dict').then(res => {
-  fullTimeEduDict = res.data ? res.data.filter(item => item.category === 1).map(item => item.name) : []
-  partTimeEduDict = res.data ? res.data.filter(item => item.category === 2).map(item => item.name) : []
-})
+// request('personnel', 'dict').then(res => {
+//   fullTimeEduDict = res.data ? res.data.filter(item => item.category === 1).map(item => item.name) : []
+//   partTimeEduDict = res.data ? res.data.filter(item => item.category === 2).map(item => item.name) : []
+// })
 
 export const nationDict = [
   '汉族',
@@ -197,19 +197,140 @@ export { fullTimeEduDict, partTimeEduDict }
 //   '中央党校大学'
 // ]
 
-// export const conclusionDict = ['优秀', '称职', '基本称职', '不称职', '不确定等次']
+export const marriageDict = ['未婚', '已婚', '再婚', '离异', '丧偶']
+
+export const eduDict = [
+  { label: '研究生', value: '研究生', category: 4 },
+  { label: '研究生班', value: '研究生班', category: 4 },
+  { label: '中央党校研究生', value: '中央党校研究生', category: 4 },
+  { label: '省（区、市）委党校研究生', value: '省（区、市）委党校研究生', category: 4 },
+  { label: '大学', value: '大学', category: 3 },
+  { label: '中央党校大学', value: '中央党校大学', category: 3 },
+  { label: '省（区、市）委党校大学', value: '省（区、市）委党校大学', category: 3 },
+  { label: '大专', value: '大专', category: 2 },
+  { label: '省（区、市）委党校大专', value: '省（区、市）委党校大专', category: 2 },
+  { label: '大学普通班', value: '大学普通班', category: 2 },
+  { label: '中央党校大专', value: '中央党校大专', category: 2 },
+  { label: '中专', value: '中专', category: 1 },
+  { label: '中技', value: '中技', category: 1 },
+  { label: '高中', value: '高中', category: 1 },
+  { label: '初中', value: '初中', category: 1 },
+  { label: '小学', value: '小学', category: 1 }
+]
+
+export const degreeDict = [
+  { label: '名誉博士', value: '名誉博士', category: 10 },
+  { label: '哲学博士', value: '哲学博士', category: 3 },
+  { label: '经济学博士', value: '经济学博士', category: 3 },
+  { label: '法学博士', value: '法学博士', category: 3 },
+  { label: '教育学博士', value: '教育学博士', category: 3 },
+  { label: '文学博士', value: '文学博士', category: 3 },
+  { label: '历史学博士', value: '历史学博士', category: 3 },
+  { label: '理学博士', value: '理学博士', category: 3 },
+  { label: '工学博士', value: '工学博士', category: 3 },
+  { label: '农学博士', value: '农学博士', category: 3 },
+  { label: '医学博士', value: '医学博士', category: 3 },
+  { label: '军事学博士', value: '军事学博士', category: 3 },
+  { label: '管理学博士', value: '管理学博士', category: 3 },
+  { label: '临床医学博士专业', value: '临床医学博士专业', category: 3 },
+  { label: '兽医博士专业', value: '兽医博士专业', category: 3 },
+  { label: '口腔医学博士专业', value: '口腔医学博士专业', category: 3 },
+  { label: '哲学硕士', value: '哲学硕士', category: 2 },
+  { label: '经济学硕士', value: '经济学硕士', category: 2 },
+  { label: '法学硕士', value: '法学硕士', category: 2 },
+  { label: '教育学硕士', value: '教育学硕士', category: 2 },
+  { label: '文学硕士', value: '文学硕士', category: 2 },
+  { label: '历史学硕士', value: '历史学硕士', category: 2 },
+  { label: '理学硕士', value: '理学硕士', category: 2 },
+  { label: '工学硕士', value: '工学硕士', category: 2 },
+  { label: '农学硕士', value: '农学硕士', category: 2 },
+  { label: '医学硕士', value: '医学硕士', category: 2 },
+  { label: '军事学硕士', value: '军事学硕士', category: 2 },
+  { label: '管理学硕士', value: '管理学硕士', category: 2 },
+  { label: '法律硕士专业', value: '法律硕士专业', category: 2 },
+  { label: '教育硕士专业', value: '教育硕士专业', category: 2 },
+  { label: '工程硕士专业', value: '工程硕士专业', category: 2 },
+  { label: '建筑学硕士专业', value: '建筑学硕士专业', category: 2 },
+  { label: '临床医学硕士专业', value: '临床医学硕士专业', category: 2 },
+  { label: '工商管理硕士专业', value: '工商管理硕士专业', category: 2 },
+  { label: '农业推广硕士专业', value: '农业推广硕士专业', category: 2 },
+  { label: '兽医硕士专业', value: '兽医硕士专业', category: 2 },
+  { label: '公共管理硕士专业', value: '公共管理硕士专业', category: 2 },
+  { label: '口腔医学硕士专业', value: '口腔医学硕士专业', category: 2 },
+  { label: '公共卫生硕士专业', value: '公共卫生硕士专业', category: 2 },
+  { label: '军士硕士专业', value: '军士硕士专业', category: 2 },
+  { label: '哲学学士', value: '哲学学士', category: 1 },
+  { label: '经济学学士', value: '经济学学士', category: 1 },
+  { label: '法学学士', value: '法学学士', category: 1 },
+  { label: '教育学学士', value: '教育学学士', category: 1 },
+  { label: '文学学士', value: '文学学士', category: 1 },
+  { label: '历史学学士', value: '历史学学士', category: 1 },
+  { label: '理学学士', value: '理学学士', category: 1 },
+  { label: '工学学士', value: '工学学士', category: 1 },
+  { label: '农学学士', value: '农学学士', category: 1 },
+  { label: '医学学士', value: '医学学士', category: 1 },
+  { label: '军事学学士', value: '军事学学士', category: 1 },
+  { label: '管理学学士', value: '管理学学士', category: 1 },
+  { label: '建筑学学士专业', value: '建筑学学士专业', category: 1 }
+]
+
 export const conclusionDict = [
   { value: '优秀', category: 1 },
   { value: '称职', category: 1 },
   { value: '基本称职', category: 1 },
+  { value: '不称职', category: 1 },
   { value: '不确定等次', category: 1 },
+  { value: '不进行考核', category: 1 },
   { value: '好', category: 2 },
   { value: '较好', category: 2 },
   { value: '一般', category: 2 },
-  { value: '较差', category: 2 }
+  { value: '较差', category: 2 },
+  { value: '不确定等次', category: 2 }
 ]
-export const aimDict = ['出差', '旅行', '学习']
-export const relationDict = ['妻子', '丈夫', '父亲', '母亲', '儿子', '女儿', '养父', '养母', '养子', '养女']
+export const aimDict = ['出差', '旅行', '学习', '探亲']
+// export const relationDict = ['妻子', '丈夫', '父亲', '母亲', '儿子', '女儿', '养父', '养母', '养子', '养女', '继父', '继母', '继子', '继女', '长子', '次子', '三子', '四子', '五子', '长女', '次女', '三女', '四女', '五女']
+export const relationDict = [
+  { label: '妻子', value: '妻子', sort: 1 },
+  { label: '丈夫', value: '丈夫', sort: 2 },
+  { label: '儿子', value: '儿子', sort: 7 },
+  { label: '女儿', value: '女儿', sort: 8 },
+  { label: '长子', value: '长子', sort: 11 },
+  { label: '次子', value: '次子', sort: 12 },
+  { label: '三子', value: '三子', sort: 13 },
+  { label: '四子', value: '四子', sort: 14 },
+  { label: '五子', value: '五子', sort: 15 },
+  { label: '六子', value: '六子', sort: 16 },
+  { label: '七子', value: '七子', sort: 17 },
+  { label: '八子', value: '八子', sort: 18 },
+  { label: '九子', value: '九子', sort: 19 },
+  { label: '长女', value: '长女', sort: 21 },
+  { label: '次女', value: '次女', sort: 22 },
+  { label: '三女', value: '三女', sort: 23 },
+  { label: '四女', value: '四女', sort: 24 },
+  { label: '五女', value: '五女', sort: 25 },
+  { label: '六女', value: '六女', sort: 26 },
+  { label: '七女', value: '七女', sort: 27 },
+  { label: '八女', value: '八女', sort: 28 },
+  { label: '九女', value: '九女', sort: 29 },
+  { label: '养子', value: '养子', sort: 31 },
+  { label: '养女', value: '养女', sort: 32 },
+  { label: '继子', value: '继子', sort: 33 },
+  { label: '继女', value: '继女', sort: 34 },
+  { label: '父亲', value: '父亲', sort: 40 },
+  { label: '母亲', value: '母亲', sort: 41 },
+  { label: '养父', value: '养父', sort: 42 },
+  { label: '养母', value: '养母', sort: 43 },
+  { label: '继父', value: '继父', sort: 44 },
+  { label: '继母', value: '继母', sort: 45 },
+  { label: '岳父', value: '岳父', sort: 46 },
+  { label: '岳母', value: '岳母', sort: 47 },
+  { label: '公公', value: '公公', sort: 48 },
+  { label: '婆婆', value: '婆婆', sort: 49 },
+  { label: '哥哥', value: '哥哥', sort: 50 },
+  { label: '姐姐', value: '姐姐', sort: 51 },
+  { label: '弟弟', value: '弟弟', sort: 52 },
+  { label: '妹妹', value: '妹妹', sort: 53 }
+]
 export const seasonDict = [
   { label: '年终', value: 100 },
   { label: '一季度', value: 101 },
@@ -342,3 +463,91 @@ export const oldDepartmentDict = [
   '政治处',
   '组织宣传科'
 ]
+
+export const reviewCategoryDict = [
+  { label: '人员基本信息', value: 1 },
+  { label: '教育情况', value: 2 },
+  { label: '个人简历', value: 3 },
+  { label: '家庭成员', value: 4 }
+]
+export const reviewStatusDict = [
+  { label: '待审核', value: 1 },
+  { label: '审核通过', value: 2 },
+  { label: '审核不通过', value: -1 }
+]
+export const feedbackCategoryDict = [
+  { label: '个人信息', value: 1 }
+]
+export const feedbackStatusDict = [
+  { label: '待审核', value: 1 },
+  { label: '已处理', value: 2 },
+  { label: '不处理', value: -1 }
+]
+
+export const trainingMethodDict = [
+  { label: '委托培训', value: 1, parent: 0 },
+  { label: '自主培训', value: 2, parent: 0 },
+  { label: '线上', value: 11, parent: 1 },
+  { label: '线下', value: 12, parent: 1 },
+  { label: '统一视频', value: 111, parent: 11 },
+  { label: '自学视频', value: 112, parent: 11 }
+]
+
+export const trainingCategoryDict = [
+  { label: '政治理论培训', value: 1, parent: 0 },
+  { label: '领导干部任职培训', value: 2, parent: 0 },
+  { label: '公务员初任培训', value: 3, parent: 0 },
+  { label: '在职培训', value: 4, parent: 0 },
+  { label: '专业资格继续教育培训', value: 5, parent: 0 },
+  { label: '警衔评授培训', value: 6, parent: 0 },
+  { label: '警体培训', value: 7, parent: 0 },
+  { label: '应急处突培训', value: 8, parent: 0 },
+  { label: '岗位比武', value: 9, parent: 0 },
+  { label: '其他培训', value: 10, parent: 0 },
+  { label: '处级领导', value: 21, parent: 2 },
+  { label: '科级领导', value: 22, parent: 2 },
+  { label: '首次授予警衔培训', value: 61, parent: 6 },
+  { label: '警衔晋升培训', value: 62, parent: 6 }
+]
+
+export const trainingMethodOption = [
+  {
+    label: '委托培训',
+    value: 1,
+    children: [
+      {
+        label: '线上',
+        value: 11,
+        children: [
+          { label: '统一视频', value: 111 },
+          { label: '自学视频', value: 112 }
+        ]
+      },
+      { label: '线下', value: 12 }
+    ]
+  },
+  { label: '自主培训', value: 2 }
+]
+
+// export const trainingCategoryOption = [
+//   { label: '政治理论培训', value: 1 },
+//   {
+//     label: '领导干部任职培训',
+//     value: 2,
+//     children: [
+//       { label: '处级领导', value: 21 },
+//       { label: '科级领导', value: 22 }
+//     ]
+//   },
+//   { label: '公务员初任培训', value: 3 },
+//   { label: '在职培训', value: 4 },
+//   { label: '专业资格继续教育培训', value: 5 }
+// ]
+
+export const trainingCategoryOption = trainingCategoryDict.filter(i => i.parent === 0).map(i => {
+  const children = trainingCategoryDict.filter(item => item.parent === i.value)
+  if (children.length !== 0) {
+    i.children = children
+  }
+  return i
+})

@@ -23,12 +23,12 @@
       </el-form-item>
       <el-form-item label="是否为领导职务" prop="isLeader">
         <el-select v-model="form.isLeader" :style="formItemWidth" placeholder="请选择是或否">
-          <el-option v-for="i in op.yesOrNo" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in op.yesOrNo" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="性质" prop="isChief">
         <el-select v-model="form.isChief" :style="formItemWidth" placeholder="请选择性质">
-          <el-option v-for="i in op.chiefOrVice" :key="i.vaule" :label="i.label" :value="i.value" />
+          <el-option v-for="i in op.chiefOrVice" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="级别" prop="levelId">

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 19:46:18
- * @LastEditTime: 2022-02-18 11:20:18
+ * @LastEditTime: 2022-06-27 11:20:23
  * @LastEditors: truxcoder
  * @Description: 举报详情
 -->
@@ -15,11 +15,13 @@
             <!-- <hr class="mb-4" /> -->
             <el-descriptions class="margin-top" title="" :column="1" border>
               <el-descriptions-item label="涉及人员">
-                <el-tooltip v-for="(v, k) in row.personnels" :key="k" placement="top">
+                <span v-for="(v, k) in row.personnels" :key="k" class=" pr-2">
+                  <el-link :href="getDetailLink(v.id)" type="primary" target="_blank">{{ v.name }}</el-link>
+                </span>
+                <!-- <el-tooltip v-for="(v, k) in row.personnels" :key="k" placement="top">
                   <div slot="content">警号: {{ v.policeCode }}<br />单位: {{ v.organShortName }}</div>
-                  <!-- <el-tag type="danger" size="small" effect="plain" class="pr-1">{{ v.name }}</el-tag> -->
                   <span class="pr-1 underline text-red-500">{{ v.name }}</span>
-                </el-tooltip>
+                </el-tooltip> -->
               </el-descriptions-item>
               <el-descriptions-item label="受理时间"> {{ row.reportTime | dateFilter }} </el-descriptions-item>
               <el-descriptions-item label="当前阶段"> {{ row.step | stepFilter }} </el-descriptions-item>
@@ -28,7 +30,7 @@
           <div class=" flex-1 ml-4">
             <el-card>
               <div>
-                <div class=" font-semibold">举报简介</div>
+                <div class=" font-semibold">处置情况</div>
                 <el-divider />
               </div>
               <div>{{ intro }}</div>
@@ -62,6 +64,8 @@
 <script>
 import { common_mixin } from '@/common/mixin/mixin'
 import { request } from '@/api/index'
+
+import { getDetailLink } from '@/utils/personnel'
 
 export default {
   name: 'ReportDetail',
@@ -148,6 +152,9 @@ export default {
     },
     onCancel() {
       this.$emit('visibleChange', 'detail')
+    },
+    getDetailLink(id) {
+      return getDetailLink(id)
     }
   }
 }

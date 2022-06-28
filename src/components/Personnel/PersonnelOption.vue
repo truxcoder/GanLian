@@ -18,7 +18,7 @@
     :loading="loading"
     @change="onChange"
   >
-    <el-option v-for="i in isUpdate ? personnelList : personnelOpitons" :key="i.vaule" :label="i.label" :value="i.value" />
+    <el-option v-for="i in isUpdate ? personnelList : personnelOpitons" :key="i.value" :label="i.label" :value="i.value" />
   </el-select>
 </template>
 

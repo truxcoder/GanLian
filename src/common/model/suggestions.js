@@ -2,6 +2,7 @@ import { request } from '@/api/index'
 import { subjectDict } from '@/utils/subject_dict'
 let fullTimeEdu = []
 let partTimeEdu = []
+let finalEdu = []
 const subjects = subjectDict.map(item => {
   return { value: item }
 })
@@ -20,6 +21,7 @@ request('personnel', 'dict').then(res => {
           return { value: item.name }
         })
     : []
+  finalEdu = res.data ? Array.from(new Set(res.data.map(i => i.name))).map(item => ({ value: item })) : []
 })
 const values = {
   nation: [
@@ -147,9 +149,14 @@ export const suggestions = {
     var results = queryString ? data.filter(createFilter(queryString)) : data
     cb(results)
   },
+  queryFinalEdu(queryString, cb) {
+    const data = finalEdu
+    var results = queryString ? data.filter(createFilter(queryString)) : data
+    cb(results)
+  },
   querySubject(queryString, cb) {
     const data = subjects
-    var results = queryString ? data.filter(createFilter(queryString)) : data
+    var results = queryString ? data.filter(createFilter(queryString)) : []
     cb(results)
   },
   queryProCert(queryString, cb) {

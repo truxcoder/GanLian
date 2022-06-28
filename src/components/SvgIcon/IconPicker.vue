@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-29 10:29:36
- * @LastEditTime: 2022-04-01 16:32:43
+ * @LastEditTime: 2022-05-10 16:14:19
  * @LastEditors: truxcoder
  * @Description: 图标选择
 -->
@@ -9,7 +9,7 @@
 <template>
   <div>
     <el-input id="iconInput" :style="{width}" class="icon-input" :value="value" placeholder="请选择图标" @input="onInput">
-      <i slot="prefix" class="el-input__icon" style="color:#999" :class="value" />>
+      <i slot="prefix" class="el-input__icon" style="color:#999" :class="value" />
       <i id="iconOpen" slot="suffix" class="el-input__icon el-icon-menu icon-open" @click="onOpen($event)" />
     </el-input>
     <div v-show="visible" class="options" :style="{'top': mt, 'width':width ? width : '500px'}">
