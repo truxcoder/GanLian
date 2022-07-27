@@ -1,12 +1,12 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-04-20 09:17:03
+ * @LastEditTime: 2022-07-27 12:07:22
  * @LastEditors: truxcoder
  * @Description:
  */
 module.exports = {
-  title: '干部管理和廉洁从政',
+  title: '干部管理与廉洁从政',
   fixedHeader: true,
   sidebarLogo: true,
   // 后端服务器地址

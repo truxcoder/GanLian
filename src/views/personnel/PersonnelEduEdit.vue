@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-05-12 18:53:20
- * @LastEditTime: 2022-06-21 15:05:31
+ * @LastEditTime: 2022-06-29 10:14:30
  * @LastEditors: truxcoder
  * @Description: 人员教育情况编辑页
 -->
@@ -13,6 +13,7 @@
       :inline="true"
       class="add-form"
       :model="form"
+      :rules="rules"
       size="medium"
       :label-width="formLabelWidth"
       label-position="right"
@@ -69,6 +70,7 @@ import { request } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import { eduOptions, degreeOptions } from '@/utils/dict_edu'
 import { suggestions } from '@/common/model/suggestions'
+import rules from '@/common/rules/edu'
 
 export default {
   name: 'PersonnelEduEdit',
@@ -83,6 +85,7 @@ export default {
       formItemWidth: { width: '300px' },
       cascaderProps: { expandTrigger: 'hover', emitPath: false },
       originForm: {},
+      rules,
       form: { id: '', fullTimeEdu: '', fullTimeDegree: '', fullTimeMajor: '', fullTimeSchool: '', partTimeEdu: '', partTimeDegree: '', partTimeMajor: '', partTimeSchool: '', finalEdu: '', finalDegree: '', finalMajor: '', finalSchool: '' }
     }
   },

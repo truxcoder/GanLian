@@ -80,6 +80,12 @@ import { permission_mixin } from '@/common/mixin/permission'
 import AppointmentEdit from './AppointmentEdit.vue'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import Docxtemplater from 'docxtemplater'
+// const ImageModule = require('docxtemplater-image-module')
+const ImageModule = require('docxtemplater-image-module-free')
+const https = require('https')
+const http = require('http')
+const Stream = require('stream').Transform
+// import { doc } from 'module'
 import PizZip from 'pizzip'
 import PizZipUtils from 'pizzip/utils/index.js'
 import { saveAs } from 'file-saver'
@@ -87,6 +93,7 @@ import dayjs from 'dayjs'
 import { getAge } from '@/utils'
 import { formatResume } from '@/utils/resume'
 import { awardGrade } from '@/utils/dict'
+import { getPhoto } from '@/utils/personnel'
 
 export default {
   name: 'Appointment',
@@ -186,6 +193,33 @@ export default {
       }
       return ''
     },
+    getHttpData(url, callback) {
+      const method = url.substr(0, 5) === 'https' ? https : http
+      method
+        .request(url, function(response) {
+          if (response.statusCode !== 200) {
+            return callback(
+              new Error(
+                `Request to ${url} failed, status code: ${response.statusCode}`
+              )
+            )
+          }
+          const data = new Stream()
+          response.on('data', function(chunk) {
+            data.push(chunk)
+          })
+          response.on('end', function() {
+            callback(null, data.read())
+          })
+          response.on('error', function(e) {
+            callback(e)
+          })
+        })
+        .on('error', e => {
+          this.$message.error('请求照片时发生错误')
+        })
+        .end()
+    },
     handleExport(index, row) {
       const data = { personnelId: row.personnelId }
       request('appointment', 'table', data).then(response => {
@@ -197,12 +231,53 @@ export default {
             if (error) {
               throw error
             }
+            // 渲染照片要用到image-module插件，但官方的docxtemplater-image-module收费，网上找到一个免费的docxtemplater-image-module-free
+            // 创建Docxtemplater实例的时候要传入imageOpts选项。因为要从URL获取照片，所以在这个选项里定义了getImage方法。同时定义了getSize用于确定照片大小。
+            const photo = response.data?.idCode ? getPhoto(response.data?.idCode, 'small') : ''
+            const imageOpts = {
+              getImage: (tagValue, tagName) => {
+                // console.log(tagValue, tagName)
+                // tagValue is "https://docxtemplater.com/xt-pro-white.png"
+                // tagName is "image"
+
+                return new Promise((resolve, reject) => {
+                  this.getHttpData(tagValue, function(err, data) {
+                    if (err) {
+                      return reject(err)
+                    }
+                    resolve(data)
+                  })
+                })
+              },
+              getSize: function(img, tagValue, tagName) {
+                // console.log(tagValue, tagName)
+                // img is the value that was returned by getImage
+                // This is to force the width to 600px, but keep the same aspect ratio
+                const sizeOf = require('image-size')
+                const sizeObj = sizeOf(img)
+                // console.log(sizeObj)
+                const forceWidth = 135
+                const ratio = forceWidth / sizeObj.width
+                return [
+                  forceWidth,
+                  // calculate height taking into account aspect ratio
+                  Math.round(sizeObj.height * ratio)
+                ]
+                // return [134, 192]
+              },
+              centered: true
+            }
             const zip = new PizZip(content)
-            const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true })
+            const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true, modules: [new ImageModule(imageOpts)] })
+            // doc.attachModule(new ImageModule(imageOpts))
             const fullTimeEdu = response.data.fullTimeDegree ? response.data.fullTimeEdu + '\n' + response.data.fullTimeDegree : response.data.fullTimeEdu
             const partTimeEdu = response.data.partTimeDegree ? response.data.partTimeEdu + '\n' + response.data.partTimeDegree : response.data.partTimeEdu
-            const fullTimeSchool = response.data.fullTimeSchool ? response.data.fullTimeSchool + '\n' + response.data.fullTimeMajor + '专业' : ''
-            const partTimeSchool = response.data.partTimeSchool ? response.data.partTimeSchool + '\n' + response.data.partTimeMajor + '专业' : ''
+            let fullTimeSchool = response.data.fullTimeSchool ? response.data.fullTimeSchool + (response.data.fullTimeMajor ? '\n' + response.data.fullTimeMajor : '') : ''
+            const partTimeSchool = response.data.partTimeSchool ? response.data.partTimeSchool + (response.data.partTimeMajor ? '\n' + response.data.partTimeMajor : '') : ''
+            if (response.data.fullTimeEdu === '小学' || response.data.fullTimeEdu === '初中' || response.data.fullTimeEdu === '高中') {
+              fullTimeSchool = ''
+            }
+            // 找到现任职务
             let post = ''
             response.posts.reduce((pre, cur, index, array) => {
               post = pre
@@ -220,7 +295,12 @@ export default {
             }, post)
 
             const family = response.family.map(i => {
-              i.age = getAge(dayjs(i.birthday).format('YYYY-MM-DD'))
+              // 按照干审表规定，如家属已去世，则对应年龄留空
+              if (i.organ.includes('已去世') || i.organ.includes('已故') || i.post.includes('已去世') || i.post.includes('已故')) {
+                i.age = ''
+              } else {
+                i.age = getAge(dayjs(i.birthday).format('YYYY-MM-DD'))
+              }
               return i
             })
             const familyItem = { relation: '', name: '', age: '', organ: '', post: '', political: '' }
@@ -238,10 +318,23 @@ export default {
               }
               resume.push({ content: formatResume(i, resumeList[i], resumeList, 'YYYY.MM') })
             }
-            const award = response.awards.map(i => {
-              const content = dayjs(i.getTime).format('YYYY.MM') + '  ' + this.getAwardName(i)
-              return { content }
-            })
+            // const award = response.awards.map(i => {
+            //   const content = dayjs(i.getTime).format('YYYY.MM') + '  ' + this.getAwardName(i)
+            //   return { content }
+            // })
+            // 处理奖惩情况
+            const award = response.awards.map(i => dayjs(i.getTime).format('YYYY.MM') + ' ' + this.getAwardName(i)).join(';')
+            const disciplines = response.disciplines.map(i => dayjs(i.getTime).format('YYYY年MM月') + '经' + i.organ + '批准' + '受到' + i.dictName + '处分').join(';')
+            let awardAndPunish = '无'
+            if (award !== '' && disciplines === '') {
+              awardAndPunish = award
+            }
+            if (award === '' && disciplines !== '') {
+              awardAndPunish = disciplines
+            }
+            if (award !== '' && disciplines !== '') {
+              awardAndPunish = award + '\n' + disciplines
+            }
             let appraisal = ''
             response.appraisals.forEach(i => {
               if (appraisal !== '') {
@@ -250,7 +343,7 @@ export default {
               appraisal += i.years + '年年度考核结果为' + i.conclusion
             })
             appraisal += '。'
-            doc.setData({
+            const docData = {
               name: response.data.name,
               gender: response.data.gender,
               birthday: dayjs(response.data.birthday).format('YYYY.MM'),
@@ -258,7 +351,7 @@ export default {
               nation: response.data.nation,
               hometown: response.data.hometown,
               birthplace: response.data.birthplace,
-              joinPartyDay: dayjs(response.data.joinPartyDay).format('YYYY.MM'),
+              joinPartyDay: dayjs(response.data.joinPartyDay).year() === 1 ? '' : dayjs(response.data.joinPartyDay).format('YYYY.MM'),
               startJobDay: dayjs(response.data.startJobDay).format('YYYY.MM'),
               health: response.data.health,
               technicalTitle: response.data.technicalTitle,
@@ -275,34 +368,29 @@ export default {
               family: family,
               resume,
               award,
-              appraisal
-            })
-            try {
-              doc.render()
-            } catch (error) {
-              // The error thrown here contains additional information when logged with JSON.stringify (it contains a properties object containing all suberrors).
-
-              console.log(JSON.stringify({ error: error }, this.replaceErrors))
-
-              if (error.properties && error.properties.errors instanceof Array) {
-                const errorMessages = error.properties.errors
-                  .map(function(error) {
-                    return error.properties.explanation
-                  })
-                  .join('\n')
-                console.log('errorMessages', errorMessages)
-                // errorMessages is a humanly readable message looking like this :
-                // 'The tag beginning with "foobar" is unopened'
-              }
-              throw error
+              awardAndPunish,
+              appraisal,
+              image: photo
             }
-            const out = doc.getZip().generate({
-              type: 'blob',
-              mimeType:
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            })
-            // Output the document using Data-URI
-            saveAs(out, response.data.name + '干审表.docx')
+
+            // doc.setData(docData)
+
+            // 因为涉及到照片，这里选择异步渲染文档
+            doc.renderAsync(docData)
+            // doc.render(imageData)
+              .then(() => {
+                const buffer = doc.getZip().generate({
+                  type: 'blob',
+                  mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                  // type: 'nodebuffer',
+                  // compression: 'DEFLATE'
+                })
+                saveAs(buffer, response.data.name + '干审表.docx')
+              })
+              .catch(error => {
+                console.log('发生错误:', error)
+                this.$message.error(error)
+              })
           })
         } else {
           console.log('--')

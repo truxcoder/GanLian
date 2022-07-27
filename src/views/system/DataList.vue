@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-01-19 15:22:52
- * @LastEditTime: 2022-03-18 11:34:25
+ * @LastEditTime: 2022-07-27 14:59:33
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -110,6 +110,7 @@
 import { common_mixin } from '@/common/mixin/mixin'
 import { request } from '@/api/index'
 import { idCodeValidate } from '@/utils/validate'
+import isEmpty from 'lodash/isEmpty'
 
 export default {
   name: 'DataList',
@@ -206,6 +207,10 @@ export default {
         .then(() => {
           if (!this.idCodeValidate()) {
             this.$message.error('不能同步身份证号码不合法人员!')
+            return false
+          }
+          if (isEmpty(this.multipleSelection)) {
+            this.$message.info('您未选择任何数据')
             return false
           }
           this.loading = true

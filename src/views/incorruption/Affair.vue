@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-04-11 11:39:34
+ * @LastEditTime: 2022-07-26 15:56:23
  * @LastEditors: truxcoder
  * @Description: 各类事项管理
 -->
@@ -11,6 +11,11 @@
       <el-col :span="24"><h2>暂无数据</h2></el-col>
     </el-row> -->
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form-item v-if="can.global" label="单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" multiple placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="姓名" prop="personnelId">
         <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
       </el-form-item>
@@ -99,6 +104,9 @@ export default {
     }
   },
   computed: {
+    organList() {
+      return this.$store.getters.organs
+    },
     params() {
       return this.$route.params
     },
@@ -138,7 +146,7 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
       request(this.resource, 'list/' + this.category, data, params).then(response => {
         if (response.count) {
           this.originData = response.data

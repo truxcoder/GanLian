@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-04-18 15:40:30
- * @LastEditTime: 2022-04-18 17:24:15
+ * @LastEditTime: 2022-07-27 14:58:21
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -14,8 +14,8 @@
         <el-button type="danger" plain size="mini" @click="onSubmit">确定</el-button>
       </div>
       <div v-if="tab === 'add'" class="notice">
-        <span class=" pr-4">如果您有十分的把握，也可略过审查，直接全部同步。请点击:</span>
-        <el-button type="danger" plain size="mini" @click="onSubmitAll">全部更新</el-button>
+        <span class=" pr-4">如果您有十分的把握，也可略过审查，直接全部添加。请点击:</span>
+        <el-button type="danger" plain size="mini" @click="onSubmitAll">全部添加</el-button>
       </div>
       <div v-if="tab === 'update'" class="mt-4">
         <span class=" pr-4">如果您有十分的把握，也可略过审查，直接全部更新。请点击:</span>
@@ -65,9 +65,10 @@
 import { common_mixin } from '@/common/mixin/mixin'
 import { request } from '@/api/index'
 import { idCodeValidate } from '@/utils/validate'
+import isEmpty from 'lodash/isEmpty'
 
 export default {
-  name: 'DataList',
+  name: 'AccountList',
   filters: {
     userTypeFilter(userType) {
       if (userType === 1) {
@@ -161,6 +162,10 @@ export default {
         .then(() => {
           if (!this.idCodeValidate()) {
             this.$message.error('不能同步身份证号码不合法人员!')
+            return false
+          }
+          if (isEmpty(this.multipleSelection)) {
+            this.$message.info('您未选择任何数据')
             return false
           }
           this.loading = true

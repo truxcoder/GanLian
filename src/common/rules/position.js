@@ -1,3 +1,10 @@
+/*
+ * @Author: truxcoder
+ * @Date: 2021-11-15 16:40:58
+ * @LastEditTime: 2022-06-29 10:02:44
+ * @LastEditors: truxcoder
+ * @Description:
+ */
 export default {
   name: [
     { required: true, message: '请输入名称', trigger: 'blur' },
@@ -11,5 +18,5 @@ export default {
   ],
   levelId: [
     { required: true, message: '请选择级别', trigger: 'change' }
-  ],
+  ]
 }

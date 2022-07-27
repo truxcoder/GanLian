@@ -85,7 +85,7 @@ import { search_mixin } from '@/common/mixin/search'
 import { permission_mixin } from '@/common/mixin/permission'
 
 export default {
-  name: 'Personnel',
+  name: 'Account',
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {

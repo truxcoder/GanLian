@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-01-19 15:22:52
- * @LastEditTime: 2022-03-15 11:23:46
+ * @LastEditTime: 2022-07-27 14:57:30
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -66,6 +66,7 @@
 <script>
 import { common_mixin } from '@/common/mixin/mixin'
 import { request } from '@/api/index'
+import isEmpty from 'lodash/isEmpty'
 
 export default {
   name: 'DepartmentList',
@@ -149,8 +150,12 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          this.loading = true
           let data = this.multipleSelection
+          if (isEmpty(data)) {
+            this.$message.info('您未选择任何数据')
+            return false
+          }
+          this.loading = true
           if (this.tab === 'delete') {
             data = { id: this.multipleSelection.map(i => i.deptId) }
           }

@@ -1,23 +1,28 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-05-26 10:50:03
+ * @LastEditTime: 2022-07-26 15:56:04
  * @LastEditors: truxcoder
  * @Description:处分，前端分页
 -->
 <template>
   <div class="app-container">
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form-item v-if="can.global" label="单位" prop="organParam">
+        <el-select v-model="searchForm.organParam" size="small" :style="searchItemWidth" multiple placeholder="请选择单位">
+          <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="姓名" prop="personnelId">
-        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" size="small" />
+        <PersonnelOption ref="personnelOption" v-model="searchForm.personnelId" :form-item-width="searchNameWidth" size="small" />
       </el-form-item>
       <el-form-item label="类别" prop="category">
-        <el-select v-model="searchForm.category" size="small" placeholder="类别">
+        <el-select v-model="searchForm.category" size="small" :style="searchItemWidth" placeholder="类别">
           <el-option v-for="i in options.category" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="处分项" prop="dictId">
-        <el-select v-model="searchForm.dictId" size="small" placeholder="请选择处理项">
+        <el-select v-model="searchForm.dictId" size="small" :style="searchItemWidth" placeholder="请选择处理项">
           <el-option v-for="i in disDictList" :key="i.id" :label="i.name" :value="i.id" />
         </el-select>
       </el-form-item>
@@ -134,10 +139,15 @@ export default {
       currentData: [],
       detailVisible: false,
       dictVisible: false,
+      searchItemWidth: { width: '155px' },
+      searchNameWidth: { width: '150px' },
       searchForm: { personnelId: '', category: '', dictId: '' }
     }
   },
   computed: {
+    organList() {
+      return this.$store.getters.organs
+    },
     options() {
       const categoryOptions = [
         { label: '党纪处分', value: 1 },
@@ -160,7 +170,7 @@ export default {
   methods: {
     fetchAllData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
       const promises = [request(this.resource, 'list', data, params), request('dis_dict', 'list')]
       Promise.all(promises).then(responses => {
         this.originData = responses[0].data ?? []
@@ -175,7 +185,7 @@ export default {
     },
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      params = this.buildParams(this.queryMeans, params)
       request(this.resource, 'list', data, params).then(response => {
         this.originData = response.data ?? []
         this.currentData = this.originData.length ? [...this.originData] : []

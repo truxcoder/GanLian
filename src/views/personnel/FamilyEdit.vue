@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:24:30
- * @LastEditTime: 2022-06-22 10:30:47
+ * @LastEditTime: 2022-07-20 14:46:33
  * @LastEditors: truxcoder
  * @Description: 添加修改家庭成员信息
 -->
@@ -19,7 +19,7 @@
       label-position="right"
     >
       <el-form-item label="姓名" prop="name">
-        <el-input v-model="form.name" :style="formItemWidth" placeholder="请输入姓名" />
+        <el-input v-model.trim="form.name" :style="formItemWidth" placeholder="请输入姓名" />
       </el-form-item>
 
       <el-form-item label="性别" prop="gender">
@@ -28,7 +28,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="称谓" prop="relation">
-        <el-select v-model="form.relation" :style="formItemWidth" allow-create filterable placeholder="称谓">
+        <el-select v-model.trim="form.relation" :style="formItemWidth" allow-create filterable placeholder="称谓">
           <el-option v-for="i in op.relation" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>

@@ -169,53 +169,25 @@ export const constantRoutes = [
         name: 'TalentDashboard',
         component: () => import('@/views/talent/Dashboard'),
         meta: { title: '人才库', icon: 'dashboard' }
-      }
-    ]
-  },
-  {
-    path: '/talent',
-    component: TalentLayout,
-    hidden: true,
-    children: [
+      },
       {
         path: 'politics',
         name: 'TalentPolitics',
         component: () => import('@/views/talent/Talent'),
         meta: { title: '政工人才库', icon: 'dashboard' }
-      }
-    ]
-  },
-  {
-    path: '/talent',
-    component: TalentLayout,
-    hidden: true,
-    children: [
+      },
       {
         path: 'finance',
         name: 'TalentFinance',
         component: () => import('@/views/talent/Talent'),
         meta: { title: '财务人才库', icon: 'dashboard' }
-      }
-    ]
-  },
-  {
-    path: '/talent',
-    component: TalentLayout,
-    hidden: true,
-    children: [
+      },
       {
         path: 'information',
         name: 'TalentInformation',
         component: () => import('@/views/talent/Talent'),
         meta: { title: '信息化人才库', icon: 'dashboard' }
-      }
-    ]
-  },
-  {
-    path: '/talent',
-    component: TalentLayout,
-    hidden: true,
-    children: [
+      },
       {
         path: 'pick',
         name: 'TalentPick',
@@ -224,6 +196,58 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/talent',
+  //   component: TalentLayout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'politics',
+  //       name: 'TalentPolitics',
+  //       component: () => import('@/views/talent/Talent'),
+  //       meta: { title: '政工人才库', icon: 'dashboard' }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/talent',
+  //   component: TalentLayout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'finance',
+  //       name: 'TalentFinance',
+  //       component: () => import('@/views/talent/Talent'),
+  //       meta: { title: '财务人才库', icon: 'dashboard' }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/talent',
+  //   component: TalentLayout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'information',
+  //       name: 'TalentInformation',
+  //       component: () => import('@/views/talent/Talent'),
+  //       meta: { title: '信息化人才库', icon: 'dashboard' }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/talent',
+  //   component: TalentLayout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'pick',
+  //       name: 'TalentPick',
+  //       component: () => import('@/views/talent/TalentPick'),
+  //       meta: { title: '人才抽取', icon: 'dashboard' }
+  //     }
+  //   ]
+  // },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
