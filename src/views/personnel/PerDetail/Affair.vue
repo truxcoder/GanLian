@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-16 15:27:45
- * @LastEditTime: 2022-03-16 17:28:36
+ * @LastEditTime: 2022-08-08 14:39:27
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -9,11 +9,11 @@
   <div>
     <div class=" flex items-center text-left">
       <el-button v-if="can.add" type="primary" size="mini" @click="handleEdit('add')">添加信息</el-button>
-      <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <!-- <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button> -->
     </div>
     <div v-if="currentData.length" class="mt-4">
       <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
-        <el-table-column align="center" type="selection" width="55" />
+        <!-- <el-table-column align="center" type="selection" width="55" /> -->
         <el-table-column label="分类" align="center" width="220">
           <template slot-scope="scope">
             {{ getCategory(scope.row.category) }}
@@ -27,7 +27,7 @@
         <el-table-column align="center" label="操作" width="240">
           <template slot-scope="scope">
             <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
-            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button>
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row, scope.row.category + 102)">删除</el-button>
             <el-button size="mini" type="primary" @click="handleDetail(scope.row)">详情</el-button>
           </template>
         </el-table-column>
@@ -53,6 +53,7 @@ import AffairEdit from '@/views/incorruption/AffairEdit.vue'
 import AffairDetail from '@/views/incorruption/AffairDetail.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
+import { delete_mixin } from '@/common/mixin/pre_delete'
 import { permission_mixin } from '@/common/mixin/permission'
 import { common_mixin } from '@/common/mixin/mixin'
 import { affairCategoryDict } from '@/utils/dict'
@@ -60,11 +61,12 @@ import { affairCategoryDict } from '@/utils/dict'
 export default {
   name: 'Affair',
   components: { AffairEdit, AffairDetail },
-  mixins: [mixin, permission_mixin, common_mixin],
+  mixins: [mixin, permission_mixin, common_mixin, delete_mixin],
   data() {
     return {
       resource: 'affair',
-      obj: 'DetailAffair'
+      obj: 'DetailAffair',
+      isPerDetailPage: true
     }
   },
   computed: {

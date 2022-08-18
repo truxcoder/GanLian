@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-06-16 17:40:19
+ * @LastEditTime: 2022-08-15 09:41:41
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
@@ -271,6 +271,7 @@ export const degreeDict = [
   { label: '医学学士', value: '医学学士', category: 1 },
   { label: '军事学学士', value: '军事学学士', category: 1 },
   { label: '管理学学士', value: '管理学学士', category: 1 },
+  { label: '艺术学学士', value: '艺术学学士', category: 1 }, // 此项在干免表编辑器里不存在，系另增加的选项
   { label: '建筑学学士专业', value: '建筑学学士专业', category: 1 }
 ]
 
@@ -469,6 +470,13 @@ export const reviewCategoryDict = [
   { label: '教育情况', value: 2 },
   { label: '个人简历', value: 3 },
   { label: '家庭成员', value: 4 }
+]
+export const incorruptionReviewCategoryDict = [
+  { label: '处分数据', value: 101 },
+  { label: '信访举报', value: 102 },
+  { label: '经济责任审计', value: 103 },
+  { label: '个人事项核查', value: 104 },
+  { label: '检查巡视巡查', value: 105 }
 ]
 export const reviewStatusDict = [
   { label: '待审核', value: 1 },

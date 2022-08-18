@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 15:39:29
- * @LastEditTime: 2022-04-11 10:54:29
+ * @LastEditTime: 2022-08-03 15:42:00
  * @LastEditors: truxcoder
  * @Description: 人员详情页任职列表
 -->
@@ -40,13 +40,14 @@
 <script>
 import PostEdit from '@/views/personnel/PostEdit.vue'
 import { mixin } from '@/common/mixin/personnel_detail'
+import { PerDetailDeleteMixin } from '@/common/mixin/delete'
 import { common_mixin } from '@/common/mixin/mixin'
 import { permission_mixin } from '@/common/mixin/permission'
 
 export default {
   name: 'Post',
   components: { PostEdit },
-  mixins: [common_mixin, mixin, permission_mixin],
+  mixins: [common_mixin, mixin, permission_mixin, PerDetailDeleteMixin],
   data() {
     return {
       resource: 'post',

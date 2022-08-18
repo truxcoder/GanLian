@@ -2,7 +2,7 @@
   <div>
     <div class=" flex items-center text-left">
       <el-button v-if="can.add" type="primary" size="mini" @click="handleEdit('add')">添加信息</el-button>
-      <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
+      <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData(101)">删除</el-button>
     </div>
     <div v-if="currentData.length" class="mt-4">
       <el-table v-loading="loading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
@@ -37,7 +37,7 @@
             <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
               编辑
             </el-button>
-            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
+            <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row, 101)">
               删除
             </el-button>
             <el-button size="mini" type="primary" @click="handleDetail(scope.row)">
@@ -69,6 +69,7 @@ import DisciplineEdit from '@/views/incorruption/DisciplineEdit.vue'
 import DisciplineDetail from '@/views/incorruption/DisciplineDetail.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
+import { delete_mixin } from '@/common/mixin/pre_delete'
 import { permission_mixin } from '@/common/mixin/permission'
 
 import { common_mixin } from '@/common/mixin/mixin'
@@ -77,7 +78,7 @@ import { request } from '@/api'
 export default {
   name: 'Discipline',
   components: { DisciplineEdit, DisciplineDetail },
-  mixins: [mixin, permission_mixin, common_mixin],
+  mixins: [mixin, permission_mixin, common_mixin, delete_mixin],
   data() {
     return {
       resource: 'discipline',

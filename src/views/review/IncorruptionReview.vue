@@ -1,9 +1,9 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-05-18 10:22:51
- * @LastEditTime: 2022-07-28 09:57:57
+ * @LastEditTime: 2022-08-04 12:00:18
  * @LastEditors: truxcoder
- * @Description: 数据审核
+ * @Description: 干部监督数据审核
 -->
 
 <template>
@@ -20,7 +20,7 @@
       </el-form-item>
       <el-form-item label="数据分类" prop="category">
         <el-select v-model="searchForm.category" size="small" :style="searchItemWidth" placeholder="请选择分类">
-          <el-option v-for="i in reviewCategoryDict" :key="i.value" :label="i.label" :value="i.value" />
+          <el-option v-for="i in incorruptionReviewCategoryDict" :key="i.value" :label="i.label" :value="i.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="当前状态" prop="status">
@@ -56,6 +56,11 @@
           {{ getCategory(scope.row.category) }}
         </template>
       </el-table-column>
+      <el-table-column label="动作" align="center">
+        <template slot-scope="scope">
+          {{ getAction(scope.row.content) }}
+        </template>
+      </el-table-column>
       <el-table-column label="当前状态" align="center">
         <template slot-scope="scope">
           <span :class="getStatusClass(scope.row.status)">{{ getStatus(scope.row.status) }}</span>
@@ -65,6 +70,7 @@
 
       <el-table-column align="center" label="操作" width="160">
         <template slot-scope="scope">
+          <!-- <el-button size="mini" type="primary" @click="handleDetail(getContent(scope.row.content))">审核</el-button> -->
           <el-button size="mini" type="primary" @click="handleDetail(scope.row)">审核</el-button>
         </template>
       </el-table-column>
@@ -81,7 +87,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <ReviewDetail :visible="detailVisible" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <IncorruptionReviewDetail :visible="detailVisible" :row="rowData" :dis-dict="disDict" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -92,14 +98,14 @@ import { delete_mixin } from '@/common/mixin/delete'
 import { list_mixin } from '@/common/mixin/list'
 import { search_mixin } from '@/common/mixin/search'
 import { permission_mixin } from '@/common/mixin/permission'
-import ReviewDetail from './ReviewDetail.vue'
+import IncorruptionReviewDetail from '@/views/review/IncorruptionReviewDetail.vue'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 
-import { reviewCategoryDict, reviewStatusDict } from '@/utils/dict'
+import { incorruptionReviewCategoryDict, reviewStatusDict } from '@/utils/dict'
 
 export default {
-  name: 'Review',
-  components: { ReviewDetail, PersonnelOption },
+  name: 'IncorruptionReview',
+  components: { IncorruptionReviewDetail, PersonnelOption },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -108,7 +114,8 @@ export default {
       originData: [],
       currentData: [],
       reviewStatusDict,
-      reviewCategoryDict,
+      disDict: [],
+      incorruptionReviewCategoryDict,
       searchItemWidth: { width: '170px' },
       searchNameWidth: { width: '160px' },
       formItemWidth: { width: '170px' },
@@ -123,6 +130,7 @@ export default {
   created() {
     this.check().then(() => {
       this.fetchData()
+      this.fetchDictData()
     })
   },
   methods: {
@@ -146,12 +154,17 @@ export default {
         this.listLoading = false
       })
     },
+    fetchDictData() {
+      request('dis_dict', 'list').then(response => {
+        this.disDict = response.data
+      })
+    },
     editSuccess() {
       this.detailVisible = false
       this.fetchData(this.searchData, this.queryParam)
     },
     getCategory(c) {
-      for (const i of reviewCategoryDict) {
+      for (const i of incorruptionReviewCategoryDict) {
         if (i.value === c) {
           return i.label
         }
@@ -165,6 +178,23 @@ export default {
         }
       }
       return '未定义'
+    },
+    getContent(c) {
+      return JSON.parse(c)
+    },
+    getAction(c) {
+      const content = JSON.parse(c)
+      switch (content.action) {
+        case 'add':
+          return '添加'
+        case 'update':
+          return '修改'
+        case 'delete':
+          return '删除'
+
+        default:
+          return '未知'
+      }
     },
     getStatusClass(s) {
       switch (s) {
@@ -181,7 +211,7 @@ export default {
       this.detailVisible = true
     },
     interceptor(data) {
-      data.categories = [1, 2, 3, 4]
+      data.categories = [101, 102, 103, 104, 105]
     }
   }
 }

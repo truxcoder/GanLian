@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 11:23:18
- * @LastEditTime: 2022-06-14 16:52:16
+ * @LastEditTime: 2022-08-03 15:39:17
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -65,13 +65,14 @@
 import AppraisalEdit from '@/views/personnel/AppraisalEdit.vue'
 import { permission_mixin } from '@/common/mixin/permission'
 import { mixin } from '@/common/mixin/personnel_detail'
+import { PerDetailDeleteMixin } from '@/common/mixin/delete'
 
 import { conclusionDict, seasonDict } from '@/utils/dict'
 
 export default {
   name: 'Appraisal',
   components: { AppraisalEdit },
-  mixins: [mixin, permission_mixin],
+  mixins: [mixin, permission_mixin, PerDetailDeleteMixin],
   data() {
     return {
       obj: 'DetailAppraisal',

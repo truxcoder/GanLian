@@ -1,4 +1,11 @@
-import { request, curd } from '@/api/index'
+/*
+ * @Author: truxcoder
+ * @Date: 2021-11-29 15:44:54
+ * @LastEditTime: 2022-08-03 15:35:52
+ * @LastEditors: truxcoder
+ * @Description: 个人情况页mixin
+ */
+import { request } from '@/api/index'
 export const mixin = {
   props: {
     baseData: {
@@ -18,7 +25,6 @@ export const mixin = {
       addVisible: false,
       originData: [],
       currentData: [],
-      multipleSelection: [],
       rowData: {},
       currentEditIndex: 0
     }
@@ -58,9 +64,6 @@ export const mixin = {
       this.updateVisible = false
       this.fetchData()
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
     handleEdit(act, row) {
       this.action = act
       if (act === 'add') {
@@ -75,58 +78,6 @@ export const mixin = {
       this.rowData = row
       this.currentEditIndex = index
       this.updateVisible = true
-    },
-    handleDelete(index, id) {
-      this.$confirm('将删除该条信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          curd('delete', { id: [id] }, { resource: this.resource })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.fetchData()
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
-    deleteMutiData() {
-      this.$confirm('将删除选中信息, 是否确定?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          curd('delete', { id: this.multipleSelection.map(item => item.id) }, { resource: this.resource })
-            .then(response => {
-              this.$message({
-                message: response.message,
-                type: 'success'
-              })
-              this.fetchData()
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
     }
   }
 }

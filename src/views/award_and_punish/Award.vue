@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-05-26 10:43:25
+ * @LastEditTime: 2022-08-01 14:43:29
  * @LastEditors: truxcoder
  * @Description:奖励信息，后端分页
 -->
@@ -204,8 +204,10 @@ export default {
       this.detailVisible = true
     },
     interceptor(data) {
+      // 此处达梦无法准确处理时区问题，获得的年份为0区时间的年份，而不是东8区时间的年份。所以不用年份来判断。
       if ('year' in data) {
-        data.intercept = 'YEAR(awards.get_time) = ' + data.year
+        // data.intercept = 'YEAR(awards.get_time) = ' + data.year
+        data.intercept = `awards.get_time >= date'${data.year}-01-01 00:00:00.000000 +08:00' and awards.get_time < date'${data.year + 1}-01-01 00:00:00.000000 +08:00'`
       }
     }
   }

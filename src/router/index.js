@@ -41,6 +41,7 @@ const Account = () => import('@/views/system/Account')
 const PersonnelDisabled = () => import('@/views/system/PersonnelDisabled')
 const Review = () => import('@/views/review/Review')
 const Feedback = () => import('@/views/review/Feedback')
+const IncorruptionReview = () => import('@/views/review/IncorruptionReview')
 
 const Appointment = () => import('@/views/personnel/Appointment')
 
@@ -72,6 +73,7 @@ export const componentList = {
   PersonnelDisabled,
   Review,
   Feedback,
+  IncorruptionReview,
   Appointment
 }
 /**

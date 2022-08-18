@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:24:30
- * @LastEditTime: 2022-04-01 14:50:01
+ * @LastEditTime: 2022-08-08 14:29:32
  * @LastEditors: truxcoder
  * @Description: 添加修改各类事项信息
  * wangEditor使用说明:
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { curd, request } from '@/api/index'
+import { request, curd } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import rules from '@/common/rules/affair'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
@@ -132,12 +132,23 @@ export default {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          console.log('this.form:', this.form)
-          curd(this.action, this.form, { resource: this.resource })
+          const content = {
+            action: this.action,
+            data: JSON.stringify(this.form)
+          }
+          const data = {
+            personnelId: this.$store.getters.personnelId,
+            organId: this.$store.getters.organ,
+            category: this.form.category + 102,
+            content: JSON.stringify(content)
+          }
+          const result = this.form.category === 2
+            ? curd(this.action, this.form, { resource: this.resource }) : request('pre', null, data)
+          result
             .then(response => {
               this.$message.success(response.message)
               this.dialogLoading = false
-              this.$emit('editSuccess')
+              this.form.category === 2 ? this.$emit('editSuccess') : this.$emit('visibleChange', 'edit')
             })
             .catch(err => {
               console.log(err)

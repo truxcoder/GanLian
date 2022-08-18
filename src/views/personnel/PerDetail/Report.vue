@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-30 15:39:29
- * @LastEditTime: 2022-03-02 20:23:29
+ * @LastEditTime: 2022-08-03 15:42:30
  * @LastEditors: truxcoder
  * @Description: 人员详情页举报列表
 -->
@@ -42,6 +42,7 @@
 import ReportDetail from '@/views/incorruption/ReportDetail.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
+import { PerDetailDeleteMixin } from '@/common/mixin/delete'
 import { permission_mixin } from '@/common/mixin/permission'
 
 export default {
@@ -80,7 +81,7 @@ export default {
       return result
     }
   },
-  mixins: [mixin, permission_mixin],
+  mixins: [mixin, permission_mixin, PerDetailDeleteMixin],
   data() {
     return {
       resource: 'report',

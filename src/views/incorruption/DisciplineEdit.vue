@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-04-18 10:25:14
+ * @LastEditTime: 2022-08-04 10:55:17
  * @LastEditors: truxcoder
  * @Description: 处分信息添加编辑
 -->
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { curd } from '@/api/index'
+import { request } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import rules from '@/common/rules/discipline'
@@ -110,11 +110,23 @@ export default {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.dialogLoading = true
-          curd(this.action, this.form, { resource: this.resource })
+          const content = {
+            action: this.action,
+            data: JSON.stringify(this.form)
+          }
+          const data = {
+            personnelId: this.$store.getters.personnelId,
+            organId: this.$store.getters.organ,
+            category: 101,
+            content: JSON.stringify(content)
+          }
+          // curd(this.action, this.form, { resource: this.resource })
+          request('pre', null, data)
             .then(response => {
               this.$message.success(response.message)
               this.dialogLoading = false
-              this.$emit('editSuccess')
+              // this.$emit('editSuccess')
+              this.$emit('visibleChange', 'edit')
             })
             .catch(err => {
               console.log(err)

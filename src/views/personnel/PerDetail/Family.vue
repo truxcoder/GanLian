@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-16 20:39:01
- * @LastEditTime: 2022-06-21 15:07:42
+ * @LastEditTime: 2022-08-03 15:41:18
  * @LastEditors: truxcoder
  * @Description: 家庭成员页
 -->
@@ -55,6 +55,7 @@
 import FamilyEdit from '@/views/personnel/FamilyEdit.vue'
 
 import { mixin } from '@/common/mixin/personnel_detail'
+import { PerDetailDeleteMixin } from '@/common/mixin/delete'
 import { permission_mixin } from '@/common/mixin/permission'
 import { common_mixin } from '@/common/mixin/mixin'
 import { relationDict } from '@/utils/dict'
@@ -62,7 +63,7 @@ import { relationDict } from '@/utils/dict'
 export default {
   name: 'Family',
   components: { FamilyEdit },
-  mixins: [mixin, permission_mixin, common_mixin],
+  mixins: [mixin, permission_mixin, common_mixin, PerDetailDeleteMixin],
   data() {
     return {
       resource: 'family',

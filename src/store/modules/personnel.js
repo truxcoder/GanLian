@@ -1,19 +1,23 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-01 16:25:23
- * @LastEditTime: 2022-04-19 21:47:55
+ * @LastEditTime: 2022-08-01 16:01:08
  * @LastEditors: truxcoder
  * @Description:
  */
 import { request } from '@/api'
 const state = {
   personnelOptions: [],
+  personnelMap: {},
   perDptMap: {}
 }
 
 const mutations = {
   CHANGE_PER_OPTIONS: (state, payload) => {
     state.personnelOptions = payload
+  },
+  CHANGE_PER_MAP: (state, payload) => {
+    state.personnelMap = payload
   },
   CHANGE_PER_DPT_MAP: (state, payload) => {
     state.perDptMap = payload
@@ -33,6 +37,11 @@ const actions = {
             }
           })
           commit('CHANGE_PER_OPTIONS', personnelOptions)
+          const personnelList = {}
+          response.data.forEach(i => {
+            personnelList[i.id] = i.name
+          })
+          commit('CHANGE_PER_MAP', personnelList)
           resolve()
         })
         .catch(error => {

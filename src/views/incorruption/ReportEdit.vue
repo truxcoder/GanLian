@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-15 10:13:03
- * @LastEditTime: 2022-04-28 15:15:44
+ * @LastEditTime: 2022-08-04 09:39:32
  * @LastEditors: truxcoder
  * @Description: 添加和修改举报信息
 -->
@@ -129,13 +129,13 @@ export default {
             console.log('added:', added)
             console.log('deled:', deled)
             if (added.length === 0 && deled.length === 0) {
-              data = { report: this.form }
+              data = { report: this.form, current: this.personnels }
             } else if (added.length > 0 && deled.length > 0) {
-              data = { report: this.form, add: added, del: deled }
+              data = { report: this.form, add: added, del: deled, current: this.personnels }
             } else if (added.length > 0) {
-              data = { report: this.form, add: added }
+              data = { report: this.form, add: added, current: this.personnels }
             } else if (deled.length > 0) {
-              data = { report: this.form, del: deled }
+              data = { report: this.form, del: deled, current: this.personnels }
             } else {
               this.$message.error('有错误发生!')
               this.dialogLoading = false
@@ -146,7 +146,18 @@ export default {
             this.dialogLoading = false
             return false
           }
-          request(this.resource, this.action, data)
+          const content = {
+            action: this.action,
+            data: JSON.stringify(data)
+          }
+          data = {
+            personnelId: this.$store.getters.personnelId,
+            organId: this.$store.getters.organ,
+            category: 102,
+            content: JSON.stringify(content)
+          }
+          request('pre', null, data)
+          // request(this.resource, this.action, data)
             .then(response => {
               this.$message.success(response.message)
               this.dialogLoading = false

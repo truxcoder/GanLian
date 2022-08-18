@@ -323,7 +323,13 @@ export default {
             //   return { content }
             // })
             // 处理奖惩情况
-            const award = response.awards.map(i => dayjs(i.getTime).format('YYYY.MM') + ' ' + this.getAwardName(i)).join(';')
+            // const award = response.awards.map(i => dayjs(i.getTime).format('YYYY.MM') + ' ' + this.getAwardName(i)).join(';')
+            const award = response.awards.map(i => {
+              if (i.category === 1 && i.grade !== 1) {
+                return dayjs(i.getTime).format('YYYY年MM月') + '某某单位' + '记' + this.getAwardName(i) + '一次'
+              }
+              return dayjs(i.getTime).format('YYYY年MM月') + ' ' + this.getAwardName(i)
+            }).join(';')
             const disciplines = response.disciplines.map(i => dayjs(i.getTime).format('YYYY年MM月') + '经' + i.organ + '批准' + '受到' + i.dictName + '处分').join(';')
             let awardAndPunish = '无'
             if (award !== '' && disciplines === '') {
@@ -340,7 +346,7 @@ export default {
               if (appraisal !== '') {
                 appraisal += ';'
               }
-              appraisal += i.years + '年年度考核结果为' + i.conclusion
+              appraisal += i.years + '年年度考核为' + i.conclusion
             })
             appraisal += '。'
             const docData = {

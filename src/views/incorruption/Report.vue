@@ -4,7 +4,7 @@
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">
         添加
       </el-button>
-      <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
+      <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData(102)">
         删除
       </el-button>
       <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
@@ -39,7 +39,7 @@
           <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">
             编辑
           </el-button>
-          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">
+          <el-button v-if="can.delete" size="mini" type="danger" @click="handleDelete(scope.row, 102)">
             删除
           </el-button>
           <el-button size="mini" type="primary" @click="handleStep(scope.row)">
@@ -72,7 +72,7 @@
 <script>
 import { request } from '@/api/index'
 import { common_mixin } from '@/common/mixin/mixin'
-import { delete_mixin } from '@/common/mixin/delete'
+import { delete_mixin } from '@/common/mixin/pre_delete'
 import { list_mixin } from '@/common/mixin/list'
 import { search_mixin } from '@/common/mixin/search'
 

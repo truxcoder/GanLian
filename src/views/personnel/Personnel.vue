@@ -36,6 +36,15 @@
       <el-button v-if="can.manage" type="primary" icon="el-icon-scjd-circle-forbidden iconfont" size="mini" @click="fetchDisabledData">查看禁用人员</el-button>
       <el-button v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click=" onQuickSearchBoxShow">展开快捷查询</el-button>
       <el-button v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click=" onQuickSearchBoxShow">收缩快捷查询</el-button>
+      <el-dropdown v-if="can.manage" class="data-export" @command="handleCommand">
+        <el-button type="primary" icon="el-icon-download" size="mini">
+          数据导出<i class="el-icon-arrow-down el-icon--right" />
+        </el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="select">导出所选数据</el-dropdown-item>
+          <el-dropdown-item command="all">导出全部数据</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
     <CollapseTransition>
       <div v-show="quickSearchBoxShow" ref="quickSearchBox">
@@ -118,6 +127,7 @@
       highlight-current-row
       @selection-change="handleSelectionChange"
     >
+      <el-table-column v-if="can.manage" align="center" type="selection" width="55" />
       <el-table-column align="center" label="序号" width="70">
         <template slot-scope="scope">
           {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
@@ -172,10 +182,11 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" :is-parent-list="true" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" :can="can" :is-parent-list="true" @editSuccess="editSuccess" @visibleChange="visibleChange" />
 
     <!-- <personnel-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
     <PersonnelSearch :visible="searchVisible" :can="can" :levels="levelList" @advanceSearch="advanceSearch" @visibleChange="visibleChange" />
+    <PersonnelDataExport :visible="exportVisible" :all="exportData" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -192,11 +203,12 @@ import { permission_mixin } from '@/common/mixin/permission'
 import PersonnelSearch from './PersonnelSearch'
 // import PersonnelUpdate from './PerUpdate'
 import PersonnelEdit from './PerEdit.vue'
+import PersonnelDataExport from './PersonnelDataExport.vue'
 import CollapseTransition from '@/utils/collapse-transition.js'
 
 export default {
   name: 'Personnel',
-  components: { PersonnelEdit, PersonnelSearch, CollapseTransition },
+  components: { PersonnelEdit, PersonnelSearch, CollapseTransition, PersonnelDataExport },
   mixins: [common_mixin, permission_mixin, delete_mixin, list_mixin, search_mixin],
   data() {
     return {
@@ -205,7 +217,9 @@ export default {
       queryMeans: 'frontend',
       originData: [],
       currentData: [],
+      exportData: [],
       searchVisible: false,
+      exportVisible: false,
       quickSearchBoxShow: false,
       levelList: [],
       formItemWidth: { width: '170px' },
@@ -321,6 +335,21 @@ export default {
         })
         .catch(() => { this.$message.info('已取消禁用') })
     },
+    handleCommand(command) {
+      if (command === 'select') {
+        if (this.multipleSelection.length === 0) {
+          this.$message.warning('未选择任何数据')
+          return
+        }
+        this.exportData = this.multipleSelection
+      } else if (command === 'all') {
+        this.exportData = this.currentData
+      } else {
+        this.$message.warning('数据错误')
+        return
+      }
+      this.exportVisible = true
+    },
     onClean() {
       this.$refs.searchForm.resetFields()
       this.$set(this.searchForm, 'level', '')
@@ -334,6 +363,9 @@ export default {
 <style lang="scss" scoped>
 .tool-bar {
   margin-bottom: 10px;
+}
+.data-export {
+  margin-left: 10px;
 }
 .pagination {
   margin-top: 15px;
