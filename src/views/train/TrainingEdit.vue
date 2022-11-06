@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-06-08 14:50:48
+ * @LastEditTime: 2022-08-22 16:04:51
  * @LastEditors: truxcoder
  * @Description: 培训信息添加编辑
 -->
@@ -81,7 +81,7 @@ export default {
   data() {
     return {
       resource: 'training',
-      form: { title: '', place: '', sponsor: '', organizer: '', method: '', category: '', period: '', isFullTime: '', isInner: '', startTime: '', endTime: '', intro: '' },
+      form: { title: '', place: '', sponsor: '', organizer: '', method: '', category: '', period: '', isFullTime: '', isInner: '', startTime: '', endTime: '', intro: '', organId: '' },
       rules,
       dialogWidth: '1200px',
       formLabelWidth: '140px',
@@ -100,8 +100,11 @@ export default {
           }
           this.form.id = this.row.id
         }
+        if (this.action === 'add') {
+          this.form.organId = this.$store.getters.organ
+        }
       } else {
-        this.form = { title: '', place: '', sponsor: '', organizer: '', method: '', category: '', period: '', isFullTime: '', isInner: '', startTime: '', endTime: '', intro: '' }
+        this.form = { title: '', place: '', sponsor: '', organizer: '', method: '', category: '', period: '', isFullTime: '', isInner: '', startTime: '', endTime: '', intro: '', organId: '' }
         this.$refs.editForm.resetFields()
       }
     }

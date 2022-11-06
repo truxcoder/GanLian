@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-12-13 17:15:04
- * @LastEditTime: 2022-03-17 18:27:14
+ * @LastEditTime: 2022-08-23 09:19:53
  * @LastEditors: truxcoder
  * @Description: 重构分配权限
 -->
@@ -61,7 +61,10 @@ export default {
       return Object.keys(permissionDict)
     },
     objList() {
-      return this.moduleData.concat(detailObj, talentObj)
+      const dashboard = [
+        { name: 'Dashboard', title: '控制台' }
+      ]
+      return this.moduleData.concat(detailObj, talentObj, dashboard)
     }
   },
   watch: {

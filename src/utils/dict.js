@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-29 09:49:12
- * @LastEditTime: 2022-08-15 09:41:41
+ * @LastEditTime: 2022-08-23 09:25:53
  * @LastEditors: truxcoder
  * @Description: 定义各类字典
  */
@@ -399,7 +399,8 @@ export const permissionDict = {
   READ: '查看数据',
   MANAGE: '管理数据',
   MENU: '进入菜单',
-  GLOBAL: '全局数据'
+  GLOBAL: '全局数据',
+  SPECIAL: '特殊权限'
 }
 export const affairCategoryDict = ['未定义', '经济责任审计情况', '个人事项核查情况', '检查巡视巡查']
 export const oldDepartmentDict = [

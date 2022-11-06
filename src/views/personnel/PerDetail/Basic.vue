@@ -3,7 +3,11 @@
     <div v-if="baseData.remark" class="flex my-2 text-red-600 bg-blue-50 border border-gray-300 rounded-sm px-4 py-2">
       <div>{{ baseData.remark }}</div>
     </div>
-    <div class="flex mt-2">
+    <!-- 如果不具备读取个人详情的权限，则仅渲染姓名 -->
+    <div v-if="!canReadBasicInfo">
+      <h1>姓名：{{ baseData.name }}</h1>
+    </div>
+    <div v-if="canReadBasicInfo" class="flex mt-2">
       <div class="flex-none">
         <div v-loading="photoLoading" class="photoZone ">
           <!-- <img :src="photoURL" alt class="photo" /> -->
@@ -46,7 +50,8 @@
         </el-descriptions>
       </div>
     </div>
-    <div class="mt-4 text-left border border-gray-300 rounded-sm">
+    <!-- 教育情况 -->
+    <div v-if="canReadBasicInfo" class="mt-4 text-left border border-gray-300 rounded-sm">
       <div class="h-12 flex items-center px-4 bg-blue-50 justify-between">
         <span>教育情况</span>
         <el-button v-if="can.update" type="text" @click="eduVisible = true">编辑</el-button>
@@ -86,7 +91,8 @@
         </dl>
       </div>
     </div>
-    <div class="mt-4 text-left border border-gray-300 rounded-sm">
+    <!-- 个人简历 -->
+    <div v-if="canReadBasicInfo" class="mt-4 text-left border border-gray-300 rounded-sm">
       <div class="h-12 flex items-center px-4 bg-blue-50 justify-between">
         <span>个人简历</span>
         <el-button v-if="can.update" type="text" @click="resumeVisible = true">编辑</el-button>
@@ -99,8 +105,6 @@
       </div>
     </div>
     <PersonnelEdit :visible="editVisible" :action="action" :row="baseData" :can="can" @editSuccess="updateSuccess" @visibleChange="visibleChange" />
-
-    <!-- <personnel-update :visible="updateVisible" :rowdata="baseData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
     <ResumeEdit :visible="resumeVisible" :personnel-id="baseData.id" :resume="baseData.resume" :can="can" @editSuccess="editSuccess" @visibleChange="visibleChange" />
     <PersonnelEduEdit :visible="eduVisible" :row="baseData" :can="can" @editSuccess="editSuccess" @visibleChange="visibleChange" />
     <FeedbackEdit :visible="feedbackVisible" :row="baseData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
@@ -233,8 +237,19 @@ export default {
       result = JSON.parse(resume)
       return result
     },
+    // 是否为普通用户
     isNormal() {
       return isNormalRole(this.$store.getters.roles)
+    },
+    // 是否能读取个人基本信息
+    canReadBasicInfo() {
+      if (this.isNormal) {
+        return true
+      }
+      if (this.baseData.id === this.$store.getters.personnelId) {
+        return true
+      }
+      return this.can.read
     }
   },
   created() {
@@ -304,7 +319,14 @@ export default {
   text-align: center;
 }
 .photoZone {
-  @apply flex border border-gray-300 mr-4 p-4 justify-center items-center
+  display: flex;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgba(209, 213, 219, var(--tw-border-opacity));
+  margin-right: 1rem/* 16px */;
+  padding: 1rem/* 16px */;
+  justify-content: center;
+  align-items: center;
 }
 
 /* .photoZone {
@@ -343,10 +365,7 @@ export default {
 .mainTable th {
   background: #efefef;
 }
-.mainTable tr,
-.mainTable td {
-  /* background-color: #fff; */
-}
+
 .mainTable td {
   padding: 0.5rem;
 }

@@ -39,7 +39,7 @@
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="can.manage" type="success" icon="el-icon-folder-add" size="mini" @click="batchVisible = true">批量录入</el-button>
       <el-button v-if="total && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <div class="tableZone">
       <el-table

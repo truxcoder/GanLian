@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 10:59:14
- * @LastEditTime: 2022-06-08 16:10:14
+ * @LastEditTime: 2022-09-20 10:18:14
  * @LastEditors: truxcoder
  * @Description: 人员详情页个人培训模块编辑参与培训信息，本页列出培训列表供用户选择或取消参与
 -->
@@ -112,6 +112,12 @@ export default {
         return []
       }
     },
+    can: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
     personnelId: {
       type: String,
       default() {
@@ -133,7 +139,7 @@ export default {
       formTitleWidth: { width: '500px' },
       formTextAreaWidth: { width: '940px' },
       dialogLoading: false,
-      searchForm: { title: '', organ: '' }
+      searchForm: { title: '', sponsor: '' }
     }
   },
   computed: {
@@ -163,7 +169,10 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      params = this.buildParams(this.queryMeans)
+      if (!this.can.global) {
+        params.organId = this.$store.getters.organ
+      }
+      params = this.buildParams(this.queryMeans, params)
       request('training', 'list', data, params).then(response => {
         this.originData = response.data ?? []
         this.count = response.count
@@ -173,6 +182,9 @@ export default {
           })
         }
         this.currentData = this.originData.length ? [...this.originData] : []
+        this.listLoading = false
+      }).catch(err => {
+        console.log(err)
         this.listLoading = false
       })
     },

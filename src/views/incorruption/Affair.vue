@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-28 11:07:42
- * @LastEditTime: 2022-08-08 14:39:06
+ * @LastEditTime: 2022-08-24 16:57:22
  * @LastEditors: truxcoder
  * @Description: 各类事项管理
 -->
@@ -29,7 +29,7 @@
     <div class="tool-bar">
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData(category + 102)">删除</el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-09 12:43:53
- * @LastEditTime: 2022-05-30 14:57:55
+ * @LastEditTime: 2022-08-22 10:42:07
  * @LastEditors: truxcoder
  * @Description:
 -->
@@ -83,10 +83,12 @@ export default {
     this.actCheck()
       .then(() => this.check('DetailBasic'))
       .then(() => {
+        // 如果为浏览者为本人或者具备全局权限，则放开权限
         if (this.id === this.$store.getters.personnelId || this.can.global) {
           this.fetchData()
           return
         } else {
+          // 否则，看浏览者是否与该人员同一单位，如果是同一单位，说明具备所级权限，则放开
           request('personnel', 'organ', { id: this.id }).then(res => {
             if (!res.data || res.data !== this.$store.getters.organ) {
               this.$message.error('你无权查看此人信息!')

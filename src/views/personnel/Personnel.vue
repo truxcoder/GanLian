@@ -24,7 +24,7 @@
         <el-button type="primary" size="small" icon="el-icon-search" @click="onSearch">查询</el-button>
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item v-if="can.special">
         <el-button type="success" size="small" icon="el-icon-search" @click="searchVisible = true">高级查询</el-button>
       </el-form-item>
       <el-form-item>
@@ -34,9 +34,9 @@
     <div class="tool-bar">
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
       <el-button v-if="can.manage" type="primary" icon="el-icon-scjd-circle-forbidden iconfont" size="mini" @click="fetchDisabledData">查看禁用人员</el-button>
-      <el-button v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click=" onQuickSearchBoxShow">展开快捷查询</el-button>
-      <el-button v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click=" onQuickSearchBoxShow">收缩快捷查询</el-button>
-      <el-dropdown v-if="can.manage" class="data-export" @command="handleCommand">
+      <el-button v-if="can.special" v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click=" onQuickSearchBoxShow">展开快捷查询</el-button>
+      <el-button v-if="can.special" v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click=" onQuickSearchBoxShow">收缩快捷查询</el-button>
+      <el-dropdown v-if="can.manage && can.global" class="data-export" @command="handleCommand">
         <el-button type="primary" icon="el-icon-download" size="mini">
           数据导出<i class="el-icon-arrow-down el-icon--right" />
         </el-button>
@@ -48,7 +48,7 @@
     </div>
     <CollapseTransition>
       <div v-show="quickSearchBoxShow" ref="quickSearchBox">
-        <div class="border py-4 mb-4">
+        <div class="border pb-4 mb-4">
           <div class="quick-buttons">
             <el-button size="small" type="success" plain @click="onQuickSearch('fc')">符合副处级领导干部选拔条件人员</el-button>
             <el-popover
@@ -110,6 +110,18 @@
               <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
             </el-popover>
           </div>
+          <div class="quick-buttons">
+            <el-dropdown class="data-export" @command="handleQuickSearchCommand">
+              <el-button size="small" type="success" plain>
+                符合职级晋升条件的人员<i class="el-icon-arrow-down el-icon--right" />
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="willUp1x">一级巡视员</el-dropdown-item>
+                <el-dropdown-item command="willUp2x">二级巡视员</el-dropdown-item>
+                <el-dropdown-item command="willUp1d">一级调研员</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
         </div>
       </div>
     </CollapseTransition>
@@ -145,7 +157,12 @@
           <!-- <span :class="{'text_red':!scope.row.organId}">{{ scope.row.organId ? getOrganName(scope.row.organId, "short") : '未定义' }}</span> -->
         </template>
       </el-table-column>
-      <el-table-column align="center" label="姓名" prop="name" />
+      <!-- <el-table-column align="center" label="姓名" prop="name" /> -->
+      <el-table-column align="center" label="姓名">
+        <template slot-scope="scope">
+          <el-link @click="handleTable(scope.$index, scope.row)">{{ scope.row.name }}</el-link>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="身份" width="70">
         <template>
           <!-- {{ scope.row.userType === 1 ? '民警' : '辅警' }} -->
@@ -159,13 +176,14 @@
           <span :class="{ text_red: isBirthdayZero(scope.row.birthday) }">{{ scope.row.birthday | ageFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="民族" prop="nation" width="90" align="center" />
+      <el-table-column label="民族" prop="nation" width="75" align="center" />
       <el-table-column label="政治面貌" prop="political" align="center" width="120" />
-      <el-table-column align="center" label="操作" width="240">
+      <el-table-column align="center" label="操作" :width="lastColumnWidth">
         <template slot-scope="scope">
           <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
           <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button> -->
           <el-button v-if="can.manage" size="mini" :type="scope.row.status?'danger':'success'" @click="handleDisable(scope.row)">{{ scope.row.status?'禁用':'启用' }}</el-button>
+          <el-button size="mini" type="primary" @click="handleTable(scope.$index, scope.row)">一览</el-button>
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
         </template>
       </el-table-column>
@@ -234,6 +252,15 @@ export default {
   computed: {
     organList() {
       return this.$store.getters.organs
+    },
+    lastColumnWidth() {
+      if (this.can.manage) {
+        return 280
+      } else if (this.can.update) {
+        return 220
+      } else {
+        return 160
+      }
     }
   },
   created() {
@@ -301,6 +328,19 @@ export default {
       window.open(url.href, '_blank')
       // this.$router.push({ path: 'pdetail' })
     },
+    handleTable(index, row) {
+      const width = 700
+      const windowWidth = window.window.innerWidth
+      const left = (windowWidth - width) / 2
+      const height = window.window.innerHeight
+      const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=${width},height=${height},left=${left},top=0`
+      const url = this.$router.resolve({
+        path: '/pertable',
+        query: { id: row.id }
+      })
+      open(url.href, 'name', params)
+      // this.$router.push({ path: 'pdetail' })
+    },
     advanceSearch(data) {
       this.searchData = data
       this.currentPage = 1
@@ -350,9 +390,13 @@ export default {
       }
       this.exportVisible = true
     },
+    handleQuickSearchCommand(command) {
+      this.onQuickSearch(command)
+    },
     onClean() {
       this.$refs.searchForm.resetFields()
       this.$set(this.searchForm, 'level', '')
+      this.$set(this.searchForm, 'organId', '')
       // this.queryParam = {}
       this.isClean = true
     }
@@ -380,6 +424,7 @@ export default {
 .quick-buttons {
   display: inline-block;
   padding-left: 16px;
+  padding-top: 16px;
 }
 
 </style>

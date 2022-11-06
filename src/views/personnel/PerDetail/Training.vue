@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-09 09:40:38
- * @LastEditTime: 2022-06-08 16:12:10
+ * @LastEditTime: 2022-08-22 17:28:39
  * @LastEditors: truxcoder
  * @Description: 人员个人培训列表
 -->
@@ -41,7 +41,7 @@
       </el-table>
     </div>
     <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
-    <train-person-add :visible="addVisible" :passed="originData" :personnel-id="personnelId" @addSuccess="addSuccess" @visibleChange="visibleChange" />
+    <train-person-add :visible="addVisible" :passed="originData" :can="can" :personnel-id="personnelId" @addSuccess="addSuccess" @visibleChange="visibleChange" />
     <training-detail :visible="detailVisible" :options="options" :row="rowData" @visibleChange="visibleChange" />
   </div>
 </template>

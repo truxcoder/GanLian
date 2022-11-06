@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-05-18 10:22:51
- * @LastEditTime: 2022-08-04 12:00:18
+ * @LastEditTime: 2022-10-27 10:05:05
  * @LastEditors: truxcoder
  * @Description: 干部监督数据审核
 -->
@@ -87,7 +87,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <IncorruptionReviewDetail :visible="detailVisible" :row="rowData" :dis-dict="disDict" @editSuccess="editSuccess" @visibleChange="visibleChange" />
+    <IncorruptionReviewDetail :visible="detailVisible" :row="rowData" :can="can" :dis-dict="disDict" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 

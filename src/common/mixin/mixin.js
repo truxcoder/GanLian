@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-05-19 11:37:43
+ * @LastEditTime: 2022-09-22 14:19:40
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -54,6 +54,9 @@ export const common_mixin = {
     },
     ynFilter(bool) {
       return bool ? '是' : '否'
+    },
+    toFixed(n) {
+      return n.toFixed(2)
     }
   }
 }

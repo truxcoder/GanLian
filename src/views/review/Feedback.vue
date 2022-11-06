@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-05-18 10:22:51
- * @LastEditTime: 2022-06-24 11:40:04
+ * @LastEditTime: 2022-08-24 17:02:36
  * @LastEditors: truxcoder
  * @Description: 数据反馈
 -->
@@ -36,7 +36,7 @@
       </el-form-item>
     </el-form>
     <div class="tool-bar">
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />

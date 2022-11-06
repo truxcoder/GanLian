@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-14 11:15:43
- * @LastEditTime: 2022-05-16 10:30:21
+ * @LastEditTime: 2022-08-23 09:12:24
  * @LastEditors: truxcoder
  * @Description: 权限检查相关
  */
@@ -18,7 +18,8 @@ export const permission_mixin = {
         READ: false,
         MANAGE: false,
         MENU: false,
-        GLOBAL: false
+        GLOBAL: false,
+        SPECIAL: false
       }
     }
   },
@@ -31,7 +32,8 @@ export const permission_mixin = {
         read: this.permission.MANAGE || this.permission.READ,
         manage: this.permission.MANAGE,
         menu: this.permission.MENU,
-        global: this.permission.GLOBAL
+        global: this.permission.GLOBAL,
+        special: this.permission.SPECIAL
       }
     },
     defaultSearchData() {
@@ -43,7 +45,7 @@ export const permission_mixin = {
       return new Promise((resolve, reject) => {
         const sub = this.$store.getters.roles.length === 1 && this.$store.getters.roles[0] === 'normal' ? 'normal' : this.$store.getters.id
         const obj = object ?? this.$options.name
-        const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
+        const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL', 'SPECIAL']
         request('permission', 'check', { sub, obj, act })
           .then(res => {
             Object.assign(this.permission, res.data)
@@ -67,7 +69,8 @@ export const detail_permission_mixin = {
         READ: false,
         MANAGE: false,
         MENU: false,
-        GLOBAL: false
+        GLOBAL: false,
+        SPECIAL: false
       }
     }
   },
@@ -80,7 +83,8 @@ export const detail_permission_mixin = {
         read: this.permission.MANAGE || this.permission.READ,
         manage: this.permission.MANAGE,
         menu: this.permission.MENU,
-        global: this.permission.GLOBAL
+        global: this.permission.GLOBAL,
+        special: this.permission.SPECIAL
       }
     }
   },
@@ -88,7 +92,7 @@ export const detail_permission_mixin = {
     async check() {
       const sub = this.$store.getters.id
       const obj = this.obj
-      const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL']
+      const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL', 'SPECIAL']
       const res = await permissionCheck({ sub, obj, act })
       Object.assign(this.permission, res.data)
     }

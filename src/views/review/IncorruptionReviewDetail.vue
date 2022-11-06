@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-05-18 14:09:17
- * @LastEditTime: 2022-08-08 10:22:10
+ * @LastEditTime: 2022-10-27 10:05:09
  * @LastEditors: truxcoder
  * @Description: 干部监督数据审核详情页
 -->
@@ -65,8 +65,8 @@
 
     <div slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取 消</el-button>
-      <el-button type="danger" :disabled="row.status === 2" @click="onReject">驳 回</el-button>
-      <el-button type="success" :disabled="row.status === 2" @click="onPass">通 过</el-button>
+      <el-button v-if="can.manage" type="danger" :disabled="row.status === 2" @click="onReject">驳 回</el-button>
+      <el-button v-if="can.manage" type="success" :disabled="row.status === 2" @click="onPass">通 过</el-button>
     </div>
   </el-dialog>
 </template>
@@ -114,6 +114,12 @@ export default {
       default: false
     },
     row: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+    can: {
       type: Object,
       default() {
         return {}

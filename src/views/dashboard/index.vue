@@ -1,13 +1,13 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-07-27 16:35:00
+ * @LastEditTime: 2022-08-23 09:48:49
  * @LastEditors: truxcoder
  * @Description: 控制台
 -->
 <template>
   <div id="dashboard-container" class="container mx-auto px-5 py-5">
-    <div class=" flex">
+    <div v-if="can.special" class=" flex">
       <div class=" w-1/4">
         <trux-list v-slot="scope" :title="listTitle" :data="listData">
           <li class="el-icon-document" />
@@ -21,7 +21,7 @@
         </trux-list>
       </div>
     </div>
-    <div class=" flex mt-8">
+    <div v-if="can.special" class=" flex mt-8">
       <div class=" w-1/2">
         <div id="police" class=" h-96 w-full">aaa</div>
       </div>
@@ -29,7 +29,7 @@
         <div id="age" class=" h-96 w-full" />
       </div>
     </div>
-    <div class=" flex mt-8">
+    <div v-if="can.special" class=" flex mt-8">
       <div class=" w-full">
         <div id="fenbu" class=" h-96 w-full">aaa</div>
       </div>
@@ -41,6 +41,7 @@
 <script>
 import { request } from '@/api/index'
 import TruxList from '@/components/trux/list.vue'
+import { permission_mixin } from '@/common/mixin/permission'
 import * as echarts from 'echarts'
 
 export default {
@@ -52,6 +53,7 @@ export default {
         0}人，35岁以下青年民警${row.youngerThanThirtyFive ?? 0}人`
     }
   },
+  mixins: [permission_mixin],
   data() {
     return {
       originData: [],
@@ -236,7 +238,9 @@ export default {
       this.$store.dispatch('department/setDepartments')
     }
     // request('discipline', 'list').then(res => console.log('request res:', res))
-    request('dashboard').then(res => {
+    this.check().then(() =>
+      request('dashboard')
+    ).then(res => {
       this.ageList = res.ageList ?? []
       this.genderList = res.genderList ?? []
       this.politicalList = res.politicalList ?? []

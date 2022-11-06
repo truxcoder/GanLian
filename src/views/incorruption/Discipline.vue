@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-08-03 15:08:39
+ * @LastEditTime: 2022-08-24 16:57:39
  * @LastEditors: truxcoder
  * @Description:处分，前端分页
 -->
@@ -40,7 +40,7 @@
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData(101)">
         删除
       </el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
         所有数据
       </el-button>
       <el-button v-if="can.manage && can.global" type="primary" icon="el-icon-document" size="mini" @click="dictVisible = true">维护处分项字典</el-button>

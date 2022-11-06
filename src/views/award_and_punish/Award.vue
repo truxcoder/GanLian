@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-08-01 14:43:29
+ * @LastEditTime: 2022-08-24 16:56:51
  * @LastEditors: truxcoder
  * @Description:奖励信息，后端分页
 -->
@@ -46,7 +46,7 @@
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="can.manage" type="success" icon="el-icon-folder-add" size="mini" @click="batchVisible = true">批量录入</el-button>
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <el-table
       v-loading="listLoading"

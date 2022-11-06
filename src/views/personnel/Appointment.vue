@@ -19,7 +19,7 @@
     <div class="tool-bar">
       <el-button v-if="can.add" type="success" icon="el-icon-circle-plus-outline" size="mini" @click="handleEdit('add')">添加</el-button>
       <el-button v-if="total && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
     <div class="tableZone">
       <el-table
@@ -287,9 +287,11 @@ export default {
               if (index !== 0 && array[index - 1].organ === cur.organ && array[index - 1].department === cur.department) {
                 post += cur.positionName
               } else if (index !== 0 && array[index - 1].organ === cur.organ) {
-                post = post + cur.department + cur.positionName
+                const department = cur.department.includes('领导') || cur.department.includes('高级警长') || cur.department.includes('调研员') ? '' : cur.department
+                post = post + department + cur.positionName
               } else {
-                post = post + cur.organ + cur.department + cur.positionName
+                const department = cur.department.includes('领导') || cur.department.includes('高级警长') || cur.department.includes('调研员') || cur.department === cur.organ ? '' : cur.department
+                post = post + cur.organ + department + cur.positionName
               }
               return post
             }, post)

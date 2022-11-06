@@ -1,17 +1,17 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-02-08 19:46:18
- * @LastEditTime: 2022-06-08 15:32:39
+ * @LastEditTime: 2022-08-31 09:36:32
  * @LastEditors: truxcoder
  * @Description: 培训详情
 -->
 <template>
   <el-dialog v-loading="dialogLoading" width="1200px" :visible.sync="visible" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
     <div class="flex w-full">
-      <div class="w-1/2">
+      <div id="training-container" class="w-1/2">
         <div class=" font-semibold mb-2">{{ row.title }}</div>
         <hr class="mb-4" />
-        <el-descriptions class="margin-top" title="" :column="2" border>
+        <el-descriptions class="margin-top" title="" :column="2" label-class-name="training-desc-label" border>
           <el-descriptions-item label="开始时间"> {{ row.startTime | dateFilter }} </el-descriptions-item>
           <el-descriptions-item label="结束时间"> {{ row.endTime | dateFilter }} </el-descriptions-item>
           <el-descriptions-item label="培训地点"> {{ row.place }} </el-descriptions-item>
@@ -111,4 +111,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+#training-container ::v-deep .training-desc-label {
+  width: 7rem;
+}
+</style>

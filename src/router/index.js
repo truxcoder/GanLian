@@ -43,6 +43,8 @@ const Review = () => import('@/views/review/Review')
 const Feedback = () => import('@/views/review/Feedback')
 const IncorruptionReview = () => import('@/views/review/IncorruptionReview')
 
+const PoliceTeam = () => import('@/views/analysis/PoliceTeam')
+
 const Appointment = () => import('@/views/personnel/Appointment')
 
 export const componentList = {
@@ -74,7 +76,8 @@ export const componentList = {
   Review,
   Feedback,
   IncorruptionReview,
-  Appointment
+  Appointment,
+  PoliceTeam
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -158,6 +161,11 @@ export const constantRoutes = [
   {
     path: '/perdetail',
     component: () => import('@/views/personnel/PerDetail'),
+    hidden: true
+  },
+  {
+    path: '/pertable',
+    component: () => import('@/views/personnel/PersonnelTable'),
     hidden: true
   },
   {

@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-24 17:16:26
- * @LastEditTime: 2022-05-26 10:44:11
+ * @LastEditTime: 2022-08-24 16:57:06
  * @LastEditors: truxcoder
  * @Description:组织处理，后端分页
 -->
@@ -48,7 +48,7 @@
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">
         删除
       </el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
         所有数据
       </el-button>
     </div>

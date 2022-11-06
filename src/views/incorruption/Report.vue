@@ -7,7 +7,7 @@
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData(102)">
         删除
       </el-button>
-      <el-button v-if="can.read" type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
+      <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">
         所有数据
       </el-button>
     </div>
