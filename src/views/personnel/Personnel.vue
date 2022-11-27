@@ -244,7 +244,7 @@ export default {
       searchForm: {
         name: '',
         policeCode: '',
-        organId: [],
+        organId: '',
         level: ''
       }
     }
@@ -397,6 +397,7 @@ export default {
       this.$refs.searchForm.resetFields()
       this.$set(this.searchForm, 'level', '')
       this.$set(this.searchForm, 'organId', '')
+      this.$set(this.searchForm, 'policeCode', '')
       // this.queryParam = {}
       this.isClean = true
     }

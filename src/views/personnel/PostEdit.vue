@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-02 20:29:43
- * @LastEditTime: 2022-05-26 10:26:22
+ * @LastEditTime: 2022-11-27 16:17:07
  * @LastEditors: truxcoder
  * @Description: 考核信息添加编辑
 -->
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { request, curd } from '@/api/index'
+import { request } from '@/api/index'
 import { edit_mixin } from '@/common/mixin/edit'
 import PersonnelOption from '@/components/Personnel/PersonnelOption.vue'
 import rules from '@/common/rules/post'
@@ -169,7 +169,8 @@ export default {
         if (valid) {
           this.dialogLoading = true
           setDateFieldZero(this.form, this.modelDateKeys)
-          curd(this.action, this.form, { resource: this.resource })
+          // curd(this.action, this.form, { resource: this.resource })
+          request('post', this.action, this.form)
             .then(response => {
               this.$message.success(response.message)
               this.dialogLoading = false
