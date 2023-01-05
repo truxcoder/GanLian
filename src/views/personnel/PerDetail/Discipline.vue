@@ -91,7 +91,9 @@ export default {
     options() {
       const categoryOptions = [
         { label: '党纪处分', value: 1 },
-        { label: '政务处分', value: 2 }
+        { label: '政务处分', value: 2 },
+        { label: '处分', value: 3 }
+
       ]
       return {
         organ: this.$store.getters.organs,

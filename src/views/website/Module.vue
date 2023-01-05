@@ -50,7 +50,7 @@
             {{ scope.row.component }}
           </template>
         </el-table-column>
-        <el-table-column align="center" label="重定向" width="110" :show-overflow-tooltip="true">
+        <el-table-column align="center" label="重定向" :show-overflow-tooltip="true">
           <template slot-scope="scope">
             {{ scope.row.redirect }}
           </template>

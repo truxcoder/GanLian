@@ -116,9 +116,22 @@
                 符合职级晋升条件的人员<i class="el-icon-arrow-down el-icon--right" />
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="willUp1x">一级巡视员</el-dropdown-item>
-                <el-dropdown-item command="willUp2x">二级巡视员</el-dropdown-item>
-                <el-dropdown-item command="willUp1d">一级调研员</el-dropdown-item>
+                <el-dropdown-item command="willUp2d">二级调研员</el-dropdown-item>
+                <el-dropdown-item command="willUp3d">三级调研员</el-dropdown-item>
+                <el-dropdown-item command="willUp4d">四级调研员</el-dropdown-item>
+                <el-dropdown-item command="willUp1z">一级主任科员</el-dropdown-item>
+                <el-dropdown-item command="willUp2z">二级主任科员</el-dropdown-item>
+                <el-dropdown-item command="willUp3z">三级主任科员</el-dropdown-item>
+                <el-dropdown-item command="willUp4z">四级主任科员</el-dropdown-item>
+                <el-dropdown-item command="willUp1k">一级科员</el-dropdown-item>
+                <el-dropdown-item command="willUp2g">二级高级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp3g">三级高级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp4g">四级高级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp1j">一级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp2j">二级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp3j">三级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp4j">四级警长</el-dropdown-item>
+                <el-dropdown-item command="willUp1y">一级警员</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -139,8 +152,8 @@
       highlight-current-row
       @selection-change="handleSelectionChange"
     >
-      <el-table-column v-if="can.manage" align="center" type="selection" width="55" />
-      <el-table-column align="center" label="序号" width="70">
+      <el-table-column v-if="can.manage" align="center" type="selection" width="50" />
+      <el-table-column align="center" label="序号" width="60">
         <template slot-scope="scope">
           {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
         </template>
@@ -157,18 +170,16 @@
           <!-- <span :class="{'text_red':!scope.row.organId}">{{ scope.row.organId ? getOrganName(scope.row.organId, "short") : '未定义' }}</span> -->
         </template>
       </el-table-column>
-      <!-- <el-table-column align="center" label="姓名" prop="name" /> -->
       <el-table-column align="center" label="姓名">
         <template slot-scope="scope">
           <el-link @click="handleTable(scope.$index, scope.row)">{{ scope.row.name }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="身份" width="70">
-        <template>
-          <!-- {{ scope.row.userType === 1 ? '民警' : '辅警' }} -->
-          民警
+      <!-- <el-table-column align="center" label="级别" width="90">
+        <template slot-scope="scope">
+          {{ scope.row.currentLevel === 0 ? '一般民警' : levelMap[scope.row.currentLevel] }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column align="center" width="100" label="警号/工号" prop="policeCode" :show-overflow-tooltip="true" />
       <el-table-column label="性别" prop="gender" width="60" align="center" />
       <el-table-column label="年龄" width="60" align="center">
@@ -177,7 +188,7 @@
         </template>
       </el-table-column>
       <el-table-column label="民族" prop="nation" width="75" align="center" />
-      <el-table-column label="政治面貌" prop="political" align="center" width="120" />
+      <el-table-column label="政治面貌" prop="political" align="center" width="100" />
       <el-table-column align="center" label="操作" :width="lastColumnWidth">
         <template slot-scope="scope">
           <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
@@ -261,6 +272,13 @@ export default {
       } else {
         return 160
       }
+    },
+    levelMap() {
+      const _map = {}
+      this.levelList.forEach(i => {
+        _map[i.id] = i.name
+      })
+      return _map
     }
   },
   created() {

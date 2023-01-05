@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-04-06 14:10:33
- * @LastEditTime: 2022-06-16 15:18:37
+ * @LastEditTime: 2022-11-30 11:34:53
  * @LastEditors: truxcoder
  * @Description: 禁用人员管理
 -->
@@ -9,7 +9,7 @@
   <div class="app-container">
     <el-form ref="searchForm" :inline="true" :model="searchForm" class="demo-form-inline">
       <el-form-item v-if="can.global" label="单位" prop="organId">
-        <el-select v-model="searchForm.organId" :style="formItemWidth" size="small" placeholder="请选择单位">
+        <el-select v-model="searchForm.organId" :style="formItemWidth" size="small" multiple placeholder="请选择单位">
           <el-option v-for="i in organList" :key="i.id" :label="i.shortName" :value="i.id" />
         </el-select>
       </el-form-item>
@@ -235,6 +235,8 @@ export default {
     },
     onClean() {
       this.$refs.searchForm.resetFields()
+      this.$set(this.searchForm, 'organId', '')
+      this.$set(this.searchForm, 'policeCode', '')
       this.isClean = true
     }
   }
