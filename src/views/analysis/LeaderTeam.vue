@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-09-21 09:43:40
- * @LastEditTime: 2023-04-27 17:29:56
+ * @LastEditTime: 2023-05-05 14:06:49
  * @LastEditors: truxcoder
  * @Description: 干部队伍分析
 -->
@@ -92,6 +92,7 @@ export default {
   data() {
     return {
       resource: 'analysis',
+      now: '',
       originData: '',
       currentData: {},
       currentOrgan: {},
@@ -148,6 +149,7 @@ export default {
   },
   created() {
     this.check().then(() => {
+      this.now = Date.now()
       this.fetchData()
     })
   },
@@ -239,7 +241,7 @@ export default {
       return analysisMethods.getLeaderPostString(this.currentOrgan, v)
     },
     getPhotoURL(idCode) {
-      return idCode ? getPhoto(idCode, 'small') : ''
+      return idCode ? getPhoto(idCode, 'small') + '?now=' + this.now : ''
     },
     getDetailLink(id) {
       return getDetailLink(id)
