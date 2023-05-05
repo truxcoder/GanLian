@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-09-21 09:43:40
- * @LastEditTime: 2023-04-28 10:56:07
+ * @LastEditTime: 2023-04-27 17:29:56
  * @LastEditors: truxcoder
  * @Description: 干部队伍分析
 -->
@@ -16,6 +16,18 @@
 
     <el-card class=" mt-4">
       <div slot="header">
+        <span class=" font-bold">班子成员</span>
+      </div>
+      <div class="w-full flex flex-wrap">
+        <div v-for="leader in currentLeaders" :key="leader.id" class="block m-1">
+          <el-image style="width: 130px; height: 150px" :src="getPhotoURL(leader.idCode)" fit="fit" />
+          <div class="title text-center"><el-link :href="getDetailLink(leader.personnelId)" target="_blank">{{ leader.personnelName }}</el-link></div>
+        </div>
+      </div>
+    </el-card>
+
+    <el-card class=" mt-4">
+      <div slot="header">
         <span class=" font-bold">总体描述</span>
       </div>
       <div class="w-full">
@@ -25,17 +37,7 @@
 
     <el-card class=" mt-4">
       <div slot="header">
-        <span class=" font-bold">编制结构</span>
-      </div>
-      <div class="w-full">
-        <div v-html="getHeadcountString()" />
-      </div>
-    </el-card>
-
-    <el-card class=" mt-4">
-      <div slot="header">
         <span class=" font-bold">年龄结构</span>
-        <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
       </div>
       <div class="w-full">
         <div v-html="getAgeString()" />
@@ -46,19 +48,29 @@
       </div>
     </el-card>
 
-    <el-card class=" mt-4">
-      <div slot="header">
-        <span class=" font-bold">学历结构</span>
-      </div>
-      <div class="w-full">
-        <div v-html="getEduString()" />
-        <div class="w-full flex h-96 mt-4 justify-between">
-          <div id="edu-all" class=" w-1/3 h-96">整体学历</div>
-          <div id="edu-zk" class="w-1/3 h-96">正科级干部</div>
-          <div id="edu-fk" class="w-1/3 h-96">副科级干部</div>
+    <div class=" mt-4 flex">
+      <el-card class=" w-1/2">
+        <div slot="header">
+          <span class=" font-bold">学历结构</span>
         </div>
-      </div>
-    </el-card>
+        <div class="w-full">
+          <div v-html="getEduString()" />
+          <div class="w-full flex h-80 mt-4">
+            <div id="edu-all" class="w-full h-96">整体学历</div>
+          </div>
+        </div>
+      </el-card>
+
+      <el-card class=" flex-1 ml-4">
+        <div slot="header">
+          <span class=" font-bold">任职结构</span>
+        </div>
+        <div class="w-full">
+          <div v-html="getPostString()" />
+          <div id="post" class="w-full flex h-80 mt-4">任职结构</div>
+        </div>
+      </el-card>
+    </div>
 
   </div>
 </template>
@@ -67,13 +79,15 @@
 import { request } from '@/api/index'
 import { permission_mixin } from '@/common/mixin/permission'
 import { common_mixin } from '@/common/mixin/mixin'
+import { getPhoto } from '@/utils/personnel'
+import { getDetailLink } from '@/utils/personnel'
 import * as analysisMethods from './analysisMethods'
 
 import * as echarts from 'echarts'
 import { isEmpty } from 'lodash/lang'
 
 export default {
-  name: 'PoliceTeam',
+  name: 'LeaderTeam',
   mixins: [common_mixin, permission_mixin],
   data() {
     return {
@@ -81,12 +95,13 @@ export default {
       originData: '',
       currentData: {},
       currentOrgan: {},
-      departments: []
+      departments: [],
+      leaders: []
     }
   },
   computed: {
     organs() {
-      return this.$store.getters.organs.filter(i => i.shortName !== '攀枝花所' && i.shortName !== '泸州所')
+      return this.$store.getters.organs.filter(i => i.shortName !== '局机关' && i.shortName !== '攀枝花所' && i.shortName !== '泸州所')
     },
     currentOverviewData() {
       return this.currentData['overview'][this.currentOrgan.id]
@@ -96,6 +111,12 @@ export default {
     },
     currentEduData() {
       return this.currentData['edu'][this.currentOrgan.id]
+    },
+    currentPostData() {
+      return this.currentData['post'][this.currentOrgan.id]
+    },
+    currentLeaders() {
+      return this.leaders.filter(i => i.organId === this.currentOrgan.id)
     },
     departmentMap() {
       const temp = {}
@@ -109,26 +130,20 @@ export default {
     },
     ageOverviewOption() {
       const v = this.currentAgeData
-      return analysisMethods.getAgeOverviewOption(v)
+      return analysisMethods.getLeaderAgeOverviewOption(v)
     },
     ageDisOption() {
       const v = this.currentAgeData
-      return analysisMethods.getAgeDisOption(v)
+      return analysisMethods.getLeaderAgeDisOption(v)
     },
-    eduAllOption() {
+    eduOption() {
       const v = this.currentEduData
-      const overview = this.currentOverviewData
-      return analysisMethods.getEduAllOption(v, overview)
+      const num = this.currentLeaders.length ?? 0
+      return analysisMethods.getLeaderEduOption(v, num)
     },
-    eduZkOption() {
-      const v = this.currentEduData
-      const overview = this.currentOverviewData
-      return analysisMethods.getEduZkOption(v, overview)
-    },
-    eduFkOption() {
-      const v = this.currentEduData
-      const overview = this.currentOverviewData
-      return analysisMethods.getEduFkOption(v, overview)
+    postOption() {
+      const v = this.currentPostData
+      return analysisMethods.getLeaderPostOption(v)
     }
   },
   created() {
@@ -139,7 +154,8 @@ export default {
   methods: {
     fetchData(data = {}, params = {}) {
       this.listLoading = true
-      request(this.resource, 'police').then(response => {
+      request(this.resource, 'leader').then(response => {
+        this.leaders = response.leaders
         this.originData = response.data
         this.departments = response.department
         this.currentData = JSON.parse(this.originData)
@@ -168,20 +184,19 @@ export default {
       echarts.init(document.getElementById('age-overview'))
       echarts.init(document.getElementById('age-distribution'))
       echarts.init(document.getElementById('edu-all'))
-      echarts.init(document.getElementById('edu-zk'))
-      echarts.init(document.getElementById('edu-fk'))
+      echarts.init(document.getElementById('post'))
     },
     setOption() {
       const ageOverviewCharts = echarts.getInstanceByDom(document.getElementById('age-overview'))
       const ageDisCharts = echarts.getInstanceByDom(document.getElementById('age-distribution'))
-      const eduAllCharts = echarts.getInstanceByDom(document.getElementById('edu-all'))
-      const eduZkCharts = echarts.getInstanceByDom(document.getElementById('edu-zk'))
-      const eduFkCharts = echarts.getInstanceByDom(document.getElementById('edu-fk'))
+      const eduCharts = echarts.getInstanceByDom(document.getElementById('edu-all'))
+      const postCharts = echarts.getInstanceByDom(document.getElementById('post'))
+      // const eduFkCharts = echarts.getInstanceByDom(document.getElementById('edu-fk'))
       ageOverviewCharts.setOption(this.ageOverviewOption)
       ageDisCharts.setOption(this.ageDisOption)
-      eduAllCharts.setOption(this.eduAllOption)
-      eduZkCharts.setOption(this.eduZkOption)
-      eduFkCharts.setOption(this.eduFkOption)
+      eduCharts.setOption(this.eduOption)
+      postCharts.setOption(this.postOption)
+      // eduFkCharts.setOption(this.eduFkOption)
     },
     onChangeOrgan(v) {
       this.currentOrgan = v
@@ -192,9 +207,8 @@ export default {
         return ''
       }
       const v = this.currentOverviewData
-      const age = this.currentAgeData
-      const edu = this.currentEduData
-      return analysisMethods.getOverviewString(this.currentOrgan, v, age, edu)
+      const position = this.departmentMap[this.currentOrgan.id]
+      return analysisMethods.getLeaderOverviewString(this.currentOrgan, v, position)
     },
     getHeadcountString() {
       if (Object.keys(this.currentOrgan).length === 0 || Object.keys(this.currentData['overview']).length === 0) {
@@ -207,15 +221,28 @@ export default {
         return ''
       }
       const v = this.currentAgeData
-      return analysisMethods.getAgeString(this.currentOrgan, v)
+      return analysisMethods.getLeaderAgeString(this.currentOrgan, v)
     },
     getEduString() {
-      if (Object.keys(this.currentOrgan).length === 0 || Object.keys(this.currentData['age']).length === 0) {
+      if (Object.keys(this.currentOrgan).length === 0 || Object.keys(this.currentData['edu']).length === 0) {
         return ''
       }
       const v = this.currentEduData
-      const overview = this.currentOverviewData
-      return analysisMethods.getEduString(this.currentOrgan, v, overview)
+      const num = this.currentLeaders.length ?? 1
+      return analysisMethods.getLeaderEduString(this.currentOrgan, v, num)
+    },
+    getPostString() {
+      if (Object.keys(this.currentOrgan).length === 0 || Object.keys(this.currentData['post']).length === 0) {
+        return ''
+      }
+      const v = this.currentPostData
+      return analysisMethods.getLeaderPostString(this.currentOrgan, v)
+    },
+    getPhotoURL(idCode) {
+      return idCode ? getPhoto(idCode, 'small') : ''
+    },
+    getDetailLink(id) {
+      return getDetailLink(id)
     }
   }
 

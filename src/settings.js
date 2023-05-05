@@ -1,12 +1,12 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-10-26 17:56:21
+ * @LastEditTime: 2023-04-05 10:53:51
  * @LastEditors: truxcoder
  * @Description:
  */
 module.exports = {
-  title: '机构编制与干部管理',
+  title: '干部管理与廉洁从政',
   fixedHeader: true,
   sidebarLogo: true,
   // 后端服务器地址

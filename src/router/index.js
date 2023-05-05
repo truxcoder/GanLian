@@ -44,6 +44,8 @@ const Feedback = () => import('@/views/review/Feedback')
 const IncorruptionReview = () => import('@/views/review/IncorruptionReview')
 
 const PoliceTeam = () => import('@/views/analysis/PoliceTeam')
+const LeaderTeam = () => import('@/views/analysis/LeaderTeam')
+const LeaderTeamList = () => import('@/views/analysis/LeaderTeamList')
 
 const Appointment = () => import('@/views/personnel/Appointment')
 
@@ -77,7 +79,9 @@ export const componentList = {
   Feedback,
   IncorruptionReview,
   Appointment,
-  PoliceTeam
+  PoliceTeam,
+  LeaderTeam,
+  LeaderTeamList
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1
