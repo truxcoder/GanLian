@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2023-01-12 10:33:37
- * @LastEditTime: 2023-04-27 16:37:59
+ * @LastEditTime: 2023-05-06 16:57:18
  * @LastEditors: truxcoder
  * @Description:
  */
@@ -558,7 +558,7 @@ export function getOverviewString(o, v, age, edu) {
   return `${o.shortName}核定政法专项编制${v.headcount}名，实有${v.use}人，男女占比${v.male}:${v.female}，
   平均年龄${(age['total'] / (age['num'] || 1)).toFixed(2)}岁，党员占比${fmt((v.communist) / (v.use || 1))}%（含预备党员），
   本科及以上学历占比${fmt((edu['bk'] || 0) / v.use)}%，少数民族${v.minority}人，
-  副厅级${v.ft}人，正处级${v.zc}人，副处级${v.fc}人，正科级${v.zk}人，副科级及以下${(v.use || 0) - v.ft - v.zc - v.fc - v.zk - v.fk}人，核心专业人员占比**%。`
+  副厅级${v.ft}人，正处级${v.zc}人，副处级${v.fc}人，正科级${v.zk}人，副科级${v.fk}人。`
 }
 
 export function getLeaderOverviewString(o, v, p) {
