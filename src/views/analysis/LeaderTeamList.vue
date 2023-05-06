@@ -1,7 +1,7 @@
 <!--
  * @Author: truxcoder
  * @Date: 2021-11-15 09:48:14
- * @LastEditTime: 2023-04-28 10:45:19
+ * @LastEditTime: 2023-05-05 17:11:13
  * @LastEditors: truxcoder
  * @Description: 任职管理
 -->
@@ -25,7 +25,7 @@
       <el-button v-if="can.delete && total" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
     </div>
-    <el-table v-loading="listLoading" :data="currentData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
+    <el-table v-loading="listLoading" :data="queryMeans === 'backend' ? currentData : currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="姓名" width="100">
         <template slot-scope="scope">
@@ -91,6 +91,7 @@ export default {
   data() {
     return {
       resource: 'leader',
+      queryMeans: 'frontend',
       originData: [],
       currentData: [],
       levelList: [],
@@ -115,14 +116,14 @@ export default {
       this.listLoading = true
       params = this.buildParams(this.queryMeans, params)
       request(this.resource, 'list', data, params).then(response => {
-        if (response.data) {
+        if (response.data.length) {
           this.originData = response.data
           this.currentData = [...this.originData]
-          this.count = response.count
+          // this.count = response.count
         } else {
           this.originData = []
           this.currentData = []
-          this.count = 0
+          // this.count = 0
         }
         this.listLoading = false
       }).catch(err => {
