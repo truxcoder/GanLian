@@ -36,7 +36,7 @@
       <el-button v-if="can.manage" type="primary" icon="el-icon-scjd-circle-forbidden iconfont" size="mini" @click="fetchDisabledData">查看禁用人员</el-button>
       <el-button v-if="can.special" v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click=" onQuickSearchBoxShow">展开快捷查询</el-button>
       <el-button v-if="can.special" v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click=" onQuickSearchBoxShow">收缩快捷查询</el-button>
-      <el-dropdown v-if="can.manage && can.global" class="data-export" @command="handleCommand">
+      <el-dropdown v-if="can.manage" class="data-export" @command="handleCommand">
         <el-button type="primary" icon="el-icon-download" size="mini">
           数据导出<i class="el-icon-arrow-down el-icon--right" />
         </el-button>
