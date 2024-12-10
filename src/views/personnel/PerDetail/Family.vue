@@ -1,13 +1,13 @@
 <!--
  * @Author: truxcoder
  * @Date: 2022-03-16 20:39:01
- * @LastEditTime: 2022-08-03 15:41:18
+ * @LastEditTime: 2024-04-06 21:39:22
  * @LastEditors: truxcoder
  * @Description: 家庭成员页
 -->
 <template>
   <div>
-    <div class=" flex items-center text-left">
+    <div class="flex items-center text-left">
       <el-button v-if="can.add" type="primary" size="mini" @click="handleEdit('add')">添加信息</el-button>
       <el-button v-if="currentData.length && can.delete" type="danger" :disabled="!multipleSelection.length" icon="el-icon-delete" size="mini" @click="deleteMutiData">删除</el-button>
     </div>
@@ -19,7 +19,7 @@
         <el-table-column label="称谓" align="center" prop="relation" width="90" />
         <el-table-column label="出生日期" align="center" width="120">
           <template slot-scope="scope">
-            {{ scope.row.birthday| dateMonthFilter }}
+            {{ scope.row.birthday | dateMonthFilter }}
           </template>
         </el-table-column>
         <el-table-column label="政治面貌" align="center" prop="political" width="150" />
@@ -38,16 +38,8 @@
         </el-table-column>
       </el-table>
     </div>
-    <div v-else class=" mt-4 pl-1 text-gray-600">暂无数据</div>
-    <FamilyEdit
-      :visible="editVisible"
-      :single-personnel-data="baseData"
-      :action="action"
-      :row="rowData"
-      :can="can"
-      @editSuccess="editSuccess"
-      @visibleChange="visibleChange"
-    />
+    <div v-else class="mt-4 pl-1 text-gray-600">暂无数据</div>
+    <FamilyEdit :visible="editVisible" :single-personnel-data="baseData" :action="action" :row="rowData" :can="can" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
 
@@ -67,19 +59,23 @@ export default {
   data() {
     return {
       resource: 'family',
-      obj: 'DetailFamily'
+      obj: 'DetailFamily',
     }
   },
   computed: {
     relationMap() {
       const _map = new Map()
-      relationDict.forEach(i => { _map.set(i.value, i.sort) })
+      relationDict.forEach((i) => {
+        _map.set(i.value, i.sort)
+      })
       return _map
     },
     sortedData() {
       const temp = [...this.currentData]
       const _map = new Map()
-      relationDict.forEach(i => { _map.set(i.value, i.sort) })
+      relationDict.forEach((i) => {
+        _map.set(i.value, i.sort)
+      })
       return temp.sort((a, b) => {
         if (!_map.get(a.relation)) {
           return 1
@@ -89,15 +85,19 @@ export default {
           return _map.get(a.relation) - _map.get(b.relation)
         }
       })
-    }
+    },
   },
   created() {
     this.check(this.obj).then(() => {
+      // 成戒所：单独给普通用户赋权，用于修改个人家庭成员信息。
+      if (this.$store.getters.organ === '3d7e73e3a3034ca1a1da707aa3d54a96' && this.$store.state.settings?.setting?.cjs) {
+        this.permission.ADD = true
+        this.permission.UPDATE = true
+      }
       this.fetchData()
     })
   },
-  methods: {
-  }
+  methods: {},
 }
 </script>
 

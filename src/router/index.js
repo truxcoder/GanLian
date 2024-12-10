@@ -17,6 +17,7 @@ const Module = () => import('@/views/website/Module')
 const Personnel = () => import('@/views/personnel/Personnel')
 const Headcount = () => import('@/views/organ/Headcount')
 const DepartmentPosition = () => import('@/views/organ/DepartmentPosition')
+const DepartmentHighLevel = () => import('@/views/organ/DepartmentHighLevel')
 const Level = () => import('@/views/personnel/Level')
 const Position = () => import('@/views/personnel/Position')
 const Post = () => import('@/views/personnel/Post')
@@ -45,15 +46,19 @@ const IncorruptionReview = () => import('@/views/review/IncorruptionReview')
 
 const PoliceTeam = () => import('@/views/analysis/PoliceTeam')
 const LeaderTeam = () => import('@/views/analysis/LeaderTeam')
+const HighLevel = () => import('@/views/analysis/HighLevel')
 const LeaderTeamList = () => import('@/views/analysis/LeaderTeamList')
 
 const Appointment = () => import('@/views/personnel/Appointment')
+
+const Setting = () => import('@/views/system/Setting.vue')
 
 export const componentList = {
   Personnel,
   Module,
   Headcount,
   DepartmentPosition,
+  DepartmentHighLevel,
   Level,
   Position,
   Post,
@@ -81,7 +86,9 @@ export const componentList = {
   Appointment,
   PoliceTeam,
   LeaderTeam,
-  LeaderTeamList
+  HighLevel,
+  LeaderTeamList,
+  Setting,
 }
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -111,41 +118,41 @@ export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
-    hidden: true
+    hidden: true,
   },
   {
     path: '/auth',
     component: () => import('@/views/website/Auth'),
-    hidden: true
+    hidden: true,
   },
 
   {
     path: '/404',
     component: () => import('@/views/404'),
-    hidden: true
+    hidden: true,
   },
 
   {
     path: '/403',
     component: () => import('@/views/403'),
-    hidden: true
+    hidden: true,
   },
 
   {
     path: '/401',
     component: () => import('@/views/401'),
-    hidden: true
+    hidden: true,
   },
 
   {
     path: '/nologin',
     component: () => import('@/views/website/NoLogin'),
-    hidden: true
+    hidden: true,
   },
   {
     path: '/upload',
     component: () => import('@/views/other/Upload'),
-    hidden: true
+    hidden: true,
   },
 
   {
@@ -157,20 +164,20 @@ export const constantRoutes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
-        meta: { title: '控制台', icon: 'dashboard' }
-      }
-    ]
+        meta: { title: '控制台', icon: 'dashboard' },
+      },
+    ],
   },
 
   {
     path: '/perdetail',
     component: () => import('@/views/personnel/PerDetail'),
-    hidden: true
+    hidden: true,
   },
   {
     path: '/pertable',
     component: () => import('@/views/personnel/PersonnelTable'),
-    hidden: true
+    hidden: true,
   },
   {
     path: '/talent',
@@ -182,33 +189,33 @@ export const constantRoutes = [
         path: 'dashboard',
         name: 'TalentDashboard',
         component: () => import('@/views/talent/Dashboard'),
-        meta: { title: '人才库', icon: 'dashboard' }
+        meta: { title: '人才库', icon: 'dashboard' },
       },
       {
         path: 'politics',
         name: 'TalentPolitics',
         component: () => import('@/views/talent/Talent'),
-        meta: { title: '政工人才库', icon: 'dashboard' }
+        meta: { title: '政工人才库', icon: 'dashboard' },
       },
       {
         path: 'finance',
         name: 'TalentFinance',
         component: () => import('@/views/talent/Talent'),
-        meta: { title: '财务人才库', icon: 'dashboard' }
+        meta: { title: '财务人才库', icon: 'dashboard' },
       },
       {
         path: 'information',
         name: 'TalentInformation',
         component: () => import('@/views/talent/Talent'),
-        meta: { title: '信息化人才库', icon: 'dashboard' }
+        meta: { title: '信息化人才库', icon: 'dashboard' },
       },
       {
         path: 'pick',
         name: 'TalentPick',
         component: () => import('@/views/talent/TalentPick'),
-        meta: { title: '人才抽取', icon: 'dashboard' }
-      }
-    ]
+        meta: { title: '人才抽取', icon: 'dashboard' },
+      },
+    ],
   },
   // {
   //   path: '/talent',
@@ -264,7 +271,7 @@ export const constantRoutes = [
   // },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/404', hidden: true },
 ]
 
 export const asyncRoutes = [
@@ -353,14 +360,14 @@ export const asyncRoutes = [
   // },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/404', hidden: true },
 ]
 
 const createRouter = () =>
   new Router({
     // mode: 'history', // require service support
     scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes
+    routes: constantRoutes,
   })
 
 const router = createRouter()

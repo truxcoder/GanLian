@@ -34,12 +34,10 @@
     <div class="tool-bar">
       <el-button type="primary" icon="el-icon-s-data" size="mini" @click="handleAllData">所有数据</el-button>
       <el-button v-if="can.manage" type="primary" icon="el-icon-scjd-circle-forbidden iconfont" size="mini" @click="fetchDisabledData">查看禁用人员</el-button>
-      <el-button v-if="can.special" v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click=" onQuickSearchBoxShow">展开快捷查询</el-button>
-      <el-button v-if="can.special" v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click=" onQuickSearchBoxShow">收缩快捷查询</el-button>
+      <el-button v-if="can.special" v-show="!quickSearchBoxShow" type="success" icon="el-icon-arrow-down" size="mini" @click="onQuickSearchBoxShow">展开快捷查询</el-button>
+      <el-button v-if="can.special" v-show="quickSearchBoxShow" type="success" icon="el-icon-arrow-up" size="mini" @click="onQuickSearchBoxShow">收缩快捷查询</el-button>
       <el-dropdown v-if="can.manage" class="data-export" @command="handleCommand">
-        <el-button type="primary" icon="el-icon-download" size="mini">
-          数据导出<i class="el-icon-arrow-down el-icon--right" />
-        </el-button>
+        <el-button type="primary" icon="el-icon-download" size="mini"> 数据导出<i class="el-icon-arrow-down el-icon--right" /> </el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="select">导出所选数据</el-dropdown-item>
           <el-dropdown-item command="all">导出全部数据</el-dropdown-item>
@@ -51,70 +49,38 @@
         <div class="border pb-4 mb-4">
           <div class="quick-buttons">
             <el-button size="small" type="success" plain @click="onQuickSearch('fc')">符合副处级领导干部选拔条件人员</el-button>
-            <el-popover
-              placement="bottom-start"
-              title="条件说明"
-              width="500"
-              trigger="hover"
-              content="工龄≥5年。下一级两个及以上职位任职经历。下一职级（正科级）任职时间≥3年。学历:大专及以上。通过县处级领导干部考试且在三年有效期内。前三年年度考核称职及以上。政治面貌为中共党员。三年以上党龄。"
-            >
-              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            <el-popover placement="bottom-start" title="条件说明" width="500" trigger="hover" content="工龄≥5年。下一级两个及以上职位任职经历。下一职级（正科级）任职时间≥3年。学历:大专及以上。通过县处级领导干部考试且在三年有效期内。前三年年度考核称职及以上。政治面貌为中共党员。三年以上党龄。">
+              <li slot="reference" style="color: grey; margin-left: 5px" class="el-icon-question" />
             </el-popover>
           </div>
 
           <div class="quick-buttons">
             <el-button size="small" type="success" plain @click="onQuickSearch('zc')">符合副处级晋升正处级条件人员</el-button>
-            <el-popover
-              placement="bottom-start"
-              title="条件说明"
-              width="500"
-              trigger="hover"
-              content="工龄≥5年。下一级两个及以上职位任职经历。下一职级（副处级）任职时间≥2年。学历:大专及以上。通过县处级领导干部考试且在三年有效期内。前三年年度考核称职及以上。政治面貌为中共党员。三年以上党龄。"
-            >
-              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            <el-popover placement="bottom-start" title="条件说明" width="500" trigger="hover" content="工龄≥5年。下一级两个及以上职位任职经历。下一职级（副处级）任职时间≥2年。学历:大专及以上。通过县处级领导干部考试且在三年有效期内。前三年年度考核称职及以上。政治面貌为中共党员。三年以上党龄。">
+              <li slot="reference" style="color: grey; margin-left: 5px" class="el-icon-question" />
             </el-popover>
           </div>
           <div class="quick-buttons">
             <el-button size="small" type="success" plain @click="onQuickSearch('willUpInSixMonth')">半年内将晋升职级的人员</el-button>
-            <el-popover
-              placement="bottom-start"
-              title="条件说明"
-              width="500"
-              trigger="hover"
-              content="现任职级(非领导职务)为一级警长以下。现职级任职时间已满18个月。"
-            >
-              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            <el-popover placement="bottom-start" title="条件说明" width="500" trigger="hover" content="现任职级(非领导职务)为一级警长以下。现职级任职时间已满18个月。">
+              <li slot="reference" style="color: grey; margin-left: 5px" class="el-icon-question" />
             </el-popover>
           </div>
           <div class="quick-buttons">
             <el-button size="small" type="success" plain @click="onQuickSearch('willUpInThreeMonth')">三个月内将晋升职级的人员</el-button>
-            <el-popover
-              placement="bottom-start"
-              title="条件说明"
-              width="500"
-              trigger="hover"
-              content="现任职级(非领导职务)为一级警长以下。现职级任职时间已满21个月。"
-            >
-              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            <el-popover placement="bottom-start" title="条件说明" width="500" trigger="hover" content="现任职级(非领导职务)为一级警长以下。现职级任职时间已满21个月。">
+              <li slot="reference" style="color: grey; margin-left: 5px" class="el-icon-question" />
             </el-popover>
           </div>
           <div class="quick-buttons">
             <el-button size="small" type="success" plain @click="onQuickSearch('willRetireInTwoYear')">两年内将退休的人员</el-button>
-            <el-popover
-              placement="bottom-start"
-              title="条件说明"
-              width="500"
-              trigger="hover"
-              content="男民警已满58岁，女民警已满53岁。"
-            >
-              <li slot="reference" style="color:grey; margin-left:5px" class="el-icon-question" />
+            <el-popover placement="bottom-start" title="条件说明" width="500" trigger="hover" content="男民警已满58岁，女民警已满53岁。">
+              <li slot="reference" style="color: grey; margin-left: 5px" class="el-icon-question" />
             </el-popover>
           </div>
           <div class="quick-buttons">
             <el-dropdown class="data-export" @command="handleQuickSearchCommand">
-              <el-button size="small" type="success" plain>
-                符合职级晋升条件的人员<i class="el-icon-arrow-down el-icon--right" />
-              </el-button>
+              <el-button size="small" type="success" plain> 符合职级晋升条件的人员<i class="el-icon-arrow-down el-icon--right" /> </el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="willUp2d">二级调研员</el-dropdown-item>
                 <el-dropdown-item command="willUp3d">三级调研员</el-dropdown-item>
@@ -142,16 +108,7 @@
 
     </transition> -->
 
-    <el-table
-      v-loading="listLoading"
-      :data="queryMeans === 'backend' ? currentData : currentPageData"
-      element-loading-text="Loading"
-      stripe
-      border
-      :fit="true"
-      highlight-current-row
-      @selection-change="handleSelectionChange"
-    >
+    <el-table v-loading="listLoading" :data="queryMeans === 'backend' ? currentData : currentPageData" element-loading-text="Loading" stripe border :fit="true" highlight-current-row @selection-change="handleSelectionChange">
       <el-table-column v-if="can.manage" align="center" type="selection" width="50" />
       <el-table-column align="center" label="序号" width="60">
         <template slot-scope="scope">
@@ -191,26 +148,17 @@
       <el-table-column label="政治面貌" prop="political" align="center" width="100" />
       <el-table-column align="center" label="操作" :width="lastColumnWidth">
         <template slot-scope="scope">
-          <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <el-button v-if="canRender(scope.row.organId, 'update')" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button>
+          <!-- <el-button v-if="can.update" size="mini" type="success" @click="handleEdit('update', scope.row)">编辑</el-button> -->
           <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row.id)">删除</el-button> -->
-          <el-button v-if="can.manage" size="mini" :type="scope.row.status?'danger':'success'" @click="handleDisable(scope.row)">{{ scope.row.status?'禁用':'启用' }}</el-button>
+          <el-button v-if="canRender(scope.row.organId, 'manage')" size="mini" :type="scope.row.status ? 'danger' : 'success'" @click="handleDisable(scope.row)">{{ scope.row.status ? '禁用' : '启用' }}</el-button>
+          <!-- <el-button v-if="can.manage" size="mini" :type="scope.row.status ? 'danger' : 'success'" @click="handleDisable(scope.row)">{{ scope.row.status ? '禁用' : '启用' }}</el-button> -->
           <el-button size="mini" type="primary" @click="handleTable(scope.$index, scope.row)">一览</el-button>
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      v-if="total"
-      class="pagination"
-      background
-      :current-page="currentPage"
-      :page-sizes="[10, 20, 40]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+    <el-pagination v-if="total" class="pagination" background :current-page="currentPage" :page-sizes="[10, 20, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     <PersonnelEdit :visible="editVisible" :action="action" :row="rowData" :can="can" :is-parent-list="true" @editSuccess="editSuccess" @visibleChange="visibleChange" />
 
     <!-- <personnel-update :visible="updateVisible" :rowdata="rowData" @updateSuccess="updateSuccess" @visibleChange="visibleChange" /> -->
@@ -256,8 +204,8 @@ export default {
         name: '',
         policeCode: '',
         organId: '',
-        level: ''
-      }
+        level: '',
+      },
     }
   },
   computed: {
@@ -275,11 +223,11 @@ export default {
     },
     levelMap() {
       const _map = {}
-      this.levelList.forEach(i => {
+      this.levelList.forEach((i) => {
         _map[i.id] = i.name
       })
       return _map
-    }
+    },
   },
   created() {
     if (this.$store.state.department.departments.length === 0) {
@@ -308,26 +256,28 @@ export default {
       if (!('status' in data)) {
         data = { ...data, status: true }
       }
-      request('personnel', 'list', data, params).then(response => {
-        // if (response?.count) {
-        if (response.data.length) {
-          this.originData = response.data
-          this.currentData = [...this.originData]
-          // this.count = response.count
+      request('personnel', 'list', data, params)
+        .then((response) => {
+          // if (response?.count) {
+          if (response.data.length) {
+            this.originData = response.data
+            this.currentData = [...this.originData]
+            // this.count = response.count
+            this.listLoading = false
+          } else {
+            this.originData = []
+            this.currentData = []
+            // this.count = 0
+            this.listLoading = false
+          }
+        })
+        .catch((err) => {
+          console.log(err)
           this.listLoading = false
-        } else {
-          this.originData = []
-          this.currentData = []
-          // this.count = 0
-          this.listLoading = false
-        }
-      }).catch(err => {
-        console.log(err)
-        this.listLoading = false
-      })
+        })
     },
     fetchOtherData() {
-      request('level', 'list').then(res => {
+      request('level', 'list').then((res) => {
         this.levelList = res.data ?? []
       })
     },
@@ -341,7 +291,7 @@ export default {
     handleDetail(index, row) {
       const url = this.$router.resolve({
         path: '/perdetail',
-        query: { id: row.id }
+        query: { id: row.id },
       })
       window.open(url.href, '_blank')
       // this.$router.push({ path: 'pdetail' })
@@ -354,7 +304,7 @@ export default {
       const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=${width},height=${height},left=${left},top=0`
       const url = this.$router.resolve({
         path: '/pertable',
-        query: { id: row.id }
+        query: { id: row.id },
       })
       open(url.href, 'name', params)
       // this.$router.push({ path: 'pdetail' })
@@ -380,18 +330,22 @@ export default {
       this.$confirm(message, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'warning',
       })
         .then(() => {
           request('personnel', 'update_status', { id: row.id, status: !row.status })
-            .then(response => {
+            .then((response) => {
               this.$message.success(response.message)
               this.$set(row, 'status', !row.status)
               // this.fetchData()
             })
-            .catch(err => { console.log(err) })
+            .catch((err) => {
+              console.log(err)
+            })
         })
-        .catch(() => { this.$message.info('已取消禁用') })
+        .catch(() => {
+          this.$message.info('已取消禁用')
+        })
     },
     handleCommand(command) {
       if (command === 'select') {
@@ -418,8 +372,8 @@ export default {
       this.$set(this.searchForm, 'policeCode', '')
       // this.queryParam = {}
       this.isClean = true
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -445,5 +399,4 @@ export default {
   padding-left: 16px;
   padding-top: 16px;
 }
-
 </style>

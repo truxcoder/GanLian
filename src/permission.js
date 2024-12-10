@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-10-12 17:02:21
- * @LastEditTime: 2022-04-19 20:57:38
+ * @LastEditTime: 2024-04-06 17:57:15
  * @LastEditors: truxcoder
  * @Description: 导航守卫，动态获取路由
  */
@@ -48,6 +48,7 @@ router.beforeEach(async (to, from, next) => {
         try {
           // note: roles 必须为数组! 如: ['admin'] or ,['developer','editor']
           const { roles, personnelId } = await store.dispatch('user/getInfo')
+          await store.dispatch('settings/changeSettingFromDB')
           // 如果用户仅为普通用户，则强制跳转到其个人页面
           // FIXME: jwt认证后需要重新获取id
           if (roles[0] === 'normal') {
@@ -80,8 +81,8 @@ router.beforeEach(async (to, from, next) => {
       // other pages that do not have permission to access are redirected to the login page.
       // next(`/login?redirect=${to.path}`)
       const params = { ticket, service }
-      request('user', 'login', {}, params).then(response => {
-        console.log('login response:', response)
+      request('user', 'login', {}, params).then((response) => {
+        // console.log('login response:', response)
         if (!response.isValid) {
           next('/403')
         } else {
