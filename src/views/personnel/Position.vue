@@ -62,18 +62,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      v-if="total"
-      class="pagination"
-      background
-      :current-page="currentPage"
-      :page-sizes="[10, 20, 40]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+    <el-pagination v-if="total" class="pagination" background :current-page="currentPage" :page-sizes="[10, 20, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     <PositionEdit :visible="editVisible" :levels="levelList" :action="action" :row="rowData" @editSuccess="editSuccess" @visibleChange="visibleChange" />
   </div>
 </template>
@@ -96,7 +85,7 @@ export default {
       originData: [],
       currentData: [],
       levelList: [],
-      form: { levelId: '', isLeader: '', isChief: '' }
+      form: { levelId: '', isLeader: '', isChief: '' },
     }
   },
   created() {
@@ -106,17 +95,19 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      request('position', 'list').then(response => {
-        this.originData = response.data
-        this.currentData = response.data
-        this.listLoading = false
-      }).catch(err => {
-        console.log(err)
-        this.listLoading = false
-      })
+      request('position', 'list')
+        .then((response) => {
+          this.originData = response.data
+          this.currentData = response.data
+          this.listLoading = false
+        })
+        .catch((err) => {
+          console.log(err)
+          this.listLoading = false
+        })
     },
     fetchLevelData() {
-      request('level', 'list').then(response => {
+      request('level', 'list').then((response) => {
         this.levelList = response.data
         this.listLoading = false
       })
@@ -125,7 +116,7 @@ export default {
       let result = this.originData
       for (const key in this.form) {
         if (this.form[key] !== '') {
-          result = result.filter(i => i[key] === this.form[key])
+          result = result.filter((i) => i[key] === this.form[key])
         }
       }
       this.currentData = result
@@ -137,8 +128,8 @@ export default {
     },
     onClean() {
       this.$refs.form.resetFields()
-    }
-  }
+    },
+  },
 }
 </script>
 

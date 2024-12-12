@@ -1,7 +1,7 @@
 /*
  * @Author: truxcoder
  * @Date: 2021-12-14 11:15:43
- * @LastEditTime: 2024-11-11 13:53:50
+ * @LastEditTime: 2024-12-12 17:13:04
  * @LastEditors: truxcoder
  * @Description: 权限检查相关
  */
@@ -39,8 +39,10 @@ export const permission_mixin = {
         global: this.permission.GLOBAL,
         special: this.permission.SPECIAL,
         addGlobal: this.permission.GLOBAL_ADD || this.permission.GLOBAL_MANAGE,
-        deleteGlobal: this.permission.GLOBAL_DELETE || this.permission.GLOBAL_MANAGE,
-        updateGlobal: this.permission.GLOBAL_UPDATE || this.permission.GLOBAL_MANAGE,
+        deleteGlobal:
+          this.permission.GLOBAL_DELETE || this.permission.GLOBAL_MANAGE,
+        updateGlobal:
+          this.permission.GLOBAL_UPDATE || this.permission.GLOBAL_MANAGE,
         manageGlobal: this.permission.GLOBAL_MANAGE,
       }
     },
@@ -51,12 +53,28 @@ export const permission_mixin = {
   methods: {
     check(object = null) {
       return new Promise((resolve, reject) => {
-        const sub = this.$store.getters.roles.length === 1 && this.$store.getters.roles[0] === 'normal' ? 'normal' : this.$store.getters.id
+        const sub =
+          this.$store.getters.roles.length === 1 &&
+          this.$store.getters.roles[0] === 'normal'
+            ? 'normal'
+            : this.$store.getters.id
         const obj = object ?? this.$options.name
-        const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL', 'SPECIAL', 'GLOBAL_ADD', 'GLOBAL_DELETE', 'GLOBAL_UPDATE', 'GLOBAL_MANAGE']
+        const act = [
+          'ADD',
+          'DELETE',
+          'UPDATE',
+          'READ',
+          'MANAGE',
+          'MENU',
+          'GLOBAL',
+          'SPECIAL',
+          'GLOBAL_ADD',
+          'GLOBAL_DELETE',
+          'GLOBAL_UPDATE',
+          'GLOBAL_MANAGE',
+        ]
         request('permission', 'check', { sub, obj, act })
           .then((res) => {
-            console.log('[ res.data ] >', res.data)
             Object.assign(this.permission, res.data)
             resolve()
           })
@@ -107,7 +125,16 @@ export const detail_permission_mixin = {
     async check() {
       const sub = this.$store.getters.id
       const obj = this.obj
-      const act = ['ADD', 'DELETE', 'UPDATE', 'READ', 'MANAGE', 'MENU', 'GLOBAL', 'SPECIAL']
+      const act = [
+        'ADD',
+        'DELETE',
+        'UPDATE',
+        'READ',
+        'MANAGE',
+        'MENU',
+        'GLOBAL',
+        'SPECIAL',
+      ]
       const res = await permissionCheck({ sub, obj, act })
       Object.assign(this.permission, res.data)
     },
