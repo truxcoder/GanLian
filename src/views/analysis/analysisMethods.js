@@ -1,10 +1,12 @@
 /*
  * @Author: truxcoder
  * @Date: 2023-01-12 10:33:37
- * @LastEditTime: 2023-05-19 13:02:23
+ * @LastEditTime: 2024-12-18 17:58:27
  * @LastEditors: truxcoder
  * @Description:
  */
+
+import dayjs from 'dayjs'
 
 function fmt(number) {
   return (number * 100).toFixed(2)
@@ -13,33 +15,51 @@ export function getAgeOverviewOption(v) {
   return {
     title: {
       text: '年龄概况',
-      left: 'left'
+      left: 'left',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {},
     xAxis: {
-      data: ['全体人员', '男民警', '女民警', '正科级', '副科级']
+      data: ['全体人员', '男民警', '女民警', '正科级', '副科级'],
     },
     yAxis: {},
     series: [
       {
         name: '平均年龄',
         type: 'bar',
-        data: [(v['total'] / (v['num'] || 1)).toFixed(2), (v['maleTotal'] / (v['maleNum'] || 1)).toFixed(2), (v['femaleTotal'] / (v['femaleNum'] || 1)).toFixed(2), (v['zkTotal'] / (v['zkNum'] || 1)).toFixed(2), (v['fkTotal'] / (v['fkNum'] || 1)).toFixed(2)]
+        data: [
+          (v['total'] / (v['num'] || 1)).toFixed(2),
+          (v['maleTotal'] / (v['maleNum'] || 1)).toFixed(2),
+          (v['femaleTotal'] / (v['femaleNum'] || 1)).toFixed(2),
+          (v['zkTotal'] / (v['zkNum'] || 1)).toFixed(2),
+          (v['fkTotal'] / (v['fkNum'] || 1)).toFixed(2),
+        ],
       },
       {
         name: '最大年龄',
         type: 'bar',
-        data: [v['oldest'], v['maleOldest'], v['femaleOldest'], v['zkOldest'], v['fkOldest']]
+        data: [
+          v['oldest'],
+          v['maleOldest'],
+          v['femaleOldest'],
+          v['zkOldest'],
+          v['fkOldest'],
+        ],
       },
       {
         name: '最小年龄',
         type: 'bar',
-        data: [v['youngest'], v['maleYoungest'], v['femaleYoungest'], v['zkYoungest'], v['fkYoungest']]
-      }
-    ]
+        data: [
+          v['youngest'],
+          v['maleYoungest'],
+          v['femaleYoungest'],
+          v['zkYoungest'],
+          v['fkYoungest'],
+        ],
+      },
+    ],
   }
 }
 
@@ -51,33 +71,36 @@ export function getLeaderAgeOverviewOption(v) {
   return {
     title: {
       text: '年龄概况',
-      left: 'left'
+      left: 'left',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {},
     xAxis: {
-      data: ['班子成员', '副处级']
+      data: ['班子成员', '副处级'],
     },
     yAxis: {},
     series: [
       {
         name: '平均年龄',
         type: 'bar',
-        data: [((v['total'] || 0) / (v['num'] || 1)).toFixed(2), ((v['fcTotal'] || 0) / (v['fcNum'] || 1)).toFixed(2)]
+        data: [
+          ((v['total'] || 0) / (v['num'] || 1)).toFixed(2),
+          ((v['fcTotal'] || 0) / (v['fcNum'] || 1)).toFixed(2),
+        ],
       },
       {
         name: '最大年龄',
         type: 'bar',
-        data: [v['oldest'] || 0, v['fcOldest'] || 0]
+        data: [v['oldest'] || 0, v['fcOldest'] || 0],
       },
       {
         name: '最小年龄',
         type: 'bar',
-        data: [v['youngest'] || 0, v['fcYoungest'] || 0]
-      }
-    ]
+        data: [v['youngest'] || 0, v['fcYoungest'] || 0],
+      },
+    ],
   }
 }
 
@@ -85,47 +108,83 @@ export function getAgeDisOption(v) {
   return {
     title: {
       text: '年龄分布',
-      left: 'left'
+      left: 'left',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {},
     xAxis: {
-      data: ['20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59']
+      data: [
+        '20-24',
+        '25-29',
+        '30-34',
+        '35-39',
+        '40-44',
+        '45-49',
+        '50-54',
+        '55-59',
+      ],
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
     },
     series: [
       {
         name: '全体民警',
         type: 'line',
-        data: [v['20-24'], v['25-29'], v['30-34'], v['35-39'], v['40-44'], v['45-49'], v['50-54'], v['55-59']],
+        data: [
+          v['20-24'],
+          v['25-29'],
+          v['30-34'],
+          v['35-39'],
+          v['40-44'],
+          v['45-49'],
+          v['50-54'],
+          v['55-59'],
+        ],
         label: {
           show: true,
-          position: 'top'
-        }
+          position: 'top',
+        },
       },
       {
         name: '正科级',
         type: 'line',
-        data: [v['zk-20-24'], v['zk-25-29'], v['zk-30-34'], v['zk-35-39'], v['zk-40-44'], v['zk-45-49'], v['zk-50-54'], v['zk-55-59']],
+        data: [
+          v['zk-20-24'],
+          v['zk-25-29'],
+          v['zk-30-34'],
+          v['zk-35-39'],
+          v['zk-40-44'],
+          v['zk-45-49'],
+          v['zk-50-54'],
+          v['zk-55-59'],
+        ],
         label: {
           show: true,
-          position: 'top'
-        }
+          position: 'top',
+        },
       },
       {
         name: '副科级',
         type: 'line',
-        data: [v['fk-20-24'], v['fk-25-29'], v['fk-30-34'], v['fk-35-39'], v['fk-40-44'], v['fk-45-49'], v['fk-50-54'], v['fk-55-59']],
+        data: [
+          v['fk-20-24'],
+          v['fk-25-29'],
+          v['fk-30-34'],
+          v['fk-35-39'],
+          v['fk-40-44'],
+          v['fk-45-49'],
+          v['fk-50-54'],
+          v['fk-55-59'],
+        ],
         label: {
           show: true,
-          position: 'top'
-        }
-      }
-    ]
+          position: 'top',
+        },
+      },
+    ],
   }
 }
 
@@ -134,34 +193,34 @@ export function getLeaderAgeDisOption(v) {
   return {
     title: {
       text: '年龄分布',
-      left: 'left'
+      left: 'left',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {},
     radar: {
       // shape: 'circle',
       axisName: {
         formatter: '【{value}】',
-        color: '#428BD4'
+        color: '#428BD4',
       },
       splitArea: {
         areaStyle: {
           color: ['#77EADF', '#26C3BE', '#64AFE9', '#428BD4'],
           shadowColor: 'rgba(0, 0, 0, 0.2)',
-          shadowBlur: 10
-        }
+          shadowBlur: 10,
+        },
       },
       axisLine: {
         lineStyle: {
-          color: 'rgba(211, 253, 250, 0.8)'
-        }
+          color: 'rgba(211, 253, 250, 0.8)',
+        },
       },
       splitLine: {
         lineStyle: {
-          color: 'rgba(211, 253, 250, 0.8)'
-        }
+          color: 'rgba(211, 253, 250, 0.8)',
+        },
       },
       indicator: [
         { name: '30-34', max: 5 },
@@ -169,43 +228,53 @@ export function getLeaderAgeDisOption(v) {
         { name: '40-44', max: 5 },
         { name: '45-49', max: 5 },
         { name: '50-54', max: 5 },
-        { name: '55-59', max: 5 }
-      ]
+        { name: '55-59', max: 5 },
+      ],
     },
     series: [
       {
         name: '副处级',
         type: 'radar',
-        data: [{
-          value: [v['fc-30-34'], v['fc-35-39'], v['fc-40-44'], v['fc-45-49'], v['fc-50-54'], v['fc-55-59']],
-          areaStyle: {
-            color: 'rgba(255, 228, 52, 0.6)'
-          }
-        }],
+        data: [
+          {
+            value: [
+              v['fc-30-34'],
+              v['fc-35-39'],
+              v['fc-40-44'],
+              v['fc-45-49'],
+              v['fc-50-54'],
+              v['fc-55-59'],
+            ],
+            areaStyle: {
+              color: 'rgba(255, 228, 52, 0.6)',
+            },
+          },
+        ],
         label: {
           show: true,
-          position: 'top'
-        }
-      }
-    ]
+          position: 'top',
+        },
+      },
+    ],
   }
 }
 
 export function getEduAllOption(v, o) {
   const other = (o.use || 0) - (v.yjs || 0) - (v.bk || 0) - (v.zk || 0)
-  const other_qrz = (o.use || 0) - (v.qrzyjs || 0) - (v.qrzbk || 0) - (v.qrzzk || 0)
+  const other_qrz =
+    (o.use || 0) - (v.qrzyjs || 0) - (v.qrzbk || 0) - (v.qrzzk || 0)
   return {
     title: {
       text: '全体民警学历分布',
-      left: 'center'
+      left: 'center',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {
       orient: 'vertical',
       // orient: 'horizontal',
-      left: 'left'
+      left: 'left',
     },
     series: [
       {
@@ -213,74 +282,75 @@ export function getEduAllOption(v, o) {
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: [0, '30%'],
         data: [
           {
             value: v.qrzyjs || 0,
-            name: '全日制研究生'
+            name: '全日制研究生',
           },
           {
             value: v.qrzbk || 0,
-            name: '全日制本科'
+            name: '全日制本科',
           },
           {
             value: v.qrzzk || 0,
-            name: '全日制专科'
+            name: '全日制专科',
           },
           {
             value: other_qrz,
-            name: '全日制其他'
-          }
-        ]
+            name: '全日制其他',
+          },
+        ],
       },
       {
         type: 'pie',
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: ['45%', '60%'],
         data: [
           {
             value: v.yjs || 0,
-            name: '研究生'
+            name: '研究生',
           },
           {
             value: v.bk || 0,
-            name: '本科'
+            name: '本科',
           },
           {
             value: v.zk || 0,
-            name: '专科'
+            name: '专科',
           },
           {
             value: other,
-            name: '其他'
-          }
-        ]
-      }
-    ]
+            name: '其他',
+          },
+        ],
+      },
+    ],
   }
 }
 
 export function getEduZkOption(v, o) {
   const other = (o.zk || 0) - (v.yjs_zk || 0) - (v.bk_zk || 0) - (v.zk_zk || 0)
-  const other_qrz = (o.zk || 0) - (v.qrzyjs_zk || 0) - (v.qrzbk_zk || 0) - (v.qrzzk_zk || 0)
+  const other_qrz =
+    (o.zk || 0) - (v.qrzyjs_zk || 0) - (v.qrzbk_zk || 0) - (v.qrzzk_zk || 0)
   return {
     title: {
       text: '正科级干部学历分布',
-      left: 'center'
+      left: 'center',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {
       orient: 'vertical',
       // orient: 'horizontal',
-      left: 'left'
+      left: 'left',
     },
     series: [
       {
@@ -288,74 +358,75 @@ export function getEduZkOption(v, o) {
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: [0, '30%'],
         data: [
           {
             value: v.qrzyjs_zk || 0,
-            name: '全日制研究生'
+            name: '全日制研究生',
           },
           {
             value: v.qrzbk_zk || 0,
-            name: '全日制本科'
+            name: '全日制本科',
           },
           {
             value: v.qrzzk_zk || 0,
-            name: '全日制专科'
+            name: '全日制专科',
           },
           {
             value: other_qrz,
-            name: '全日制其他'
-          }
-        ]
+            name: '全日制其他',
+          },
+        ],
       },
       {
         type: 'pie',
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: ['45%', '60%'],
         data: [
           {
             value: v.yjs_zk || 0,
-            name: '研究生'
+            name: '研究生',
           },
           {
             value: v.bk_zk || 0,
-            name: '本科'
+            name: '本科',
           },
           {
             value: v.zk_zk || 0,
-            name: '专科'
+            name: '专科',
           },
           {
             value: other,
-            name: '其他'
-          }
-        ]
-      }
-    ]
+            name: '其他',
+          },
+        ],
+      },
+    ],
   }
 }
 
 export function getEduFkOption(v, o) {
   const other = (o.fk || 0) - (v.yjs_fk || 0) - (v.bk_fk || 0) - (v.zk_fk || 0)
-  const other_qrz = (o.fk || 0) - (v.qrzyjs_fk || 0) - (v.qrzbk_fk || 0) - (v.qrzzk_fk || 0)
+  const other_qrz =
+    (o.fk || 0) - (v.qrzyjs_fk || 0) - (v.qrzbk_fk || 0) - (v.qrzzk_fk || 0)
   return {
     title: {
       text: '副科级干部学历分布',
-      left: 'center'
+      left: 'center',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {
       orient: 'vertical',
       // orient: 'horizontal',
-      left: 'left'
+      left: 'left',
     },
     series: [
       {
@@ -363,56 +434,56 @@ export function getEduFkOption(v, o) {
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: [0, '30%'],
         data: [
           {
             value: v.qrzyjs_fk || 0,
-            name: '全日制研究生'
+            name: '全日制研究生',
           },
           {
             value: v.qrzbk_fk || 0,
-            name: '全日制本科'
+            name: '全日制本科',
           },
           {
             value: v.qrzzk_fk || 0,
-            name: '全日制专科'
+            name: '全日制专科',
           },
           {
             value: other_qrz,
-            name: '全日制其他'
-          }
-        ]
+            name: '全日制其他',
+          },
+        ],
       },
       {
         type: 'pie',
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: ['45%', '60%'],
         data: [
           {
             value: v.yjs_fk || 0,
-            name: '研究生'
+            name: '研究生',
           },
           {
             value: v.bk_fk || 0,
-            name: '本科'
+            name: '本科',
           },
           {
             value: v.zk_fk || 0,
-            name: '专科'
+            name: '专科',
           },
           {
             value: other,
-            name: '其他'
-          }
-        ]
-      }
-    ]
+            name: '其他',
+          },
+        ],
+      },
+    ],
   }
 }
 
@@ -422,15 +493,15 @@ export function getLeaderEduOption(v, n) {
   return {
     title: {
       text: '学历分布',
-      left: 'center'
+      left: 'center',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {
       orient: 'vertical',
       // orient: 'horizontal',
-      left: 'left'
+      left: 'left',
     },
     series: [
       {
@@ -438,56 +509,56 @@ export function getLeaderEduOption(v, n) {
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: [0, '30%'],
         data: [
           {
             value: v.qrzyjs || 0,
-            name: '全日制研究生'
+            name: '全日制研究生',
           },
           {
             value: v.qrzbk || 0,
-            name: '全日制本科'
+            name: '全日制本科',
           },
           {
             value: v.qrzzk || 0,
-            name: '全日制专科'
+            name: '全日制专科',
           },
           {
             value: other_qrz,
-            name: '全日制其他'
-          }
-        ]
+            name: '全日制其他',
+          },
+        ],
       },
       {
         type: 'pie',
         label: {
           show: true,
           position: 'inner',
-          formatter: '{b}:{c}'
+          formatter: '{b}:{c}',
         },
         radius: ['45%', '60%'],
         data: [
           {
             value: v.yjs || 0,
-            name: '研究生'
+            name: '研究生',
           },
           {
             value: v.bk || 0,
-            name: '本科'
+            name: '本科',
           },
           {
             value: v.zk || 0,
-            name: '专科'
+            name: '专科',
           },
           {
             value: other,
-            name: '其他'
-          }
-        ]
-      }
-    ]
+            name: '其他',
+          },
+        ],
+      },
+    ],
   }
 }
 
@@ -496,34 +567,34 @@ export function getLeaderPostOption(v) {
   return {
     title: {
       text: '任职结构',
-      left: 'left'
+      left: 'left',
     },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
     },
     legend: {},
     radar: {
       // shape: 'circle',
       axisName: {
         formatter: '【{value}】',
-        color: '#428BD4'
+        color: '#428BD4',
       },
       splitArea: {
         areaStyle: {
           color: ['#77EADF', '#26C3BE', '#64AFE9', '#428BD4'],
           shadowColor: 'rgba(0, 0, 0, 0.2)',
-          shadowBlur: 10
-        }
+          shadowBlur: 10,
+        },
       },
       axisLine: {
         lineStyle: {
-          color: 'rgba(211, 253, 250, 0.8)'
-        }
+          color: 'rgba(211, 253, 250, 0.8)',
+        },
       },
       splitLine: {
         lineStyle: {
-          color: 'rgba(211, 253, 250, 0.8)'
-        }
+          color: 'rgba(211, 253, 250, 0.8)',
+        },
       },
       indicator: [
         { name: '低于2年', max: 7 },
@@ -532,31 +603,41 @@ export function getLeaderPostOption(v) {
         { name: '大于等于10年', max: 7 },
         { name: '1个职位经历', max: 7 },
         { name: '2个职位经历', max: 7 },
-        { name: '3个及以上职位经历', max: 7 }
-      ]
+        { name: '3个及以上职位经历', max: 7 },
+      ],
     },
     series: [
       {
         name: '副处级',
         type: 'radar',
-        data: [{
-          value: [v['year1'], v['year2'], v['year5'], v['year10'], v['post1'], v['post2'], v['post3']],
-          areaStyle: {
-            color: 'rgba(255, 228, 52, 0.6)'
-          }
-        }],
+        data: [
+          {
+            value: [
+              v['year1'],
+              v['year2'],
+              v['year5'],
+              v['year10'],
+              v['post1'],
+              v['post2'],
+              v['post3'],
+            ],
+            areaStyle: {
+              color: 'rgba(255, 228, 52, 0.6)',
+            },
+          },
+        ],
         label: {
           show: true,
-          position: 'top'
-        }
-      }
-    ]
+          position: 'top',
+        },
+      },
+    ],
   }
 }
 
 export function getOverviewString(o, v, age, edu) {
   return `${o.shortName}核定政法专项编制${v.headcount}名，实有${v.use}人，男女占比${v.male}:${v.female}，
-  平均年龄${(age['total'] / (age['num'] || 1)).toFixed(2)}岁，党员占比${fmt((v.communist) / (v.use || 1))}%（含预备党员），
+  平均年龄${(age['total'] / (age['num'] || 1)).toFixed(2)}岁，党员占比${fmt(v.communist / (v.use || 1))}%（含预备党员），
   本科及以上学历占比${fmt((edu['bk'] || 0) / v.use)}%，少数民族${v.minority}人，
   副厅级${v.ft}人，正处级${v.zc}人，副处级${v.fc}人，正科级${v.zk}人，副科级${v.fk}人。`
 }
@@ -601,10 +682,20 @@ export function getAgeString(o, v) {
   正科级${v['zk-55-59']}人，副科级${v['fk-55-59']}人。`
 }
 
-export function getLeaderAgeString(o, v) {
+function getPersonBeAge(leaders, age) {
+  const today = dayjs()
+  return leaders
+    .filter(
+      (i) => Math.floor(today.diff(dayjs(i.birthday), 'years', true)) === age,
+    )
+    .map((i) => i.personnelName)
+    .join('，')
+}
+
+export function getLeaderAgeString(o, v, leaders) {
   v = v ?? {}
   return `${o.shortName}班子成员平均年龄${((v['total'] || 0) / (v['num'] || 1)).toFixed(2)}岁，
-  最大${v['oldest'] || 0}岁，最小${v['youngest'] || 0}岁。
+  最大${v['oldest'] || 0}岁（${getPersonBeAge(leaders, v['oldest'] || 0)}），最小${v['youngest'] || 0}岁（${getPersonBeAge(leaders, v['youngest'] || 0)}）。
   其中副处级领导干部平均年龄${((v['fcTotal'] || 0) / (v['fcNum'] || 1)).toFixed(2)}岁，
   最大${v['fcOldest'] || 0}岁，最小${v['fcYoungest'] || 0}岁。
   30-34岁${v['30-34'] || 0}人，35-39岁${v['35-39'] || 0}人，
